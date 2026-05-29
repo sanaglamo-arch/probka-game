@@ -13,7 +13,7 @@
   const missionDefinitions = [
     { id: "daily_complete", title: "Двор дня", text: "Пройти уровень дня", reward: 20, target: 1 },
     { id: "three_stars", title: "Чистый выезд", text: "Получить 3 звезды", reward: 30, target: 1 },
-    { id: "no_undo", title: "Без отката", text: "Пройти любой уровень без Undo", reward: 40, target: 1 }
+    { id: "no_undo", title: "Без отката", text: "Пройти любой уровень без отмены", reward: 40, target: 1 }
   ];
 
   const els = {
@@ -50,6 +50,7 @@
     levelTitle: document.getElementById("levelTitle"),
     movesLabel: document.getElementById("movesLabel"),
     limitLabel: document.getElementById("limitLabel"),
+    moveMeter: document.getElementById("moveMeter"),
     winModal: document.getElementById("winModal"),
     winTitle: document.getElementById("winTitle"),
     starsLabel: document.getElementById("starsLabel"),
@@ -179,7 +180,7 @@
     els.levelsPanel.hidden = view !== "levels";
     els.garagePanel.hidden = view !== "garage";
     els.missionsPanel.hidden = view !== "missions";
-    els.stickyAd.hidden = view === "game";
+    els.stickyAd.hidden = view !== "menu";
     updateHud();
     if (view === "levels") renderLevelSelect();
     if (view === "garage") renderGarage();
@@ -197,20 +198,25 @@
     els.movesLabel.textContent = level ? `${moves} / ${limit} ходов` : `${moves} ${plural(moves, ["ход", "хода", "ходов"])}`;
     els.limitLabel.textContent = level ? `Осталось ${remaining}` : "";
     els.limitLabel.classList.toggle("danger", level && remaining <= 2);
+    if (els.moveMeter) {
+      const moveProgress = level && limit ? Math.min(100, Math.round((moves / limit) * 100)) : 0;
+      els.moveMeter.style.setProperty("--move-progress", `${moveProgress}%`);
+      els.moveMeter.classList.toggle("danger", level && remaining <= 2);
+    }
     els.playArea.classList.toggle("move-danger", level && remaining <= 2);
     renderActionButtons();
     els.dailyButton.setAttribute("aria-label", `Уровень дня, награда до ${getDailyRewardPreview()} монет`);
     els.skipButton.disabled = activeMode === "daily";
     els.muteButton.textContent = state.settings.muted ? "Тихо" : "Звук";
     els.muteButton.setAttribute("aria-pressed", String(state.settings.muted));
-    if (level) els.levelTitle.textContent = activeMode === "daily" ? `${level.title}: ${activeDailyDateKey}` : `${levelIndex + 1}. ${level.title}`;
+    if (level) els.levelTitle.textContent = activeMode === "daily" ? `${level.title} · ${formatShortDate(activeDailyDateKey)}` : `${levelIndex + 1}. ${level.title}`;
     updateMenuStatus();
   }
 
   function renderActionButtons() {
-    setToolButton(els.undoButton, "U", "Отмена", "ход назад");
-    setToolButton(els.hintButton, "?", "Подсказка", state.hints > 0 ? `${state.hints} в запасе` : "за рекламу");
-    setToolButton(els.skipButton, "AD", "Пропуск", activeMode === "daily" ? "недоступен" : "за рекламу");
+    setToolButton(els.undoButton, "↶", "Отмена", "ход назад");
+    setToolButton(els.hintButton, "?", "Подсказка", state.hints > 0 ? `${state.hints} в запасе` : "за видео");
+    setToolButton(els.skipButton, ">>", "Пропуск", activeMode === "daily" ? "недоступен" : "за видео");
   }
 
   function setToolButton(button, icon, title, subtitle) {
@@ -226,7 +232,7 @@
     const completion = getValidDailyCompletion(dateKey);
     if (els.dailyStatusLabel) {
       els.dailyStatusLabel.textContent = completion
-        ? `Сегодня: ${"★".repeat(completion.stars)}${"☆".repeat(3 - completion.stars)} · серия ${state.daily.streak.current}`
+        ? `Пройден: ${"★".repeat(completion.stars)}${"☆".repeat(3 - completion.stars)} · серия ${state.daily.streak.current}`
         : `Сложный двор · до ${getDailyRewardPreview()} монет`;
     }
     if (els.missionStatusLabel) {
@@ -235,7 +241,9 @@
         const record = state.daily.missions[mission.id];
         return record && !record.claimed && record.progress >= mission.target;
       }).length;
-      els.missionStatusLabel.textContent = available ? `${claimed} / ${missionDefinitions.length} · +${available}` : `${claimed} / ${missionDefinitions.length}`;
+      els.missionStatusLabel.textContent = available
+        ? `${claimed} / ${missionDefinitions.length} · ${available} готово`
+        : `${claimed} / ${missionDefinitions.length}`;
     }
     renderDailyWeek();
   }
@@ -448,7 +456,18 @@
       if (group.pack) {
         const title = document.createElement("div");
         title.className = "level-pack-title";
-        title.innerHTML = `<strong>${group.pack.title}</strong><span>${group.pack.subtitle}</span>`;
+        const completedCount = group.levels.filter((item) => state.completed[item.id]).length;
+        const progress = Math.round((completedCount / group.levels.length) * 100);
+        title.innerHTML = `
+          <div>
+            <strong>${group.pack.title}</strong>
+            <span>${group.pack.subtitle}</span>
+          </div>
+          <div class="level-pack-progress" style="--pack-progress: ${progress}%">
+            <b>${completedCount}/${group.levels.length}</b>
+            <i><span></span></i>
+          </div>
+        `;
         section.appendChild(title);
       }
 
@@ -471,10 +490,10 @@
       if (state.completed[item.id]) button.classList.add("done");
       if (index === state.currentLevelIndex) button.classList.add("current");
       const completion = state.completed[item.id];
-      const marker = completion ? `${"★".repeat(completion.stars)}${"☆".repeat(3 - completion.stars)}` : `D${item.difficulty || 1}`;
+      const marker = completion ? `${"★".repeat(completion.stars)}${"☆".repeat(3 - completion.stars)}` : `сл.${item.difficulty || 1}`;
       button.innerHTML = unlocked
         ? `<span class="level-number">${index + 1}</span><small>${marker}</small>`
-        : `<span class="level-number">×</span><small>lock</small>`;
+        : `<span class="level-number">${index + 1}</span><small>закр.</small>`;
       button.title = completion
         ? `${item.title}: ${completion.stars} зв., лучший результат ${completion.bestMoves} ходов`
         : unlocked
@@ -493,7 +512,11 @@
     const ownedCount = skins.filter((skin) => state.garage.ownedSkins[skin.id]).length;
     const equipped = getEquippedSkin();
     if (els.garageSummary) {
-      els.garageSummary.innerHTML = `<strong>${ownedCount} / ${skins.length}</strong> скинов открыто · выбрано: <strong>${equipped.name}</strong>`;
+      const progress = Math.round((ownedCount / skins.length) * 100);
+      els.garageSummary.innerHTML = `
+        <div><strong>${ownedCount} / ${skins.length}</strong> скинов открыто · надето: <strong>${equipped.name}</strong></div>
+        <div class="garage-meter" style="--garage-progress: ${progress}%"><span></span></div>
+      `;
     }
     skins.forEach((skin) => {
       const owned = Boolean(state.garage.ownedSkins[skin.id]);
@@ -518,10 +541,10 @@
 
       const button = document.createElement("button");
       if (equipped) {
-        button.textContent = "Выбрано";
+        button.textContent = "Надето";
         button.disabled = true;
       } else if (owned) {
-        button.textContent = "Выбрать";
+        button.textContent = "Надеть";
       } else if (canBuy) {
         button.textContent = "Купить";
       } else {
@@ -543,7 +566,7 @@
       state.garage.equippedSkinId = skin.id;
       saveProgress();
       playSound("button");
-      showToast(`${skin.name}: выбрано`);
+      showToast(`${skin.name}: надето`);
       renderGarage();
       draw();
       return;
@@ -568,7 +591,13 @@
     syncDailyMissions();
     els.missionsList.innerHTML = "";
     if (els.missionRefreshLabel) {
-      els.missionRefreshLabel.innerHTML = `Обновятся завтра по Москве · серия daily: <strong>${state.daily.streak.current}</strong>, рекорд: <strong>${state.daily.streak.best}</strong>`;
+      els.missionRefreshLabel.innerHTML = `
+        <span>Обновятся завтра по Москве</span>
+        <div class="mission-refresh-stats">
+          <strong>Серия ${state.daily.streak.current}</strong>
+          <strong>Рекорд ${state.daily.streak.best}</strong>
+        </div>
+      `;
     }
     missionDefinitions.forEach((mission) => {
       const record = state.daily.missions[mission.id] || createMissionRecord();
@@ -577,7 +606,9 @@
       const card = document.createElement("article");
       card.className = `mission-card${record.claimed ? " claimed" : ready ? " ready" : ""}`;
       const percent = Math.round((progress / mission.target) * 100);
+      const icon = mission.id === "daily_complete" ? "Д" : mission.id === "three_stars" ? "★" : "↶";
       card.innerHTML = `
+        <div class="mission-icon" aria-hidden="true">${icon}</div>
         <div class="mission-meta">
           <div class="mission-title"><strong>${mission.title}</strong><span>+${mission.reward} ₽</span></div>
           <span class="label">${mission.text}</span>
@@ -601,10 +632,11 @@
     els.dailyWeek.innerHTML = "";
     days.forEach((day) => {
       const item = document.createElement("div");
-      item.className = `daily-day${day.completion ? " done" : ""}${day.isToday ? " today" : ""}`;
-      const label = day.isToday ? "сегодня" : formatShortDate(day.dateKey);
-      const status = day.completion ? "★".repeat(day.completion.stars) : day.isFuture ? "скоро" : "—";
-      item.innerHTML = `<strong>${status}</strong><span>${label}</span>`;
+      item.className = `daily-day${day.completion ? " done" : ""}${day.isToday ? " today" : ""}${day.isFuture ? " future" : ""}`;
+      const dateLabel = formatShortDate(day.dateKey);
+      const status = day.completion ? "★".repeat(day.completion.stars) : day.isFuture ? "..." : "—";
+      const caption = day.isToday ? "сегодня" : day.completion ? "готово" : day.isFuture ? "скоро" : "мимо";
+      item.innerHTML = `<span class="daily-date">${dateLabel}</span><strong>${status}</strong><span class="daily-caption">${caption}</span>`;
       els.dailyWeek.appendChild(item);
     });
   }
@@ -616,6 +648,7 @@
     els.canvas.width = size;
     els.canvas.height = size;
     ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+    boardPad = gridSize > 10 ? 12 : gridSize > 8 ? 16 : 22;
     cellSize = (rect.width - boardPad * 2) / gridSize;
     draw();
   }
@@ -1083,7 +1116,7 @@
       flashHint();
       return;
     }
-    showRewarded("Подсказка", "Yandex rewarded video покажет следующий правильный ход.", () => {
+    showRewarded("Подсказка", "Рекламное видео в Яндекс Играх покажет следующий правильный ход.", () => {
       state.hints += 1;
       saveProgress();
       updateHud();
@@ -1303,11 +1336,11 @@
     if (isAnimating) return;
     if (activeMode === "daily") {
       playSound("bump");
-      showToast("Daily нельзя пропустить");
+      showToast("Уровень дня нельзя пропустить");
       return;
     }
     playSound("button");
-    showRewarded("Пропуск уровня", "После rewarded-рекламы следующий двор откроется сразу.", () => {
+    showRewarded("Пропуск уровня", "После рекламного видео следующий двор откроется сразу.", () => {
       const next = levels[levelIndex + 1];
       if (next) {
         state.unlocked[next.id] = true;
@@ -1330,7 +1363,7 @@
   function showInterstitial(callback) {
     showAd({
       title: "Рекламная пауза",
-      text: "Interstitial-реклама появится здесь между уровнями, когда подключим Yandex Games SDK.",
+      text: "Полноэкранная пауза появится здесь между уровнями после подключения Yandex Games SDK.",
       buttonText: "Продолжить",
       onClose: callback
     });
@@ -1377,7 +1410,7 @@
     }
     playSound("button");
     els.winModal.hidden = true;
-    showRewarded("Удвоить награду", "Rewarded-реклама удвоит монеты за этот уровень.", () => {
+    showRewarded("Удвоить награду", "Рекламное видео удвоит монеты за этот уровень.", () => {
       state.coins += lastReward;
       saveProgress();
       updateHud();
@@ -1474,39 +1507,43 @@
     const boardWidth = level.width * cellSize;
     const boardHeight = level.height * cellSize;
     const gradient = ctx.createLinearGradient(0, 0, width, height);
-    gradient.addColorStop(0, "#d8e0e8");
-    gradient.addColorStop(0.38, "#eef2f5");
-    gradient.addColorStop(1, "#c8d0d9");
+    gradient.addColorStop(0, "#eef9ff");
+    gradient.addColorStop(0.42, "#dbe8f1");
+    gradient.addColorStop(1, "#c7d2dc");
     ctx.fillStyle = gradient;
     roundedRect(ctx, 0, 0, width, height, 8);
     ctx.fill();
 
     ctx.save();
-    ctx.fillStyle = "#b9c2cc";
+    ctx.fillStyle = "#b7c4cf";
     ctx.fillRect(0, 0, width, boardPad * 0.72);
     ctx.fillRect(0, height - boardPad * 0.72, width, boardPad * 0.72);
-    ctx.fillStyle = "#f2c143";
-    ctx.fillRect(boardPad - 4, boardPad - 7, boardWidth + 8, 5);
-    ctx.fillRect(boardPad - 4, boardPad + boardHeight + 2, boardWidth + 8, 5);
-    ctx.fillRect(boardPad - 7, boardPad - 4, 5, boardHeight + 8);
-    ctx.fillRect(boardPad + boardWidth + 2, boardPad - 4, 5, boardHeight + 8);
+    ctx.fillStyle = "#f5c84b";
+    ctx.fillRect(boardPad - 5, boardPad - 7, boardWidth + 10, 5);
+    ctx.fillRect(boardPad - 5, boardPad + boardHeight + 2, boardWidth + 10, 5);
+    ctx.fillStyle = "#263343";
+    ctx.globalAlpha = 0.22;
+    ctx.fillRect(boardPad - 8, boardPad - 2, 5, boardHeight + 4);
+    ctx.fillRect(boardPad + boardWidth + 3, boardPad - 2, 5, boardHeight + 4);
+    ctx.globalAlpha = 1;
     ctx.restore();
 
     ctx.save();
     ctx.translate(boardPad, boardPad);
 
     const asphalt = ctx.createLinearGradient(0, 0, boardWidth, boardHeight);
-    asphalt.addColorStop(0, "#566170");
-    asphalt.addColorStop(0.5, "#46515f");
-    asphalt.addColorStop(1, "#353f4c");
+    asphalt.addColorStop(0, "#5d6876");
+    asphalt.addColorStop(0.46, "#46515f");
+    asphalt.addColorStop(1, "#303a47");
     ctx.fillStyle = asphalt;
     roundedRect(ctx, 0, 0, boardWidth, boardHeight, 7);
     ctx.fill();
 
     const exitLaneY = level.exit.row * cellSize;
-    ctx.fillStyle = "rgba(25, 191, 130, 0.1)";
+    ctx.fillStyle = "rgba(25, 191, 130, 0.11)";
     ctx.fillRect(cellSize * 0.08, exitLaneY + cellSize * 0.2, boardWidth - cellSize * 0.08, cellSize * 0.6);
 
+    const lineWidth = Math.max(1, Math.min(2, cellSize * 0.04));
     for (let y = 0; y < level.height; y += 1) {
       for (let x = 0; x < level.width; x += 1) {
         if ((x + y) % 2 === 0) {
@@ -1514,8 +1551,8 @@
           ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
         }
 
-        ctx.strokeStyle = "rgba(255, 216, 90, 0.27)";
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = "rgba(255, 216, 90, 0.25)";
+        ctx.lineWidth = lineWidth;
         ctx.beginPath();
         ctx.moveTo(x * cellSize + cellSize * 0.18, y * cellSize + cellSize * 0.16);
         ctx.lineTo(x * cellSize + cellSize * 0.82, y * cellSize + cellSize * 0.16);
@@ -1523,7 +1560,7 @@
       }
     }
 
-    ctx.strokeStyle = "rgba(255,255,255,0.13)";
+    ctx.strokeStyle = "rgba(255,255,255,0.11)";
     ctx.lineWidth = 1;
     for (let i = 0; i <= level.width; i += 1) {
       ctx.beginPath();
@@ -1538,8 +1575,8 @@
       ctx.stroke();
     }
 
-    ctx.strokeStyle = "rgba(255,255,255,0.42)";
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = "rgba(255,255,255,0.32)";
+    ctx.lineWidth = Math.max(1, cellSize * 0.035);
     ctx.setLineDash([cellSize * 0.26, cellSize * 0.2]);
     for (let row = 1; row < level.height; row += 2) {
       ctx.beginPath();
@@ -1549,13 +1586,19 @@
     }
     ctx.setLineDash([]);
 
-    ctx.fillStyle = "rgba(255,255,255,0.12)";
-    for (let i = 0; i < 34; i += 1) {
+    ctx.fillStyle = "rgba(255,255,255,0.1)";
+    const specks = Math.min(56, 20 + level.width * level.height * 0.24);
+    for (let i = 0; i < specks; i += 1) {
       const x = ((i * 37) % 100) / 100 * boardWidth;
       const y = ((i * 53) % 100) / 100 * boardHeight;
       const size = i % 5 === 0 ? 3 : 2;
       ctx.fillRect(x, y, size, size);
     }
+
+    ctx.strokeStyle = "rgba(255, 200, 61, 0.78)";
+    ctx.lineWidth = Math.max(2, cellSize * 0.05);
+    roundedRect(ctx, 1, 1, boardWidth - 2, boardHeight - 2, 7);
+    ctx.stroke();
 
     ctx.restore();
   }

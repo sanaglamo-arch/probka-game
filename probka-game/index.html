@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Пробка во дворе</title>
-    <link rel="stylesheet" href="./styles.css?v=smart-hints-1" />
+    <link rel="stylesheet" href="./styles.css?v=yandex-polish-3" />
   </head>
   <body>
     <div id="app" class="app">
@@ -21,28 +21,36 @@
 
       <main class="game-shell">
         <section class="panel menu-panel" id="menuPanel">
-          <div class="progress-card">
-            <div>
-              <span class="label">Текущий уровень</span>
-              <strong id="currentLevelLabel">1</strong>
-            </div>
-          </div>
-          <div class="menu-status">
-            <button class="status-card daily-status-card" id="dailyButton" type="button">
+          <div class="menu-dashboard">
+            <button class="daily-challenge-card daily-status-card" id="dailyButton" type="button">
               <span class="label">Уровень дня</span>
-              <strong id="dailyStatusLabel">Сегодня не пройден</strong>
+              <strong id="dailyStatusLabel">Сложный двор</strong>
+              <small>Ежедневный сложный двор</small>
             </button>
-            <div class="status-card">
-              <span class="label">Миссии</span>
-              <strong id="missionStatusLabel">0 / 3</strong>
+            <div class="dashboard-row">
+              <div class="progress-card campaign-card">
+                <span class="label">Кампания</span>
+                <strong id="currentLevelLabel">1</strong>
+                <small>текущий уровень</small>
+              </div>
+              <div class="status-card mission-status-card">
+                <span class="label">Миссии</span>
+                <strong id="missionStatusLabel">0 / 3</strong>
+                <small>награды дня</small>
+              </div>
             </div>
           </div>
           <div class="daily-week" id="dailyWeek" aria-label="Календарь уровня дня"></div>
           <button class="primary-button play-cta" id="playButton">Играть</button>
-          <button class="ghost-button" id="garageButton">Гараж</button>
-          <button class="ghost-button" id="missionsButton">Миссии</button>
-          <button class="ghost-button" id="levelSelectButton">Уровни</button>
-          <button class="ghost-button reset-button" id="resetButton">Сбросить прогресс</button>
+          <div class="menu-shortcuts">
+            <button class="ghost-button" id="garageButton">Гараж</button>
+            <button class="ghost-button" id="missionsButton">Миссии</button>
+            <button class="ghost-button" id="levelSelectButton">Уровни</button>
+          </div>
+          <details class="settings-strip">
+            <summary>Настройки</summary>
+            <button class="ghost-button reset-button" id="resetButton">Сбросить прогресс</button>
+          </details>
         </section>
 
         <section class="play-area" id="playArea" hidden>
@@ -52,6 +60,7 @@
               <span id="levelTitle">Первый выезд</span>
               <strong id="movesLabel">0 ходов</strong>
               <strong class="limit-label" id="limitLabel">Осталось 5</strong>
+              <div class="move-meter" id="moveMeter" aria-hidden="true"><span></span></div>
             </div>
             <div class="hud-actions">
               <button class="icon-button sound-button" id="muteButton" aria-label="Звук" aria-pressed="false">Звук</button>
@@ -97,7 +106,7 @@
         </section>
       </main>
 
-      <div class="sticky-ad" id="stickyAd">Площадка под Yandex banner</div>
+      <div class="sticky-ad" id="stickyAd">Место для баннера Yandex Games</div>
       <div class="toast" id="toast" hidden></div>
     </div>
 
@@ -108,7 +117,7 @@
         <p id="starsLabel" class="stars">★★★</p>
         <p id="rewardLabel">+25 монет</p>
         <div class="modal-actions">
-          <button class="primary-button" id="doubleRewardButton">x2 за рекламу</button>
+          <button class="primary-button" id="doubleRewardButton">x2 за видео</button>
           <button class="ghost-button" id="nextLevelButton">Следующий</button>
         </div>
       </div>
@@ -127,14 +136,14 @@
       <div class="modal-card ad-card">
         <p class="eyebrow">Yandex Games</p>
         <h2 id="adTitle">Рекламная пауза</h2>
-        <div class="ad-frame">AD</div>
+        <div class="ad-frame">Реклама</div>
         <p id="adText">Здесь будет рекламный показ.</p>
         <button class="primary-button" id="closeAdButton">Продолжить</button>
       </div>
     </div>
 
-    <script src="./levels.js?v=smart-hints-1"></script>
-    <script src="./daily.js?v=smart-hints-1"></script>
-    <script src="./game.js?v=smart-hints-1"></script>
+    <script src="./levels.js?v=yandex-polish-3"></script>
+    <script src="./daily.js?v=yandex-polish-3"></script>
+    <script src="./game.js?v=yandex-polish-3"></script>
   </body>
 </html>
