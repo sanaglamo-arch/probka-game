@@ -1,17 +1,23 @@
 (function () {
   const root = typeof window !== "undefined" ? window : globalThis;
   const TIME_ZONE = "Europe/Moscow";
-  const DAILY_SIZE = 14;
-  const DAILY_ROW = 7;
-  const DAILY_BLOCKER_COLUMNS = [2, 5, 8, 11];
-  const DAILY_TOP_LOCKS = [
-    { id: "top_lock_2", x: 1, pocketX: 0, blockerX: 2 },
-    { id: "top_lock_5", x: 4, pocketX: 3, blockerX: 5 },
-    { id: "top_lock_8", x: 7, pocketX: 6, blockerX: 8 },
-    { id: "top_lock_11", x: 10, pocketX: 9, blockerX: 11 }
-  ];
-  const DAILY_COLORS = ["#4aa3ff", "#55d6a8", "#ffd166", "#e8edf2", "#b889ff", "#ff9f43", "#9ba6b2"];
+  const DAILY_SIZE = 6;
+  const CAR_COLORS = ["#4aa3ff", "#55d6a8", "#ffd166", "#e8edf2", "#b889ff", "#ff9f43", "#9ba6b2"];
   const OBSTACLE_KINDS = ["bin", "cone", "snow", "gate"];
+  const DAILY_CLASSIC_LAYOUTS = [
+    layout(52, "oxCCMNDDDKMNAAJKooooJEEoIFFLooIGGLox", "fogleman/rush", 1),
+    layout(53, "ooBBoxDDDKooAAJKoMooJEEMIFFLooIGGLox", "fogleman/rush", 2),
+    layout(53, "ooBBoxDDDKooAAJKoMooJEEMIFFLooIGGLHH", "fogleman/rush", 3),
+    layout(53, "BBBCCNDDoxMNJAAoMOJoKFFOGGKLooxIILoo", "fogleman/rush", 4),
+    layout(54, "BBBKCCDDoKoLIAAKoLIoJEEMFFJooMooxoHH", "fogleman/rush", 5),
+    layout(54, "oooJxoCCCJLoHAAKLoHoIKDDooIEEMoFFoxM", "fogleman/rush", 6),
+    layout(54, "oooJLxCCCJLoHAAKooHoIKDDooIEEMoFFoxM", "fogleman/rush", 7),
+    layout(54, "oxCCMoDDDKMoAAJKooooJLEEIFFLoNIGGoxN", "fogleman/rush", 8),
+    layout(55, "ooBBMxDDDKMoAAJKoNooJEENIFFLooIGGLHH", "fogleman/rush", 9),
+    layout(55, "ooBBMxDDDKMoAAJKoNooJEENIFFLooIGGLox", "fogleman/rush", 10),
+    layout(58, "BBoKMxDDDKMoIAALooIoJLEEooJFFNoGGoxN", "fogleman/rush", 11),
+    layout(60, "IBBxooIooLDDJAALooJoKEEMFFKooMGGHHHM", "fogleman/rush", 12)
+  ];
 
   const SKINS = [
     { id: "classic_red", name: "Красная классика", price: 0, color: "#ff5c68", accent: "#fff2a8", trim: "#2d1118", pattern: "rally", badge: "01" },
@@ -28,6 +34,10 @@
     getDailyLevel,
     solveLevel
   };
+
+  function layout(moves, board, source, sourceIndex) {
+    return { moves, board, source, sourceIndex };
+  }
 
   function getDateKey(date = new Date()) {
     if (typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
@@ -46,592 +56,164 @@
 
   function getDailyLevel(date = new Date()) {
     const dateKey = getDateKey(date);
-    const seed = hashString(`probka-hard-daily-v3:${dateKey}`);
-
-    for (let attempt = 0; attempt < 40; attempt += 1) {
-      const level = makeDailyCandidate(dateKey, seed + attempt * 7919, attempt);
-      const solved = solveLevel(level, level.moveLimit, 120000);
-      if (!solved.solved || solved.minMoves < 12 || solved.minMoves > 22) continue;
-      return finalizeDailyLevel(level, solved, seed, attempt);
-    }
-
-    const fallback = makeFallbackLevel(dateKey, seed);
-    const solved = solveLevel(fallback, fallback.moveLimit, 120000);
-    return finalizeDailyLevel(fallback, solved, seed, -1);
-  }
-
-  function makeDailyCandidate(dateKey, seed, attempt) {
-    const rng = createRng(seed);
-    const row = DAILY_ROW;
-    const occupied = new Set();
-    const level = createBaseLevel(dateKey, seed, row);
-
-    addVehicle(level, occupied, {
-      id: "red",
-      x: 0,
-      y: row,
-      length: 2,
-      axis: "horizontal",
-      color: "#ff5c68"
-    });
-
-    DAILY_TOP_LOCKS.forEach((lock, index) => {
-      addVehicle(level, occupied, {
-        id: `pocket_${lock.blockerX}`,
-        kind: index % 2 ? "compact" : "sedan",
-        x: lock.pocketX,
-        y: row - 3,
-        length: 2,
-        axis: "vertical",
-        color: DAILY_COLORS[(seed + index * 5 + 2) % DAILY_COLORS.length]
-      });
-    });
-
-    DAILY_TOP_LOCKS.forEach((lock, index) => {
-      addVehicle(level, occupied, {
-        id: lock.id,
-        kind: "delivery",
-        x: lock.x,
-        y: row - 2,
-        length: 2,
-        axis: "horizontal",
-        color: DAILY_COLORS[(seed + index * 2) % DAILY_COLORS.length]
-      });
-    });
-
-    DAILY_BLOCKER_COLUMNS.forEach((x, index) => {
-      addVehicle(level, occupied, {
-        id: `block_${x}`,
-        kind: index === 0 ? "taxi" : "van",
-        x,
-        y: row - 1,
-        length: 2,
-        axis: "vertical",
-        color: DAILY_COLORS[(seed + index * 3 + 1) % DAILY_COLORS.length]
-      });
-    });
-
-    DAILY_BLOCKER_COLUMNS.forEach((x, index) => {
-      addObstacleIfFree(level, occupied, {
-        id: `bottom_stop_${x}`,
-        kind: index % 2 ? "gate" : "cone",
-        x,
-        y: row + 1
-      });
-    });
-
-    [{ x: DAILY_SIZE - 1, y: row - 2 }, { x: 0, y: row + 1 }].forEach((point, index) => {
-      addObstacleIfFree(level, occupied, {
-        id: `chain_stop_${index + 1}`,
-        kind: index ? "gate" : "bin",
-        ...point
-      });
-    });
-
-    shuffle(makeHardFillerCandidates(), rng).forEach((candidate) => {
-      if (level.vehicles.length >= 26 + (attempt % 3)) return;
-      addVehicleIfFree(level, occupied, {
-        id: `daily_car_${level.vehicles.length}`,
-        ...candidate,
-        color: DAILY_COLORS[(seed + level.vehicles.length * 5) % DAILY_COLORS.length]
-      });
-    });
-
-    shuffle(makeHardObstacleCandidates(), rng).forEach((point) => {
-      if (level.obstacles.length >= 12) return;
-      addObstacleIfFree(level, occupied, {
-        id: `obstacle_${level.obstacles.length + 1}`,
-        kind: OBSTACLE_KINDS[(seed + level.obstacles.length) % OBSTACLE_KINDS.length],
-        ...point
-      });
-    });
-
-    level.dailyPlan = buildDailyPlan(level);
-    return level;
-  }
-
-  function makeFallbackLevel(dateKey, seed) {
-    const occupied = new Set();
-    const level = createBaseLevel(dateKey, seed, DAILY_ROW);
-    addVehicle(level, occupied, { id: "red", x: 0, y: DAILY_ROW, length: 2, axis: "horizontal", color: "#ff5c68" });
-    DAILY_TOP_LOCKS.forEach((lock, index) => {
-      addVehicle(level, occupied, {
-        id: `pocket_${lock.blockerX}`,
-        kind: index % 2 ? "compact" : "sedan",
-        x: lock.pocketX,
-        y: DAILY_ROW - 3,
-        length: 2,
-        axis: "vertical",
-        color: DAILY_COLORS[(index + 1) % DAILY_COLORS.length]
-      });
-    });
-    DAILY_TOP_LOCKS.forEach((lock, index) => {
-      addVehicle(level, occupied, {
-        id: lock.id,
-        kind: "delivery",
-        x: lock.x,
-        y: DAILY_ROW - 2,
-        length: 2,
-        axis: "horizontal",
-        color: DAILY_COLORS[index % DAILY_COLORS.length]
-      });
-    });
-    DAILY_BLOCKER_COLUMNS.forEach((x, index) => {
-      addVehicle(level, occupied, {
-        id: `block_${x}`,
-        kind: index === 0 ? "taxi" : "van",
-        x,
-        y: DAILY_ROW - 1,
-        length: 2,
-        axis: "vertical",
-        color: DAILY_COLORS[(index + 2) % DAILY_COLORS.length]
-      });
-    });
-    DAILY_BLOCKER_COLUMNS.forEach((x, index) => {
-      addObstacleIfFree(level, occupied, {
-        id: `bottom_stop_${x}`,
-        kind: index % 2 ? "gate" : "cone",
-        x,
-        y: DAILY_ROW + 1
-      });
-    });
-    [{ x: DAILY_SIZE - 1, y: DAILY_ROW - 2 }, { x: 0, y: DAILY_ROW + 1 }].forEach((point, index) => {
-      addObstacleIfFree(level, occupied, {
-        id: `chain_stop_${index + 1}`,
-        kind: "gate",
-        ...point
-      });
-    });
-    makeHardFillerCandidates().slice(0, 10).forEach((vehicle, index) => {
-      addVehicleIfFree(level, occupied, { id: `daily_car_${index + 1}`, ...vehicle, color: DAILY_COLORS[(index + 4) % DAILY_COLORS.length] });
-    });
-    makeHardObstacleCandidates().forEach((point, index) => {
-      if (level.obstacles.length >= 12) return;
-      addObstacleIfFree(level, occupied, {
-        id: `obstacle_${index + 1}`,
-        kind: OBSTACLE_KINDS[index % OBSTACLE_KINDS.length],
-        ...point
-      });
-    });
-    level.dailyPlan = buildDailyPlan(level);
-    return level;
-  }
-
-  function createBaseLevel(dateKey, seed, row) {
-    return {
+    const seed = hashString(`probka-classic-daily-v1:${dateKey}`);
+    const source = DAILY_CLASSIC_LAYOUTS[seed % DAILY_CLASSIC_LAYOUTS.length];
+    const flipVertical = Math.floor(seed / DAILY_CLASSIC_LAYOUTS.length) % 2 === 1;
+    const board = flipVertical ? flipBoardVertical(source.board) : source.board;
+    const level = parseClassicBoard(board, {
       id: `daily_${dateKey.replace(/-/g, "_")}`,
       packId: "daily",
       title: "Уровень дня",
       introText: `Двор дня: ${dateKey}`,
-      difficulty: 5,
+      seed,
+      sourceMeta: {
+        kind: "classic_rush_hour_daily",
+        source: source.source,
+        sourceIndex: source.sourceIndex,
+        sourceBoard: source.board,
+        board,
+        sourceMoves: source.moves,
+        variant: flipVertical ? "vertical_flip" : "base"
+      }
+    });
+
+    if (typeof document !== "undefined") {
+      return finalizeDailyLevel(level, { solved: true, minMoves: source.moves, explored: 0, method: "classic-meta" });
+    }
+
+    const solved = solveLevel(level, source.moves + 14, 500000);
+    if (!solved.solved) {
+      throw new Error(`${level.id}: daily classic source is unsolved`);
+    }
+    return finalizeDailyLevel(level, solved);
+  }
+
+  function parseClassicBoard(board, metadata) {
+    if (board.length !== DAILY_SIZE * DAILY_SIZE) throw new Error(`${metadata.id}: classic board must be 36 cells`);
+    const groups = new Map();
+    const obstacles = [];
+
+    for (let index = 0; index < board.length; index += 1) {
+      const mark = board[index];
+      const x = index % DAILY_SIZE;
+      const y = Math.floor(index / DAILY_SIZE);
+      if (mark === "o" || mark === ".") continue;
+      if (mark === "x") {
+        obstacles.push({ id: `obstacle_${obstacles.length + 1}`, kind: OBSTACLE_KINDS[obstacles.length % OBSTACLE_KINDS.length], x, y });
+        continue;
+      }
+      if (!groups.has(mark)) groups.set(mark, []);
+      groups.get(mark).push({ x, y });
+    }
+
+    const vehicles = Array.from(groups.entries())
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([mark, cells], index) => makeClassicVehicle(mark, cells, index));
+    const target = vehicles.find((vehicle) => vehicle.id === "red");
+    if (!target) throw new Error(`${metadata.id}: missing target car`);
+
+    return {
+      ...metadata,
+      difficulty: 10,
       difficultyScore: 0,
       minMoves: 0,
       searchStates: 0,
-      seed,
       width: DAILY_SIZE,
       height: DAILY_SIZE,
-      exit: { side: "right", row },
+      exit: { side: "right", row: target.y },
       targetVehicleId: "red",
-      targetMoves: { threeStars: 18, twoStars: 24 },
-      moveLimit: 32,
-      vehicles: [],
-      obstacles: [],
+      targetMoves: { threeStars: 3, twoStars: 5 },
+      moveLimit: 70,
+      vehicles,
+      obstacles,
       actors: []
     };
   }
 
-  function finalizeDailyLevel(level, solved, seed, attempt) {
-    const minMoves = Number.isFinite(solved.minMoves) ? solved.minMoves : 3;
-    level.seed = seed;
-    level.dailyAttempt = attempt;
+  function makeClassicVehicle(mark, cells, index) {
+    const xs = Array.from(new Set(cells.map((cell) => cell.x)));
+    const ys = Array.from(new Set(cells.map((cell) => cell.y)));
+    const axis = xs.length === 1 ? "vertical" : "horizontal";
+    const x = Math.min(...cells.map((cell) => cell.x));
+    const y = Math.min(...cells.map((cell) => cell.y));
+    const length = cells.length;
+    if (length < 2 || length > 3) throw new Error(`classic vehicle ${mark} has invalid length ${length}`);
+    if (axis === "horizontal") {
+      if (ys.length !== 1 || !isContiguous(xs)) throw new Error(`classic vehicle ${mark} is not contiguous`);
+    } else if (xs.length !== 1 || !isContiguous(ys)) {
+      throw new Error(`classic vehicle ${mark} is not contiguous`);
+    }
+
+    return {
+      id: mark === "A" ? "red" : `classic_${mark.toLowerCase()}`,
+      x,
+      y,
+      length,
+      axis,
+      color: mark === "A" ? "#ff5c68" : CAR_COLORS[Math.abs(index + mark.charCodeAt(0)) % CAR_COLORS.length],
+      kind: mark === "A" ? "target" : getClassicVehicleKind(axis, length)
+    };
+  }
+
+  function finalizeDailyLevel(level, solved) {
+    const minMoves = Number.isFinite(solved.minMoves) ? solved.minMoves : level.sourceMeta.sourceMoves;
     level.minMoves = minMoves;
     level.searchStates = solved.explored || 0;
-    level.moveLimit = Math.max(28, minMoves + 12);
+    level.moveLimit = minMoves + 10;
     level.targetMoves = {
-      threeStars: Math.min(level.moveLimit, minMoves + 3),
-      twoStars: Math.min(level.moveLimit, minMoves + 8)
+      threeStars: Math.min(level.moveLimit, minMoves + 2),
+      twoStars: Math.min(level.moveLimit, minMoves + 6)
     };
-    level.difficultyScore = Math.round(
-      minMoves * 12 + level.vehicles.length * 3 + level.obstacles.length * 4 + level.actors.length * 7 + (attempt < 0 ? 0 : attempt)
-    );
-    level.difficulty = clamp(Math.ceil((level.difficultyScore - 20) / 10), 1, 10);
+    level.difficultyScore = Math.round(minMoves * 16 + level.vehicles.length * 4 + level.obstacles.length * 8);
+    level.difficulty = 10;
     return level;
   }
 
-  function buildDailyPlan(level) {
-    const target = level.vehicles.find((vehicle) => vehicle.id === level.targetVehicleId);
-    const moves = [];
-    [...DAILY_TOP_LOCKS].reverse().forEach((lock) => {
-      moves.push({ id: `pocket_${lock.blockerX}`, delta: -2 });
-      moves.push({ id: lock.id, delta: -1 });
-      moves.push({ id: `block_${lock.blockerX}`, delta: -1 });
-    });
-    if (target) moves.push({ id: target.id, delta: level.width - target.length - target.x });
-    return moves;
-  }
-
-  function makeHardFillerCandidates() {
-    return [
-      { x: 0, y: 0, length: 3, axis: "horizontal", kind: "wagon" },
-      { x: 3, y: 0, length: 2, axis: "horizontal", kind: "compact" },
-      { x: 5, y: 0, length: 2, axis: "horizontal", kind: "delivery" },
-      { x: 7, y: 0, length: 3, axis: "horizontal", kind: "wagon" },
-      { x: 10, y: 0, length: 3, axis: "horizontal", kind: "delivery" },
-      { x: 1, y: 1, length: 2, axis: "horizontal", kind: "compact" },
-      { x: 4, y: 1, length: 3, axis: "horizontal", kind: "delivery" },
-      { x: 8, y: 1, length: 3, axis: "horizontal", kind: "wagon" },
-      { x: 11, y: 1, length: 2, axis: "horizontal", kind: "sedan" },
-      { x: 1, y: 2, length: 2, axis: "horizontal", kind: "taxi" },
-      { x: 4, y: 2, length: 2, axis: "horizontal", kind: "compact" },
-      { x: 7, y: 2, length: 2, axis: "horizontal", kind: "sedan" },
-      { x: 10, y: 2, length: 3, axis: "horizontal", kind: "wagon" },
-      { x: 1, y: 3, length: 2, axis: "horizontal", kind: "compact" },
-      { x: 4, y: 3, length: 2, axis: "horizontal", kind: "taxi" },
-      { x: 7, y: 3, length: 2, axis: "horizontal", kind: "compact" },
-      { x: 10, y: 3, length: 3, axis: "horizontal", kind: "delivery" },
-      { x: 1, y: 9, length: 3, axis: "horizontal", kind: "wagon" },
-      { x: 5, y: 9, length: 2, axis: "horizontal", kind: "compact" },
-      { x: 8, y: 9, length: 3, axis: "horizontal", kind: "delivery" },
-      { x: 0, y: 10, length: 2, axis: "horizontal", kind: "sedan" },
-      { x: 3, y: 10, length: 3, axis: "horizontal", kind: "wagon" },
-      { x: 7, y: 10, length: 2, axis: "horizontal", kind: "compact" },
-      { x: 10, y: 10, length: 3, axis: "horizontal", kind: "taxi" },
-      { x: 0, y: 11, length: 3, axis: "horizontal", kind: "delivery" },
-      { x: 4, y: 11, length: 2, axis: "horizontal", kind: "sedan" },
-      { x: 7, y: 11, length: 3, axis: "horizontal", kind: "wagon" },
-      { x: 11, y: 11, length: 2, axis: "horizontal", kind: "compact" },
-      { x: 0, y: 12, length: 2, axis: "horizontal", kind: "taxi" },
-      { x: 3, y: 12, length: 3, axis: "horizontal", kind: "wagon" },
-      { x: 7, y: 12, length: 2, axis: "horizontal", kind: "compact" },
-      { x: 10, y: 12, length: 3, axis: "horizontal", kind: "delivery" },
-      { x: 0, y: 13, length: 3, axis: "horizontal", kind: "sedan" },
-      { x: 4, y: 13, length: 2, axis: "horizontal", kind: "compact" },
-      { x: 7, y: 13, length: 3, axis: "horizontal", kind: "wagon" },
-      { x: 11, y: 13, length: 2, axis: "horizontal", kind: "taxi" }
-    ];
-  }
-
-  function makeHardObstacleCandidates() {
-    return [
-      { x: 13, y: 1 },
-      { x: 13, y: 2 },
-      { x: 12, y: 4 },
-      { x: 13, y: 4 },
-      { x: 1, y: 6 },
-      { x: 4, y: 6 },
-      { x: 7, y: 6 },
-      { x: 10, y: 6 },
-      { x: 1, y: 8 },
-      { x: 4, y: 8 },
-      { x: 7, y: 8 },
-      { x: 10, y: 8 },
-      { x: 12, y: 8 },
-      { x: 13, y: 8 }
-    ];
-  }
-
-  function makeFillerCandidates(row) {
-    return [
-      { x: 0, y: 0, length: 2, axis: "horizontal" },
-      { x: 0, y: 5, length: 2, axis: "horizontal" },
-      { x: 1, y: row <= 2 ? 4 : 1, length: 2, axis: "horizontal" },
-      { x: 2, y: 0, length: 2, axis: "horizontal" },
-      { x: 2, y: 5, length: 2, axis: "horizontal" },
-      { x: 0, y: row <= 2 ? 3 : 1, length: 2, axis: "vertical" },
-      { x: 5, y: row <= 2 ? 3 : 0, length: 2, axis: "vertical" }
-    ];
-  }
-
-  function makeObstacleCandidates(level, occupied) {
-    const target = level.vehicles.find((vehicle) => vehicle.id === level.targetVehicleId);
-    const result = [];
-    for (let y = 0; y < level.height; y += 1) {
-      for (let x = 0; x < level.width; x += 1) {
-        const point = { x, y };
-        if (occupied.has(cellKey(x, y))) continue;
-        if (target && point.y === target.y && point.x >= target.x + target.length) continue;
-        if (pointTouchesProtectedLane(level, point)) continue;
-        result.push(point);
-      }
-    }
-    return result;
-  }
-
-  function chooseVerticalY(row, length, rng) {
-    const candidates = [];
-    for (let y = 0; y <= 6 - length; y += 1) {
-      if (row >= y && row < y + length) candidates.push(y);
-    }
-    return candidates[Math.floor(rng() * candidates.length)] || Math.max(0, Math.min(6 - length, row - 1));
-  }
-
-  function addVehicle(level, occupied, vehicle) {
-    if (!addVehicleIfFree(level, occupied, vehicle)) {
-      throw new Error(`${level.id}: cannot place ${vehicle.id}`);
-    }
-  }
-
-  function addVehicleIfFree(level, occupied, vehicle) {
-    for (let i = 0; i < vehicle.length; i += 1) {
-      const x = vehicle.x + (vehicle.axis === "horizontal" ? i : 0);
-      const y = vehicle.y + (vehicle.axis === "vertical" ? i : 0);
-      if (!inside(level, x, y) || occupied.has(cellKey(x, y))) return false;
-    }
-    for (let i = 0; i < vehicle.length; i += 1) {
-      const x = vehicle.x + (vehicle.axis === "horizontal" ? i : 0);
-      const y = vehicle.y + (vehicle.axis === "vertical" ? i : 0);
-      occupied.add(cellKey(x, y));
-    }
-    level.vehicles.push(vehicle);
-    return true;
-  }
-
-  function addObstacleIfFree(level, occupied, obstacle) {
-    const key = cellKey(obstacle.x, obstacle.y);
-    if (!inside(level, obstacle.x, obstacle.y) || occupied.has(key)) return false;
-    occupied.add(key);
-    level.obstacles.push(obstacle);
-    return true;
-  }
-
-  function vehicleTouchesProtectedLane(level, vehicle) {
-    for (let i = 0; i < vehicle.length; i += 1) {
-      const x = vehicle.x + (vehicle.axis === "horizontal" ? i : 0);
-      const y = vehicle.y + (vehicle.axis === "vertical" ? i : 0);
-      if (pointTouchesProtectedLane(level, { x, y })) return true;
-    }
-    return false;
-  }
-
-  function pointTouchesProtectedLane(level, point) {
-    const target = level.vehicles.find((vehicle) => vehicle.id === level.targetVehicleId);
-    if (!target) return false;
-    return level.vehicles.some((vehicle) => {
-      if (vehicle.id === target.id || vehicle.axis !== "vertical") return false;
-      if (!vehicleOccupiesRow(vehicle, target.y, target.x + target.length)) return false;
-      return point.x === vehicle.x && !vehicleOccupiesCell(vehicle, point.x, point.y);
-    });
-  }
-
-  function solveLevel(level, cap, maxStates) {
-    const plannedDaily = solveDailyPlannedLevel(level);
-    if (plannedDaily && plannedDaily.moves <= cap) {
-      return { solved: true, minMoves: plannedDaily.moves, explored: 0, method: "daily-plan" };
-    }
-
-    const constructive = solveByClearingTargetLine(level);
-    if (constructive && constructive.moves <= cap) return { solved: true, minMoves: constructive.moves, explored: 0, method: "target-line" };
-
-    const hardDaily = solveByClearingTargetLineWithHelpers(level);
-    if (hardDaily && hardDaily.moves <= cap) return { solved: true, minMoves: hardDaily.moves, explored: 0, method: "target-line-helpers" };
-
-    if (level.packId === "daily" && level.width >= 10) {
-      return { solved: false, minMoves: Infinity, explored: 0, aborted: true, method: "daily-constructive" };
-    }
-
-    const start = level.vehicles.map((vehicle) => ({ ...vehicle }));
-    const queue = [{ vehicles: start, depth: 0 }];
-    const seen = new Set([stateKey(start)]);
+  function solveLevel(level, cap = 80, maxStates = 500000) {
+    const start = level.vehicles.map((vehicle) => ({ x: vehicle.x, y: vehicle.y }));
+    const startKey = stateKey(start);
+    const queue = [{ state: start, depth: 0 }];
+    const seen = new Set([startKey]);
     let cursor = 0;
-    let aborted = false;
 
-    while (cursor < queue.length && !aborted) {
+    while (cursor < queue.length) {
       const item = queue[cursor];
       cursor += 1;
-      if (isSolved(level, item.vehicles)) return { solved: true, minMoves: item.depth, explored: seen.size, method: "bfs" };
+      if (isSolved(level, item.state)) return { solved: true, minMoves: item.depth, explored: seen.size, method: "bfs" };
       if (item.depth >= cap) continue;
 
-      item.vehicles.forEach((vehicle, index) => {
-        if (aborted) return;
-        const occupied = occupiedCells(level, item.vehicles, index);
-        [-1, 1].forEach((direction) => {
-          if (aborted) return;
+      for (let index = 0; index < level.vehicles.length; index += 1) {
+        const vehicle = { ...level.vehicles[index], ...item.state[index] };
+        const occupied = occupiedCells(level, item.state, index);
+        for (const direction of [-1, 1]) {
           for (let delta = direction; Math.abs(delta) < level.width; delta += direction) {
             if (!canPlace(level, vehicle, delta, occupied)) break;
-            const next = item.vehicles.map((itemVehicle) => ({ ...itemVehicle }));
-            next[index].x += vehicle.axis === "horizontal" ? delta : 0;
-            next[index].y += vehicle.axis === "vertical" ? delta : 0;
+            const next = item.state.map((position) => ({ ...position }));
+            next[index] = {
+              x: item.state[index].x + (vehicle.axis === "horizontal" ? delta : 0),
+              y: item.state[index].y + (vehicle.axis === "vertical" ? delta : 0)
+            };
             const key = stateKey(next);
             if (seen.has(key)) continue;
             seen.add(key);
             if (seen.size > maxStates) {
-              aborted = true;
-              return;
+              return { solved: false, minMoves: Infinity, explored: seen.size, aborted: true, method: "bfs" };
             }
-            queue.push({ vehicles: next, depth: item.depth + 1 });
+            queue.push({ state: next, depth: item.depth + 1 });
           }
-        });
-      });
-    }
-
-    return { solved: false, minMoves: Infinity, explored: seen.size, aborted };
-  }
-
-  function solveDailyPlannedLevel(level) {
-    if (!Array.isArray(level.dailyPlan) || !level.dailyPlan.length) return null;
-
-    const vehicles = level.vehicles.map((vehicle) => ({ ...vehicle }));
-    let moves = 0;
-    for (const move of level.dailyPlan) {
-      const index = vehicles.findIndex((vehicle) => vehicle.id === move.id);
-      if (index < 0 || !Number.isInteger(move.delta) || move.delta === 0) return null;
-      const vehicle = vehicles[index];
-      const occupied = occupiedCells(level, vehicles, index);
-      if (!canTravel(level, vehicle, move.delta, occupied)) return null;
-      vehicle.x += vehicle.axis === "horizontal" ? move.delta : 0;
-      vehicle.y += vehicle.axis === "vertical" ? move.delta : 0;
-      moves += 1;
-    }
-
-    return isSolved(level, vehicles) ? { moves } : null;
-  }
-
-  function solveByClearingTargetLineWithHelpers(level) {
-    const vehicles = level.vehicles.map((vehicle) => ({ ...vehicle }));
-    const targetIndex = vehicles.findIndex((vehicle) => vehicle.id === level.targetVehicleId);
-    if (targetIndex < 0) return null;
-    const target = vehicles[targetIndex];
-    let moves = 0;
-
-    for (let guard = 0; guard < level.width * 2; guard += 1) {
-      const blockingIndexes = vehicles
-        .map((vehicle, index) => ({ vehicle, index }))
-        .filter((item) => item.index !== targetIndex && vehicleOccupiesRow(item.vehicle, target.y, target.x + target.length))
-        .map((item) => item.index);
-      if (!blockingIndexes.length) break;
-
-      const planned = findNextClearingMove(level, vehicles, blockingIndexes, target.y);
-      if (!planned) return null;
-
-      if (planned.helperIndex !== undefined) {
-        const helper = vehicles[planned.helperIndex];
-        helper.x += helper.axis === "horizontal" ? planned.helperDelta : 0;
-        helper.y += helper.axis === "vertical" ? planned.helperDelta : 0;
-        moves += 1;
-      }
-
-      const blocker = vehicles[planned.blockerIndex];
-      const updatedOccupied = occupiedCells(level, vehicles, planned.blockerIndex);
-      if (!canTravel(level, blocker, planned.blockerDelta, updatedOccupied)) return null;
-      blocker.y += planned.blockerDelta;
-      moves += 1;
-    }
-
-    const occupied = occupiedCells(level, vehicles, targetIndex);
-    const delta = level.width - target.length - target.x;
-    if (delta < 0 || !canTravel(level, target, delta, occupied)) return null;
-    return { moves: moves + 1 };
-  }
-
-  function findNextClearingMove(level, vehicles, blockingIndexes, targetRow) {
-    for (const blockerIndex of [...blockingIndexes].sort((a, b) => vehicles[b].x - vehicles[a].x)) {
-      const blocker = vehicles[blockerIndex];
-      if (blocker.axis !== "vertical") continue;
-
-      const occupied = occupiedCells(level, vehicles, blockerIndex);
-      const directDelta = findClearingDelta(level, blocker, targetRow, occupied);
-      if (directDelta) return { blockerIndex, blockerDelta: directDelta };
-
-      const helperMove = findHelperClearingMove(level, vehicles, blockerIndex, targetRow);
-      if (helperMove) return { blockerIndex, ...helperMove };
-    }
-    return null;
-  }
-
-  function findHelperClearingMove(level, vehicles, blockerIndex, targetRow) {
-    const blocker = vehicles[blockerIndex];
-    const blockerDeltas = [];
-    for (let delta = -1; delta > -level.height; delta -= 1) blockerDeltas.push(delta);
-    for (let delta = 1; delta < level.height; delta += 1) blockerDeltas.push(delta);
-
-    for (const blockerDelta of blockerDeltas) {
-      const travelCells = getTravelCells(blocker, blockerDelta);
-      const movedBlocker = { ...blocker, y: blocker.y + blockerDelta };
-      if (vehicleOccupiesRow(movedBlocker, targetRow, blocker.x)) continue;
-      if (!travelCells.every((cell) => inside(level, cell.x, cell.y))) continue;
-      if (travelCells.some((cell) => (level.obstacles || []).some((obstacle) => obstacle.x === cell.x && obstacle.y === cell.y))) continue;
-
-      const helperIndexes = new Set();
-      travelCells.forEach((cell) => {
-        vehicles.forEach((vehicle, index) => {
-          if (index !== blockerIndex && vehicleOccupiesCell(vehicle, cell.x, cell.y)) helperIndexes.add(index);
-        });
-      });
-      if (helperIndexes.size !== 1) continue;
-
-      const helperIndex = Array.from(helperIndexes)[0];
-      const helperDelta = findHelperDelta(level, vehicles, helperIndex, travelCells);
-      if (!helperDelta) continue;
-      return { blockerDelta, helperIndex, helperDelta };
-    }
-
-    return null;
-  }
-
-  function findHelperDelta(level, vehicles, helperIndex, blockedCells) {
-    const helper = vehicles[helperIndex];
-    const occupied = occupiedCells(level, vehicles, helperIndex);
-    for (const direction of [-1, 1]) {
-      for (let delta = direction; Math.abs(delta) < level.width; delta += direction) {
-        if (!canPlace(level, helper, delta, occupied)) break;
-        const moved = {
-          ...helper,
-          x: helper.x + (helper.axis === "horizontal" ? delta : 0),
-          y: helper.y + (helper.axis === "vertical" ? delta : 0)
-        };
-        if (!blockedCells.some((cell) => vehicleOccupiesCell(moved, cell.x, cell.y))) return delta;
+        }
       }
     }
-    return 0;
+
+    return { solved: false, minMoves: Infinity, explored: seen.size, method: "bfs" };
   }
 
-  function solveByClearingTargetLine(level) {
-    const vehicles = level.vehicles.map((vehicle) => ({ ...vehicle }));
-    const targetIndex = vehicles.findIndex((vehicle) => vehicle.id === level.targetVehicleId);
-    if (targetIndex < 0) return null;
-    const target = vehicles[targetIndex];
-    let moves = 0;
-
-    for (let guard = 0; guard < level.width; guard += 1) {
-      const blockerIndex = vehicles.findIndex(
-        (vehicle, index) => index !== targetIndex && vehicleOccupiesRow(vehicle, target.y, target.x + target.length)
-      );
-      if (blockerIndex < 0) break;
-      const blocker = vehicles[blockerIndex];
-      if (blocker.axis !== "vertical") return null;
-      const occupied = occupiedCells(level, vehicles, blockerIndex);
-      const delta = findClearingDelta(level, blocker, target.y, occupied);
-      if (!delta) return null;
-      blocker.y += delta;
-      moves += 1;
-    }
-
-    const occupied = occupiedCells(level, vehicles, targetIndex);
-    const delta = level.width - target.length - target.x;
-    if (delta < 0 || !canTravel(level, target, delta, occupied)) return null;
-    return { moves: moves + 1 };
-  }
-
-  function findClearingDelta(level, vehicle, targetRow, occupied) {
-    const deltas = [];
-    for (let delta = -1; delta > -level.height; delta -= 1) deltas.push(delta);
-    for (let delta = 1; delta < level.height; delta += 1) deltas.push(delta);
-    return deltas.find((delta) => {
-      if (!canTravel(level, vehicle, delta, occupied)) return false;
-      const moved = { ...vehicle, y: vehicle.y + delta };
-      return !vehicleOccupiesRow(moved, targetRow, vehicle.x);
-    });
-  }
-
-  function occupiedCells(level, vehicles, skipIndex) {
+  function occupiedCells(level, state, skipIndex) {
     const occupied = new Set((level.obstacles || []).map((obstacle) => cellKey(obstacle.x, obstacle.y)));
-    vehicles.forEach((vehicle, index) => {
+    level.vehicles.forEach((vehicle, index) => {
       if (index === skipIndex) return;
-      for (let i = 0; i < vehicle.length; i += 1) {
-        const x = vehicle.x + (vehicle.axis === "horizontal" ? i : 0);
-        const y = vehicle.y + (vehicle.axis === "vertical" ? i : 0);
-        occupied.add(cellKey(x, y));
-      }
+      const positioned = { ...vehicle, ...state[index] };
+      vehicleCells(positioned).forEach((cell) => occupied.add(cellKey(cell.x, cell.y)));
     });
     return occupied;
   }
@@ -645,36 +227,11 @@
     return true;
   }
 
-  function canTravel(level, vehicle, delta, occupied) {
-    if (!delta) return false;
-    const direction = Math.sign(delta);
-    for (let step = direction; Math.abs(step) <= Math.abs(delta); step += direction) {
-      if (!canPlace(level, vehicle, step, occupied)) return false;
-    }
-    return true;
-  }
-
-  function isSolved(level, vehicles) {
-    const target = vehicles.find((vehicle) => vehicle.id === level.targetVehicleId);
-    return target && target.y === level.exit.row && target.x + target.length >= level.width;
-  }
-
-  function vehicleOccupiesRow(vehicle, row, afterX) {
-    for (let i = 0; i < vehicle.length; i += 1) {
-      const x = vehicle.x + (vehicle.axis === "horizontal" ? i : 0);
-      const y = vehicle.y + (vehicle.axis === "vertical" ? i : 0);
-      if (y === row && x >= afterX) return true;
-    }
-    return false;
-  }
-
-  function vehicleOccupiesCell(vehicle, cellX, cellY) {
-    for (let i = 0; i < vehicle.length; i += 1) {
-      const x = vehicle.x + (vehicle.axis === "horizontal" ? i : 0);
-      const y = vehicle.y + (vehicle.axis === "vertical" ? i : 0);
-      if (x === cellX && y === cellY) return true;
-    }
-    return false;
+  function isSolved(level, state) {
+    const targetIndex = level.vehicles.findIndex((vehicle) => vehicle.id === level.targetVehicleId);
+    if (targetIndex < 0) return false;
+    const target = level.vehicles[targetIndex];
+    return target.axis === "horizontal" && state[targetIndex].x + target.length >= level.width;
   }
 
   function vehicleCells(vehicle) {
@@ -688,68 +245,44 @@
     return cells;
   }
 
-  function getTravelCells(vehicle, delta) {
-    const cells = [];
-    const direction = Math.sign(delta);
-    for (let step = direction; Math.abs(step) <= Math.abs(delta); step += direction) {
-      for (let i = 0; i < vehicle.length; i += 1) {
-        cells.push({
-          x: vehicle.x + (vehicle.axis === "horizontal" ? i + step : 0),
-          y: vehicle.y + (vehicle.axis === "vertical" ? i + step : 0)
-        });
+  function flipBoardVertical(board) {
+    const result = Array(board.length).fill("o");
+    for (let y = 0; y < DAILY_SIZE; y += 1) {
+      for (let x = 0; x < DAILY_SIZE; x += 1) {
+        result[(DAILY_SIZE - 1 - y) * DAILY_SIZE + x] = board[y * DAILY_SIZE + x];
       }
     }
-    return cells;
+    return result.join("");
   }
 
-  function insideVehicle(level, vehicle) {
-    return vehicleCells(vehicle).every((cell) => inside(level, cell.x, cell.y));
+  function getClassicVehicleKind(axis, length) {
+    if (length === 3) return axis === "horizontal" ? "delivery" : "van";
+    return axis === "horizontal" ? "compact" : "sedan";
   }
 
-  function stateKey(vehicles) {
-    return vehicles.map((vehicle) => `${vehicle.x},${vehicle.y}`).join("|");
+  function isContiguous(values) {
+    const sorted = [...values].sort((a, b) => a - b);
+    return sorted.every((value, index) => index === 0 || value === sorted[index - 1] + 1);
   }
 
   function inside(level, x, y) {
     return Number.isInteger(x) && Number.isInteger(y) && x >= 0 && y >= 0 && x < level.width && y < level.height;
   }
 
+  function stateKey(state) {
+    return state.map((position) => `${position.x},${position.y}`).join("|");
+  }
+
   function cellKey(x, y) {
     return `${x},${y}`;
   }
 
-  function shuffle(items, rng) {
-    const result = [...items];
-    for (let i = result.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(rng() * (i + 1));
-      const item = result[i];
-      result[i] = result[j];
-      result[j] = item;
-    }
-    return result;
-  }
-
-  function createRng(seed) {
-    let value = seed >>> 0;
-    return function next() {
-      value += 0x6d2b79f5;
-      let t = value;
-      t = Math.imul(t ^ (t >>> 15), t | 1);
-      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-  }
-
   function hashString(value) {
     let hash = 2166136261;
-    for (let i = 0; i < value.length; i += 1) {
-      hash ^= value.charCodeAt(i);
+    for (let index = 0; index < value.length; index += 1) {
+      hash ^= value.charCodeAt(index);
       hash = Math.imul(hash, 16777619);
     }
     return hash >>> 0;
-  }
-
-  function clamp(value, min, max) {
-    return Math.max(min, Math.min(max, value));
   }
 })();

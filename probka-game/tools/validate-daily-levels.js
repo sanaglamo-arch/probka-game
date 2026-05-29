@@ -41,21 +41,28 @@ function validateDailyLevel(level, date) {
   if (ids.has(level.id)) errors.push(`${prefix}: duplicate id`);
   ids.add(level.id);
   if (level.packId !== "daily") errors.push(`${prefix}: packId must be daily`);
-  if (level.width !== 14 || level.height !== 14) errors.push(`${prefix}: hard daily must be 14x14`);
+  if (level.width !== 6 || level.height !== 6) errors.push(`${prefix}: daily classic challenge must be 6x6`);
   if (!Number.isInteger(level.seed)) errors.push(`${prefix}: missing integer seed`);
   if (!Number.isInteger(level.moveLimit) || level.moveLimit < 1) errors.push(`${prefix}: invalid moveLimit`);
-  if (!Number.isInteger(level.minMoves) || level.minMoves < 12 || level.minMoves > 22) {
-    errors.push(`${prefix}: minMoves must be within 12-22, got ${level.minMoves}`);
+  if (!Number.isInteger(level.minMoves) || level.minMoves < 50 || level.minMoves > 70) {
+    errors.push(`${prefix}: minMoves must be within 50-70, got ${level.minMoves}`);
   }
   if (!Number.isInteger(level.difficultyScore) || level.difficultyScore < 0) errors.push(`${prefix}: invalid difficultyScore`);
+  if (level.dailyPlan) errors.push(`${prefix}: must not use old dailyPlan solver shortcut`);
+  if (!level.sourceMeta || level.sourceMeta.kind !== "classic_rush_hour_daily") {
+    errors.push(`${prefix}: missing classic daily source metadata`);
+  }
+  if (level.sourceMeta && !["base", "vertical_flip"].includes(level.sourceMeta.variant)) {
+    errors.push(`${prefix}: invalid classic daily variant`);
+  }
 
   const target = (level.vehicles || []).find((vehicle) => vehicle.id === level.targetVehicleId);
   if (!target) errors.push(`${prefix}: missing target vehicle`);
   if (target && (target.axis !== "horizontal" || target.y !== level.exit.row)) {
     errors.push(`${prefix}: target must be horizontal on exit row`);
   }
-  if ((level.vehicles || []).length < 20) errors.push(`${prefix}: hard daily should have at least 20 vehicles`);
-  if ((level.obstacles || []).length < 8) errors.push(`${prefix}: hard daily should have at least 8 obstacles`);
+  if ((level.vehicles || []).length < 10) errors.push(`${prefix}: daily classic should have at least 10 vehicles`);
+  if ((level.actors || []).length) errors.push(`${prefix}: daily classic must not use actors yet`);
 
   (level.obstacles || []).forEach((obstacle) => {
     const key = `${obstacle.x},${obstacle.y}`;
@@ -82,10 +89,13 @@ function validateDailyLevel(level, date) {
     }
   });
 
-  const result = daily.solveLevel(level, level.moveLimit, 120000);
+  const result = daily.solveLevel(level, level.moveLimit, 500000);
   if (!result.solved) errors.push(`${prefix}: no solution within ${level.moveLimit} moves`);
   if (result.solved && result.minMoves !== level.minMoves) {
     errors.push(`${prefix}: stored minMoves ${level.minMoves} does not match solver ${result.minMoves}`);
+  }
+  if (result.solved && result.method !== "bfs") {
+    errors.push(`${prefix}: daily must be validated by bfs, got ${result.method || "unknown"}`);
   }
 }
 
