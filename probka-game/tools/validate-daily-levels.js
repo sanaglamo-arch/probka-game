@@ -3,19 +3,26 @@ const path = require("path");
 const vm = require("vm");
 
 const days = Number.parseInt(process.argv[2] || "120", 10);
+const bankPath = path.join(__dirname, "..", "level-bank.generated.js");
+const levelsPath = path.join(__dirname, "..", "levels.js");
+const skinsPath = path.join(__dirname, "..", "skins.js");
 const dailyPath = path.join(__dirname, "..", "daily.js");
-const code = fs.readFileSync(dailyPath, "utf8");
 const sandbox = { window: {}, console };
 const errors = [];
 const ids = new Set();
+const boards = new Set();
 
-vm.runInNewContext(code, sandbox, { filename: dailyPath });
+vm.runInNewContext(fs.readFileSync(bankPath, "utf8"), sandbox, { filename: bankPath });
+vm.runInNewContext(fs.readFileSync(levelsPath, "utf8"), sandbox, { filename: levelsPath });
+vm.runInNewContext(fs.readFileSync(skinsPath, "utf8"), sandbox, { filename: skinsPath });
+vm.runInNewContext(fs.readFileSync(dailyPath, "utf8"), sandbox, { filename: dailyPath });
 
 const daily = sandbox.window.PROBKA_DAILY;
 if (!daily || typeof daily.getDailyLevel !== "function") {
   errors.push("PROBKA_DAILY.getDailyLevel must be exported");
 } else {
   validateSkins(sandbox.window.PROBKA_SKINS);
+  validateDailyBank();
   for (let index = 0; index < days; index += 1) {
     const date = new Date(Date.UTC(2026, 4, 28 + index, 9, 0, 0));
     validateDailyLevel(daily.getDailyLevel(date), date);
@@ -28,7 +35,29 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Daily validation passed: ${days} generated day(s)`);
+console.log(`Daily validation passed: ${days} generated day(s), ${sandbox.window.PROBKA_DAILY_LEVELS.length} bank slot(s)`);
+
+function validateDailyBank() {
+  const regular = sandbox.window.PROBKA_LEVELS || [];
+  regular.forEach((level) => boards.add(level.board));
+  const dailyLevels = sandbox.window.PROBKA_DAILY_LEVELS || [];
+  if (dailyLevels.length !== 365) errors.push(`expected 365 daily bank levels, got ${dailyLevels.length}`);
+  const slots = new Set();
+  dailyLevels.forEach((level, index) => {
+    const prefix = level.id || `daily_slot_${index + 1}`;
+    if (level.dailyOrder !== index + 1) errors.push(`${prefix}: bad dailyOrder`);
+    if (slots.has(level.dateSlot)) errors.push(`${prefix}: duplicate dateSlot`);
+    slots.add(level.dateSlot);
+    if (boards.has(level.board)) errors.push(`${prefix}: overlaps regular mode board`);
+    boards.add(level.board);
+    if (!level.sourceMeta || level.sourceMeta.kind !== "classic_rush_hour_daily") {
+      errors.push(`${prefix}: missing classic daily source metadata`);
+    }
+    const replay = sandbox.window.PROBKA_LEVEL_TOOLS.solveSolutionPlan(level);
+    if (!replay.solved) errors.push(`${prefix}: solutionPlan failed (${replay.reason || "unknown"})`);
+    if (replay.solved && replay.moves !== level.minMoves) errors.push(`${prefix}: plan ${replay.moves} != minMoves ${level.minMoves}`);
+  });
+}
 
 function validateDailyLevel(level, date) {
   const prefix = level && level.id ? level.id : `daily for ${date.toISOString()}`;
@@ -43,17 +72,14 @@ function validateDailyLevel(level, date) {
   if (level.packId !== "daily") errors.push(`${prefix}: packId must be daily`);
   if (level.width !== 6 || level.height !== 6) errors.push(`${prefix}: daily classic challenge must be 6x6`);
   if (!Number.isInteger(level.seed)) errors.push(`${prefix}: missing integer seed`);
-  if (!Number.isInteger(level.moveLimit) || level.moveLimit < 1) errors.push(`${prefix}: invalid moveLimit`);
-  if (!Number.isInteger(level.minMoves) || level.minMoves < 50 || level.minMoves > 70) {
-    errors.push(`${prefix}: minMoves must be within 50-70, got ${level.minMoves}`);
+  if (level.moveLimit !== undefined && level.moveLimit !== null) errors.push(`${prefix}: daily must not have a moveLimit`);
+  if (!Number.isInteger(level.minMoves) || level.minMoves < 36 || level.minMoves > 70) {
+    errors.push(`${prefix}: minMoves must be within 36-70, got ${level.minMoves}`);
   }
   if (!Number.isInteger(level.difficultyScore) || level.difficultyScore < 0) errors.push(`${prefix}: invalid difficultyScore`);
   if (level.dailyPlan) errors.push(`${prefix}: must not use old dailyPlan solver shortcut`);
   if (!level.sourceMeta || level.sourceMeta.kind !== "classic_rush_hour_daily") {
     errors.push(`${prefix}: missing classic daily source metadata`);
-  }
-  if (level.sourceMeta && !["base", "vertical_flip"].includes(level.sourceMeta.variant)) {
-    errors.push(`${prefix}: invalid classic daily variant`);
   }
 
   const target = (level.vehicles || []).find((vehicle) => vehicle.id === level.targetVehicleId);
@@ -89,7 +115,9 @@ function validateDailyLevel(level, date) {
     }
   });
 
-  const result = daily.solveLevel(level, level.moveLimit, 500000);
+  const replay = sandbox.window.PROBKA_LEVEL_TOOLS.solveSolutionPlan(level);
+  if (!replay.solved) errors.push(`${prefix}: stored solutionPlan failed (${replay.reason || "unknown"})`);
+  const result = daily.solveLevel(level, level.minMoves + 12, 500000);
   if (!result.solved) errors.push(`${prefix}: no solution within ${level.moveLimit} moves`);
   if (result.solved && result.minMoves !== level.minMoves) {
     errors.push(`${prefix}: stored minMoves ${level.minMoves} does not match solver ${result.minMoves}`);
@@ -104,7 +132,7 @@ function validateSkins(skins) {
     errors.push("PROBKA_SKINS must be exported as an array");
     return;
   }
-  if (skins.length !== 6) errors.push(`expected 6 skins, got ${skins.length}`);
+  if (skins.length !== 18) errors.push(`expected 18 skins, got ${skins.length}`);
   const ids = new Set();
   let previousPrice = -1;
   skins.forEach((skin, index) => {
@@ -114,7 +142,7 @@ function validateSkins(skins) {
     if (!/^#[0-9a-fA-F]{6}$/.test(skin.color || "")) errors.push(`skin ${skin.id}: invalid color`);
     if (!/^#[0-9a-fA-F]{6}$/.test(skin.accent || "")) errors.push(`skin ${skin.id}: invalid accent`);
     if (!/^#[0-9a-fA-F]{6}$/.test(skin.trim || "")) errors.push(`skin ${skin.id}: invalid trim`);
-    if (!["rally", "checker", "parcel", "neon", "comet", "crown"].includes(skin.pattern)) {
+    if (!["rally", "checker", "parcel", "pizza", "neon", "siren", "medical", "hazard", "retro", "business", "stickers", "comet", "chrome", "graffiti", "cyber", "crown", "vip", "tow"].includes(skin.pattern)) {
       errors.push(`skin ${skin.id}: invalid pattern`);
     }
     if (!skin.badge || skin.badge.length > 3) errors.push(`skin ${skin.id}: badge must be 1-3 chars`);

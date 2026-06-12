@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Пробка во дворе</title>
+    <link rel="stylesheet" href="./styles.css?v=tooltap-3" />
+  </head>
+  <body>
+    <div id="app" class="app">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Головоломка во дворе</p>
+          <h1>Пробка во дворе</h1>
+        </div>
+        <div class="wallet" aria-label="Кошелек">
+          <span id="coins">0</span>
+          <span class="coin">₽</span>
+        </div>
+      </header>
+
+      <main class="game-shell">
+        <section class="panel menu-panel" id="menuPanel">
+          <div class="hub-hero">
+            <div class="hub-hero-copy">
+              <div class="hub-level-line">
+                <span>Уровень</span>
+                <strong id="currentLevelLabel">1</strong>
+              </div>
+              <p id="modeStatusLabel">На счет ходов · уровень 1</p>
+              <p>Разбери двор за минимум ходов и выведи свою машину.</p>
+            </div>
+            <div class="streak-panel" id="streakPanel" aria-label="Серия">
+              <svg class="streak-flame" viewBox="0 0 64 80" aria-hidden="true">
+                <defs>
+                  <linearGradient id="flameOuter" x1="18" y1="4" x2="46" y2="76" gradientUnits="userSpaceOnUse">
+                    <stop offset="0" stop-color="#ffe66d" />
+                    <stop offset="0.46" stop-color="#ff9f2f" />
+                    <stop offset="1" stop-color="#ff5f45" />
+                  </linearGradient>
+                  <linearGradient id="flameInner" x1="29" y1="26" x2="39" y2="66" gradientUnits="userSpaceOnUse">
+                    <stop offset="0" stop-color="#fff7b0" />
+                    <stop offset="1" stop-color="#ffd24f" />
+                  </linearGradient>
+                </defs>
+                <path class="flame-outer" d="M34.9 5.8c3.8 10.2 1.2 16.1-2.2 21.5 5.8-2.7 9.3-7.2 10.7-13.5 10.7 10.1 15.2 21.9 12.2 33.2C52.1 60 42.8 72.5 31.5 72.5 18.7 72.5 8.9 62.6 8.9 49.5c0-9.1 4.8-16.1 11.1-22.7 5.8-6.2 10.7-12 14.9-21z" fill="url(#flameOuter)" />
+                <path class="flame-inner" d="M35.1 36.1c6.7 6 9.2 12 7.4 18.2-1.7 6.1-6.3 10.9-11.9 10.9-6.2 0-11.2-4.9-11.2-11.4 0-4.7 2.6-8 5.9-11.7 2.8-3.1 5.3-6.2 6.7-11 1.7 2 2.5 3.6 3.1 5z" fill="url(#flameInner)" />
+              </svg>
+              <div class="streak-copy">
+                <span>Серия</span>
+                <strong id="streakCount">0</strong>
+                <small id="streakBest">Рекорд 0</small>
+              </div>
+            </div>
+            <button class="primary-button play-cta" id="playButton">Играть</button>
+          </div>
+
+          <div class="hub-section">
+            <button class="daily-challenge-card daily-status-card" id="dailyButton" type="button">
+              <span class="daily-card-copy">
+                <span class="label">Уровень дня</span>
+                <strong id="dailyStatusLabel">Сложный двор</strong>
+                <small>Сложный пазл на сегодня</small>
+              </span>
+              <span class="daily-card-badge" aria-hidden="true">HARD</span>
+            </button>
+          </div>
+
+          <div class="hub-nav">
+            <button class="nav-tile" id="levelSelectButton">
+              <span class="nav-icon">300</span>
+              <span><strong>Уровни</strong><small>3 режима · 300 уровней</small></span>
+            </button>
+            <button class="nav-tile" id="garageButton">
+              <span class="nav-icon">01</span>
+              <span><strong>Гараж</strong><small>Скины твоей машины</small></span>
+            </button>
+            <button class="nav-tile" id="missionsButton">
+              <span class="nav-icon">★</span>
+              <span><strong>Миссии</strong><small id="missionStatusLabel">0/3 выполнено</small></span>
+            </button>
+          </div>
+          <details class="settings-strip">
+            <summary>Настройки</summary>
+            <button class="ghost-button reset-button" id="resetButton">Сбросить прогресс</button>
+          </details>
+        </section>
+
+        <section class="panel modes-panel" id="modeSelectPanel" hidden>
+          <div class="panel-head">
+            <button class="icon-button" id="modesBackButton" aria-label="Назад">←</button>
+            <div class="screen-title">
+              <p class="eyebrow">Режимы</p>
+              <h2>Выбери двор</h2>
+            </div>
+          </div>
+          <div class="mode-grid" id="modeGrid"></div>
+        </section>
+
+        <section class="play-area" id="playArea" hidden>
+          <div class="hud">
+            <button class="icon-button" id="backButton" aria-label="Назад">←</button>
+            <div class="level-meta">
+              <span id="levelTitle">Первый выезд</span>
+              <strong id="movesLabel">0 ходов</strong>
+              <strong class="limit-label" id="limitLabel">Осталось 5</strong>
+              <div class="move-meter" id="moveMeter" aria-hidden="true"><span></span></div>
+            </div>
+            <div class="hud-actions">
+              <button class="icon-button sound-button" id="muteButton" aria-label="Звук" aria-pressed="false">Звук</button>
+              <button class="icon-button" id="restartButton" aria-label="Заново">↻</button>
+            </div>
+          </div>
+
+          <div class="board-wrap">
+            <canvas id="gameCanvas" width="720" height="720" aria-label="Игровое поле"></canvas>
+          </div>
+
+          <div class="actions">
+            <button class="tool-button" id="undoButton">Отмена</button>
+            <button class="tool-button" id="hintButton">Подсказка</button>
+            <button class="tool-button" id="skipButton">Пропуск</button>
+          </div>
+        </section>
+
+        <section class="panel levels-panel" id="levelsPanel" hidden>
+          <div class="panel-head">
+            <button class="icon-button" id="levelsBackButton" aria-label="Назад">←</button>
+            <div class="screen-title">
+              <p class="eyebrow" id="levelsEyebrow">Режим</p>
+              <h2 id="levelsTitle">Уровни</h2>
+            </div>
+          </div>
+          <div class="levels-grid" id="levelsGrid"></div>
+        </section>
+
+        <section class="panel garage-panel" id="garagePanel" hidden>
+          <div class="panel-head">
+            <button class="icon-button" id="garageBackButton" aria-label="Назад">←</button>
+            <div class="screen-title">
+              <p class="eyebrow">Косметика</p>
+              <h2>Гараж</h2>
+            </div>
+          </div>
+          <div class="garage-summary" id="garageSummary"></div>
+          <div class="garage-grid" id="garageGrid"></div>
+        </section>
+
+        <section class="panel missions-panel" id="missionsPanel" hidden>
+          <div class="panel-head">
+            <button class="icon-button" id="missionsBackButton" aria-label="Назад">←</button>
+            <div class="screen-title">
+              <p class="eyebrow">Награды</p>
+              <h2>Миссии</h2>
+            </div>
+          </div>
+          <div class="mission-refresh" id="missionRefreshLabel"></div>
+          <div class="missions-list" id="missionsList"></div>
+        </section>
+      </main>
+
+      <div class="toast" id="toast" hidden></div>
+    </div>
+
+    <div class="modal" id="winModal" hidden>
+      <div class="modal-card win-card">
+        <p class="eyebrow">Двор свободен</p>
+        <h2 id="winTitle">Уровень пройден</h2>
+        <p id="starsLabel" class="stars">★★★</p>
+        <p id="rewardLabel">+25 монет</p>
+        <div class="modal-actions">
+          <button class="primary-button" id="doubleRewardButton">Удвоить награду</button>
+          <button class="ghost-button" id="nextLevelButton">Следующий</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="failModal" hidden>
+      <div class="modal-card fail-card">
+        <p class="eyebrow" id="failEyebrow">Ходы закончились</p>
+        <h2 id="failTitle">Двор снова встал</h2>
+        <p id="failText">Лимит ходов исчерпан. Попробуй заново.</p>
+        <button class="primary-button" id="retryButton">Заново</button>
+      </div>
+    </div>
+
+    <script src="./yandex-sdk.js?v=yandex-1"></script>
+    <script src="./level-bank.generated.js?v=tooltap-3"></script>
+    <script src="./levels.js?v=tooltap-3"></script>
+    <script src="./daily.js?v=tooltap-3"></script>
+    <script src="./game.js?v=tooltap-3"></script>
+  </body>
+</html>

@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Probka Browser Smoke</title>
+    <style>
+      body { margin: 0; font: 14px system-ui, sans-serif; background: #0b111a; color: #e8f0ff; }
+      iframe { width: 420px; height: 860px; border: 0; position: absolute; left: 0; top: 56px; opacity: 0.01; pointer-events: none; }
+      pre { white-space: pre-wrap; padding: 16px; }
+    </style>
+  </head>
+  <body>
+    <pre id="result">RUNNING</pre>
+    <iframe id="gameFrame" title="game smoke frame"></iframe>
+    <script>
+      (async function () {
+        const result = document.getElementById("result");
+        const frame = document.getElementById("gameFrame");
+        const storageKey = "probka_vo_dvore_progress_v1";
+        const basePath = new URL("../", window.location.href).toString();
+        const checks = [];
+        let lastDragDebug = "";
+
+        function write(status, lines) {
+          result.textContent = `${status}\n${lines.join("\n")}`;
+          document.title = status;
+        }
+
+        function wait(ms) {
+          return new Promise((resolve) => setTimeout(resolve, ms));
+        }
+
+        function makeProgress(overrides = {}) {
+          const now = Date.now();
+          const base = {
+            progressVersion: 2,
+            currentLevelIndex: 0,
+            lastModeId: "moves",
+            currentLevelByMode: { free: 0, moves: 0, timed: 0 },
+            updatedAt: now,
+            coins: 0,
+            hints: 3,
+            completed: {},
+            unlocked: { free_001: true, moves_001: true, timed_001: true },
+            ad: { levelsSinceInterstitial: 0, completedLevels: 0 },
+            garage: {
+              ownedSkins: { classic_red: true },
+              equippedSkinId: "classic_red",
+              ownedYards: { quiet_yard: true },
+              equippedYardId: "quiet_yard"
+            },
+            daily: {
+              completions: {},
+              archiveUnlocks: {},
+              attempts: {},
+              streak: { current: 0, best: 0, lastDateKey: "" }
+            },
+            missions: { dateKey: "", records: {} },
+            tutorial: { completedVersion: 1 },
+            settings: { muted: true }
+          };
+          return merge(base, overrides);
+        }
+
+        function merge(base, overrides) {
+          Object.entries(overrides || {}).forEach(([key, value]) => {
+            if (value && typeof value === "object" && !Array.isArray(value) && base[key] && typeof base[key] === "object" && !Array.isArray(base[key])) {
+              base[key] = merge({ ...base[key] }, value);
+            } else {
+              base[key] = value;
+            }
+          });
+          return base;
+        }
+
+        function setProgress(progress) {
+          localStorage.setItem(storageKey, JSON.stringify(progress));
+        }
+
+        function readProgress() {
+          return JSON.parse(localStorage.getItem(storageKey) || "{}");
+        }
+
+        async function loadScenario(name, query, validate, options = {}) {
+          frame.style.width = options.width || "420px";
+          frame.style.height = options.height || "860px";
+          if (options.clearProgress) localStorage.removeItem(storageKey);
+          if (options.progress) setProgress(options.progress);
+          frame.src = `${basePath}?mockAds=1&qaInstant=1&qa=browser-smoke-${name}&${query}`;
+          await new Promise((resolve) => {
+            frame.onload = resolve;
+            setTimeout(resolve, 1800);
+          });
+          await wait(options.wait || 600);
+          const win = frame.contentWindow;
+          const doc = frame.contentDocument;
+          if (!win || !doc) throw new Error(`${name}: iframe document is unavailable`);
+          await validate(doc, win);
+          checks.push(`PASS ${name}`);
+          write("PROBKA_SMOKE_RUNNING", checks);
+        }
+
+        function requireVisible(doc, selector, label) {
+          const node = doc.querySelector(selector);
+          if (!node) throw new Error(`${label}: missing ${selector}`);
+          if (node.hidden) throw new Error(`${label}: ${selector} is hidden`);
+          return node;
+        }
+
+        function requireCanvasNonBlank(doc, label) {
+          const canvas = doc.querySelector("#gameCanvas");
+          if (!canvas) throw new Error(`${label}: canvas missing`);
+          const ctx = canvas.getContext("2d");
+          const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+          let colored = 0;
+          for (let i = 3; i < data.length; i += 64) {
+            if (data[i] > 0) colored += 1;
+            if (colored > 80) return;
+          }
+          throw new Error(`${label}: canvas appears blank`);
+        }
+
+        function requireNoRuntimeCopyLeaks(doc, label) {
+          const text = doc.body.textContent || "";
+          if (/\bHARD\b|Daily|debug|prototype|₽|заглуш/i.test(text)) {
+            throw new Error(`${label}: technical or inconsistent runtime copy is visible`);
+          }
+          if (/\b\d+\/10\b/.test(text)) throw new Error(`${label}: obsolete daily fraction is visible`);
+        }
+
+        function requireChildInside(parent, child, label) {
+          if (!parent || !child) throw new Error(`${label}: missing layout target`);
+          const parentRect = parent.getBoundingClientRect();
+          const childRect = child.getBoundingClientRect();
+          if (
+            childRect.left < parentRect.left ||
+            childRect.right > parentRect.right ||
+            childRect.top < parentRect.top ||
+            childRect.bottom > parentRect.bottom
+          ) {
+            throw new Error(`${label}: child overflows parent`);
+          }
+        }
+
+        function clickButtonByText(doc, text) {
+          const button = Array.from(doc.querySelectorAll("button")).find((item) => item.textContent.trim() === text);
+          if (!button) throw new Error(`button "${text}" missing`);
+          button.click();
+          return button;
+        }
+
+        function getLevel(win, id) {
+          const level = (win.PROBKA_LEVELS || []).find((item) => item.id === id);
+          if (!level) throw new Error(`level ${id} missing`);
+          return level;
+        }
+
+        function boardMetrics(doc, win, level) {
+          const canvas = doc.querySelector("#gameCanvas");
+          const rect = canvas.getBoundingClientRect();
+          const gridSize = level.width || 6;
+          const gridHeight = level.height || gridSize;
+          const progress = readProgress();
+          const yardId = progress.garage?.equippedYardId || "quiet_yard";
+          const yard = (win.PROBKA_YARDS || []).find((item) => item.id === yardId);
+          if (yard?.fullArtBoard && yard.gridFrame && gridSize === 6 && gridHeight === 6) {
+            const frame = yard.gridFrame;
+            const boardPadX = Math.round(rect.width * frame.left / 1024);
+            const boardPadY = Math.round(rect.width * frame.top / 1024);
+            const cellWidth = rect.width * ((frame.right - frame.left) / 1024) / gridSize;
+            const cellHeight = rect.width * ((frame.bottom - frame.top) / 1024) / gridSize;
+            return { canvas, rect, boardPadX, boardPadY, cellSize: Math.min(cellWidth, cellHeight) };
+          }
+          const boardPad = gridSize > 10 ? 12 : gridSize > 8 ? 16 : 22;
+          const cellSize = (rect.width - boardPad * 2) / gridSize;
+          return { canvas, rect, boardPadX: boardPad, boardPadY: boardPad, cellSize };
+        }
+
+        function pointForVehicle(doc, win, level, vehicle) {
+          const metrics = boardMetrics(doc, win, level);
+          const x = vehicle.x + (vehicle.axis === "horizontal" ? vehicle.length / 2 : 0.5);
+          const y = vehicle.y + (vehicle.axis === "vertical" ? vehicle.length / 2 : 0.5);
+          return {
+            x: metrics.rect.left + metrics.boardPadX + x * metrics.cellSize,
+            y: metrics.rect.top + metrics.boardPadY + y * metrics.cellSize,
+            metrics
+          };
+        }
+
+        function makePointerEvent(win, type, x, y) {
+          return new win.PointerEvent(type, {
+            bubbles: true,
+            cancelable: true,
+            clientX: x,
+            clientY: y,
+            pointerId: 7,
+            pointerType: "touch",
+            isPrimary: true,
+            button: 0,
+            buttons: type === "pointerup" ? 0 : 1
+          });
+        }
+
+        async function dragMove(doc, win, level, vehicles, move) {
+          const vehicle = vehicles.find((item) => item.id === move.id);
+          if (!vehicle) throw new Error(`drag: missing ${move.id}`);
+          const start = pointForVehicle(doc, win, level, vehicle);
+          const dx = vehicle.axis === "horizontal" ? move.delta * start.metrics.cellSize : 0;
+          const dy = vehicle.axis === "vertical" ? move.delta * start.metrics.cellSize : 0;
+          lastDragDebug = `${move.id}:${move.delta} rect=${Math.round(start.metrics.rect.width)}x${Math.round(start.metrics.rect.height)} pad=${start.metrics.boardPadX},${start.metrics.boardPadY} cell=${start.metrics.cellSize.toFixed(2)} start=${start.x.toFixed(1)},${start.y.toFixed(1)} end=${(start.x + dx).toFixed(1)},${(start.y + dy).toFixed(1)} vehicle=${vehicle.x},${vehicle.y}`;
+          start.metrics.canvas.dispatchEvent(makePointerEvent(win, "pointerdown", start.x, start.y));
+          await wait(24);
+          start.metrics.canvas.dispatchEvent(makePointerEvent(win, "pointermove", start.x + dx * 0.65, start.y + dy * 0.65));
+          await wait(24);
+          start.metrics.canvas.dispatchEvent(makePointerEvent(win, "pointermove", start.x + dx, start.y + dy));
+          await wait(24);
+          start.metrics.canvas.dispatchEvent(makePointerEvent(win, "pointerup", start.x + dx, start.y + dy));
+          vehicle.x += vehicle.axis === "horizontal" ? move.delta : 0;
+          vehicle.y += vehicle.axis === "vertical" ? move.delta : 0;
+          await wait(260);
+        }
+
+        async function replayLevel(doc, win, levelId, moveCount = Infinity) {
+          const level = getLevel(win, levelId);
+          if (win.PROBKA_QA && win.PROBKA_QA.replaySolution) {
+            const count = Number.isFinite(moveCount) ? moveCount : (level.solutionPlan || []).length;
+            const snapshot = await win.PROBKA_QA.replaySolution(count);
+            lastDragDebug = `qa-replay ${levelId} count=${count} moves=${snapshot.moves} win=${snapshot.winOpen} fail=${snapshot.failOpen}`;
+            return { level, vehicles: [], snapshot };
+          }
+          const vehicles = level.vehicles.map((vehicle) => ({ ...vehicle }));
+          const plan = (level.solutionPlan || []).slice(0, moveCount);
+          for (const move of plan) await dragMove(doc, win, level, vehicles, move);
+          return { level, vehicles };
+        }
+
+        try {
+          await loadScenario("menu", "showcase=1&screen=menu", (doc) => {
+            requireVisible(doc, "#menuPanel", "menu");
+            if (!/Пробка во дворе/.test(doc.body.textContent)) throw new Error("menu: title missing");
+            requireNoRuntimeCopyLeaks(doc, "menu");
+          });
+          await loadScenario("tutorial", "capture=mobile", async (doc, win) => {
+            requireVisible(doc, "#playArea", "tutorial");
+            requireVisible(doc, "#tutorialOverlay", "tutorial");
+            requireCanvasNonBlank(doc, "tutorial");
+            doc.querySelector("#tutorialNextButton").click();
+            await wait(160);
+            const canvas = doc.querySelector("#gameCanvas");
+            const level = {
+              width: 6,
+              vehicles: [
+                { id: "wrong", x: 0, y: 4, length: 2, axis: "horizontal" }
+              ]
+            };
+            const wrong = pointForVehicle(doc, win, level, level.vehicles[0]);
+            canvas.dispatchEvent(makePointerEvent(win, "pointerdown", wrong.x, wrong.y));
+            await wait(120);
+            const toast = doc.querySelector("#toast");
+            if (!toast || toast.hidden || !/подсвеченная машина/i.test(toast.textContent)) {
+              throw new Error("tutorial: wrong vehicle is not blocked with clear feedback");
+            }
+          }, { clearProgress: true });
+          await loadScenario("daily", "showcase=1&screen=daily&capture=mobile", (doc) => {
+            requireVisible(doc, "#dailyPanel", "daily");
+            if (!/Уровень дня/.test(doc.body.textContent)) throw new Error("daily: heading missing");
+            if (!/Июнь/.test(doc.body.textContent)) throw new Error("daily: current month missing");
+            if (/\b\d+\/10\b/.test(doc.body.textContent)) throw new Error("daily: obsolete difficulty fraction is visible");
+            if (/реклама/i.test(doc.querySelector("#dailyCalendarGrid")?.textContent || "")) throw new Error("daily: archive tile should use lock visual, not ad copy");
+            if (!doc.querySelector(".daily-calendar-day.locked .daily-lock-mark")) throw new Error("daily: locked archive state is missing lock mark");
+            const todayTile = doc.querySelector(".daily-month.current .daily-calendar-day.today");
+            requireChildInside(todayTile, todayTile?.querySelector("small"), "daily: today badge");
+            const visibleLockedTile = doc.querySelector(".daily-month.current .daily-calendar-day.ad-locked");
+            requireChildInside(visibleLockedTile, visibleLockedTile?.querySelector(".daily-lock-mark"), "daily: lock badge");
+            requireNoRuntimeCopyLeaks(doc, "daily");
+          });
+          await loadScenario("daily-archive", "showcase=1&screen=daily&capture=mobile", async (doc) => {
+            requireVisible(doc, "#dailyPanel", "daily archive");
+            const locked = doc.querySelector(".daily-calendar-day.ad-locked");
+            if (!locked) throw new Error("daily archive: locked past day missing");
+            locked.click();
+            await wait(120);
+            requireVisible(doc, "#archiveConfirmModal", "daily archive");
+            if (!/Смотреть рекламу/.test(doc.querySelector("#archiveWatchButton")?.textContent || "")) {
+              throw new Error("daily archive: confirm should offer rewarded unlock");
+            }
+            doc.querySelector("#archiveWatchButton").click();
+            await wait(760);
+            requireVisible(doc, "#playArea", "daily archive");
+            requireCanvasNonBlank(doc, "daily archive");
+          });
+          await loadScenario("daily-win", "showcase=1&screen=daily", async (doc, win) => {
+            requireVisible(doc, "#dailyPanel", "daily win");
+            doc.querySelector("#dailyTodayStartButton").click();
+            await wait(500);
+            requireVisible(doc, "#playArea", "daily win");
+            if (!win.PROBKA_QA || !win.PROBKA_QA.replaySolution) throw new Error("daily win: QA replay hook missing");
+            await win.PROBKA_QA.replaySolution();
+            await wait(500);
+            requireVisible(doc, "#winModal", "daily win");
+            if (doc.querySelector("#nextLevelButton")?.textContent.trim() !== "Календарь") throw new Error("daily win: calendar button missing");
+            if (doc.querySelector("#winMenuButton")?.hidden) throw new Error("daily win: menu button should be visible");
+            if (!doc.querySelector("#doubleRewardButton")?.hidden) throw new Error("daily win: x2 should be hidden");
+          });
+          await loadScenario("levels", "showcase=1&screen=levels&mode=moves", (doc) => {
+            requireVisible(doc, "#levelsPanel", "levels");
+            if (doc.querySelectorAll(".level-button").length < 80) throw new Error("levels: not enough level buttons rendered");
+            requireNoRuntimeCopyLeaks(doc, "levels");
+          });
+          await loadScenario("garage", "showcase=1&screen=garage", (doc) => {
+            requireVisible(doc, "#garagePanel", "garage");
+            if (doc.querySelectorAll(".skin-card").length < 18) throw new Error("garage: skin cards missing");
+            clickButtonByText(doc, "Дворы");
+            if (doc.querySelectorAll(".yard-card").length < 8) throw new Error("garage: yard cards missing");
+            if (/₽/.test(doc.querySelector("#garagePanel")?.textContent || "")) throw new Error("garage: real-currency symbol leaked into garage");
+          });
+          await loadScenario("garage-persist", "screen=garage", async (doc) => {
+            requireVisible(doc, "#garagePanel", "garage persist");
+            const buyButton = doc.querySelector(".skin-card.can-buy button");
+            if (!buyButton) throw new Error("garage persist: affordable skin missing");
+            buyButton.click();
+            await wait(260);
+            const saved = readProgress();
+            if (!saved.garage || saved.garage.equippedSkinId === "classic_red") {
+              throw new Error("garage persist: bought skin was not equipped in progress");
+            }
+            if (!saved.garage.ownedSkins || !saved.garage.ownedSkins[saved.garage.equippedSkinId]) {
+              throw new Error("garage persist: equipped skin was not marked owned");
+            }
+          }, { progress: makeProgress({ coins: 1000 }) });
+          await loadScenario("yards-persist", "screen=garage&lockYards=1", async (doc) => {
+            requireVisible(doc, "#garagePanel", "yards persist");
+            clickButtonByText(doc, "Дворы");
+            await wait(120);
+            const buyButton = doc.querySelector(".yard-card.can-buy button");
+            if (!buyButton) {
+              const yardCards = Array.from(doc.querySelectorAll(".yard-card"));
+              const activeTab = doc.querySelector(".garage-tab.active")?.textContent.trim() || "";
+              const details = yardCards.slice(0, 4).map((card) => `${card.className}:${card.textContent.replace(/\s+/g, " ").trim()}`).join(" | ");
+              throw new Error(`yards persist: affordable yard missing; coins=${doc.querySelector("#coins")?.textContent || ""}; active=${activeTab}; cards=${yardCards.length}; ${details}`);
+            }
+            buyButton.click();
+            await wait(260);
+            const saved = readProgress();
+            if (!saved.garage || saved.garage.equippedYardId === "quiet_yard") {
+              throw new Error("yards persist: bought yard was not equipped in progress");
+            }
+            if (!saved.garage.ownedYards || !saved.garage.ownedYards[saved.garage.equippedYardId]) {
+              throw new Error("yards persist: equipped yard was not marked owned");
+            }
+          }, { progress: makeProgress({ coins: 2200 }) });
+          await loadScenario("yards-reload", "screen=garage&lockYards=1", async (doc) => {
+            requireVisible(doc, "#garagePanel", "yards reload");
+            clickButtonByText(doc, "Дворы");
+            await wait(120);
+            const saved = readProgress();
+            if (!saved.garage?.equippedYardId || saved.garage.equippedYardId === "quiet_yard") {
+              throw new Error("yards reload: saved equipped yard missing");
+            }
+            const equipped = doc.querySelector(".yard-card.equipped");
+            if (!equipped || !/Надето/.test(equipped.textContent)) throw new Error("yards reload: equipped yard state is not visible");
+          });
+          await loadScenario("missions", "showcase=1&screen=missions", (doc) => {
+            requireVisible(doc, "#missionsPanel", "missions");
+            if (doc.querySelectorAll(".mission-card").length < 3) throw new Error("missions: mission cards missing");
+            if (/Серия/.test(doc.querySelector("#missionsPanel")?.textContent || "")) throw new Error("missions: streak should stay daily-only");
+            requireNoRuntimeCopyLeaks(doc, "missions");
+          });
+          await loadScenario("gameplay", "showcase=1&mode=moves&level=1", async (doc) => {
+            requireVisible(doc, "#playArea", "gameplay");
+            requireCanvasNonBlank(doc, "gameplay");
+            const hintButton = doc.querySelector("#hintButton");
+            if (!hintButton) throw new Error("gameplay: hint button missing");
+            hintButton.click();
+            await wait(400);
+            const toast = doc.querySelector("#toast");
+            if (!toast || toast.hidden || !/Подсказка|лучший ход|сдвинь/.test(toast.textContent)) {
+              throw new Error("gameplay: smart hint did not show useful feedback");
+            }
+          });
+          await loadScenario("win", "mode=free&level=1", async (doc, win) => {
+            requireVisible(doc, "#playArea", "win");
+            await replayLevel(doc, win, "free_001");
+            await wait(780);
+            if (doc.querySelector("#winModal")?.hidden) {
+              const movesText = doc.querySelector("#movesLabel")?.textContent || "";
+              const toastText = doc.querySelector("#toast")?.textContent || "";
+              throw new Error(`win: #winModal is hidden after replay, moves="${movesText}", toast="${toastText}", drag="${lastDragDebug}"`);
+            }
+            if (!/Уровень|двор/i.test(doc.querySelector("#winModal")?.textContent || "")) {
+              throw new Error("win: win modal copy missing");
+            }
+          }, { progress: makeProgress() });
+          await loadScenario("missions-claim", "mode=free&level=1", async (doc, win) => {
+            await replayLevel(doc, win, "free_001");
+            await wait(780);
+            const saved = readProgress();
+            const records = saved.missions && saved.missions.records ? saved.missions.records : {};
+            if (!records.three_stars?.claimed || !records.no_undo?.claimed) {
+              throw new Error("missions claim: completion missions were not auto-claimed");
+            }
+          }, { progress: makeProgress() });
+          await loadScenario("moves-fail", "mode=moves&level=1&qaMoveLimit=1", async (doc, win) => {
+            await replayLevel(doc, win, "moves_001", 1);
+            await wait(420);
+            requireVisible(doc, "#failModal", "moves fail");
+            if (!/Ходы закончились|Лимит ходов/.test(doc.querySelector("#failModal")?.textContent || "")) {
+              throw new Error("moves fail: wrong fail reason");
+            }
+          }, { progress: makeProgress() });
+          await loadScenario("timed", "showcase=1&mode=timed&level=1", (doc) => {
+            requireVisible(doc, "#playArea", "timed");
+            requireCanvasNonBlank(doc, "timed");
+            const limit = doc.querySelector("#limitLabel");
+            if (!limit || !/^\d+:\d{2}$/.test(limit.textContent.trim())) throw new Error("timed: timer label missing");
+          });
+          await loadScenario("timed-fail", "mode=timed&level=1&qaTimeLimit=1", async (doc) => {
+            requireVisible(doc, "#playArea", "timed fail");
+            if (!doc.defaultView.PROBKA_QA || !doc.defaultView.PROBKA_QA.expireTimer) throw new Error("timed fail: QA timer hook missing");
+            doc.defaultView.PROBKA_QA.expireTimer();
+            await wait(120);
+            requireVisible(doc, "#failModal", "timed fail");
+            if (!/Время вышло/.test(doc.querySelector("#failModal")?.textContent || "")) {
+              throw new Error("timed fail: wrong fail reason");
+            }
+          }, { progress: makeProgress(), wait: 200 });
+          await loadScenario("mobile-tools", "showcase=1&mode=moves&level=1&capture=mobile", (doc) => {
+            requireVisible(doc, "#playArea", "mobile tools");
+            ["#undoButton", "#hintButton", "#skipButton"].forEach((selector) => {
+              const rect = doc.querySelector(selector)?.getBoundingClientRect();
+              if (!rect || rect.width < 72 || rect.height < 44) throw new Error(`mobile tools: ${selector} touch target is too small`);
+            });
+          }, { width: "360px", height: "740px" });
+          write("PROBKA_SMOKE_PASS", checks);
+        } catch (error) {
+          write("PROBKA_SMOKE_FAIL", [...checks, error.message || String(error)]);
+        }
+      })();
+    </script>
+  </body>
+</html>

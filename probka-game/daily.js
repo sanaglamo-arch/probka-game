@@ -4,6 +4,8 @@
   const DAILY_SIZE = 6;
   const CAR_COLORS = ["#4aa3ff", "#55d6a8", "#ffd166", "#e8edf2", "#b889ff", "#ff9f43", "#9ba6b2"];
   const OBSTACLE_KINDS = ["bin", "cone", "snow", "gate"];
+  const DAILY_LEVELS = Array.isArray(root.PROBKA_DAILY_LEVELS) ? root.PROBKA_DAILY_LEVELS : [];
+  const MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   const DAILY_CLASSIC_LAYOUTS = [
     layout(52, "oxCCMNDDDKMNAAJKooooJEEoIFFLooIGGLox", "fogleman/rush", 1),
     layout(53, "ooBBoxDDDKooAAJKoMooJEEMIFFLooIGGLox", "fogleman/rush", 2),
@@ -19,19 +21,11 @@
     layout(60, "IBBxooIooLDDJAALooJoKEEMFFKooMGGHHHM", "fogleman/rush", 12)
   ];
 
-  const SKINS = [
-    { id: "classic_red", name: "Красная классика", price: 0, color: "#ff5c68", accent: "#fff2a8", trim: "#2d1118", pattern: "rally", badge: "01" },
-    { id: "taxi_yellow", name: "Шашечный рывок", price: 120, color: "#ffd166", accent: "#2d2100", trim: "#fff2a8", pattern: "checker", badge: "T" },
-    { id: "mint_courier", name: "Курьерский болид", price: 180, color: "#55d6a8", accent: "#ffcc4d", trim: "#113d34", pattern: "parcel", badge: "GO" },
-    { id: "night_blue", name: "Ночной неон", price: 260, color: "#4aa3ff", accent: "#8ff7ff", trim: "#101a35", pattern: "neon", badge: "N" },
-    { id: "violet_share", name: "Комета каршеринга", price: 360, color: "#b889ff", accent: "#ff7ad9", trim: "#24143d", pattern: "comet", badge: "77" },
-    { id: "gold_yard", name: "Золотая легенда", price: 500, color: "#ff9f43", accent: "#fff2a8", trim: "#4a2600", pattern: "crown", badge: "VIP" }
-  ];
-
-  root.PROBKA_SKINS = SKINS;
   root.PROBKA_DAILY = {
     getDateKey,
     getDailyLevel,
+    getDailyCalendar,
+    getDailyIndex,
     solveLevel
   };
 
@@ -56,36 +50,70 @@
 
   function getDailyLevel(date = new Date()) {
     const dateKey = getDateKey(date);
-    const seed = hashString(`probka-classic-daily-v1:${dateKey}`);
-    const source = DAILY_CLASSIC_LAYOUTS[seed % DAILY_CLASSIC_LAYOUTS.length];
-    const flipVertical = Math.floor(seed / DAILY_CLASSIC_LAYOUTS.length) % 2 === 1;
-    const board = flipVertical ? flipBoardVertical(source.board) : source.board;
-    const level = parseClassicBoard(board, {
-      id: `daily_${dateKey.replace(/-/g, "_")}`,
-      packId: "daily",
-      title: "Уровень дня",
-      introText: `Двор дня: ${dateKey}`,
-      seed,
-      sourceMeta: {
-        kind: "classic_rush_hour_daily",
-        source: source.source,
-        sourceIndex: source.sourceIndex,
-        sourceBoard: source.board,
-        board,
-        sourceMoves: source.moves,
-        variant: flipVertical ? "vertical_flip" : "base"
+    const index = getDailyIndex(dateKey);
+    const source = DAILY_LEVELS[index];
+    if (!source) throw new Error(`daily level bank is missing slot ${index + 1}`);
+    const level = cloneLevel(source);
+    level.id = `daily_${dateKey.replace(/-/g, "_")}`;
+    level.packId = "daily";
+    level.modeId = "daily";
+    level.modeOrder = index + 1;
+    level.title = "Уровень дня";
+    level.introText = `Календарный вызов: ${formatHumanDate(dateKey)}`;
+    level.dateKey = dateKey;
+    level.seed = source.dailyOrder || index + 1;
+    level.moveLimit = undefined;
+    return level;
+  }
+
+  function getDailyCalendar(year = Number(getDateKey().slice(0, 4))) {
+    const slots = [];
+    MONTH_LENGTHS.forEach((length, monthIndex) => {
+      for (let day = 1; day <= length; day += 1) {
+        const dateKey = `${year}-${String(monthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        const index = getDailyIndex(dateKey);
+        const source = DAILY_LEVELS[index];
+        slots.push({
+          dateKey,
+          index,
+          month: monthIndex + 1,
+          day,
+          dateSlot: `${String(monthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
+          levelId: source ? source.id : "",
+          minMoves: source ? source.minMoves : 0,
+          difficulty: source ? source.difficulty : 0
+        });
       }
     });
+    return slots;
+  }
 
-    if (typeof document !== "undefined") {
-      return finalizeDailyLevel(level, { solved: true, minMoves: source.moves, explored: 0, method: "classic-meta" });
-    }
+  function getDailyIndex(date = new Date()) {
+    const dateKey = getDateKey(date);
+    const [, rawMonth, rawDay] = dateKey.split("-").map(Number);
+    const month = Math.max(1, Math.min(12, rawMonth));
+    const day = month === 2 && rawDay === 29 ? 28 : Math.max(1, Math.min(MONTH_LENGTHS[month - 1], rawDay));
+    let index = 0;
+    for (let i = 0; i < month - 1; i += 1) index += MONTH_LENGTHS[i];
+    return Math.max(0, Math.min(364, index + day - 1));
+  }
 
-    const solved = solveLevel(level, source.moves + 14, 500000);
-    if (!solved.solved) {
-      throw new Error(`${level.id}: daily classic source is unsolved`);
-    }
-    return finalizeDailyLevel(level, solved);
+  function cloneLevel(level) {
+    return {
+      ...level,
+      exit: { ...(level.exit || {}) },
+      targetMoves: { ...(level.targetMoves || {}) },
+      sourceMeta: { ...(level.sourceMeta || {}) },
+      vehicles: (level.vehicles || []).map((vehicle) => ({ ...vehicle })),
+      obstacles: (level.obstacles || []).map((obstacle) => ({ ...obstacle })),
+      actors: (level.actors || []).map((actor) => ({ ...actor, path: (actor.path || []).map((point) => ({ ...point })) })),
+      solutionPlan: (level.solutionPlan || []).map((move) => ({ ...move }))
+    };
+  }
+
+  function formatHumanDate(dateKey) {
+    const [, month, day] = dateKey.split("-");
+    return `${day}.${month}`;
   }
 
   function parseClassicBoard(board, metadata) {
@@ -123,7 +151,7 @@
       exit: { side: "right", row: target.y },
       targetVehicleId: "red",
       targetMoves: { threeStars: 3, twoStars: 5 },
-      moveLimit: 70,
+      moveLimit: null,
       vehicles,
       obstacles,
       actors: []
@@ -159,10 +187,10 @@
     const minMoves = Number.isFinite(solved.minMoves) ? solved.minMoves : level.sourceMeta.sourceMoves;
     level.minMoves = minMoves;
     level.searchStates = solved.explored || 0;
-    level.moveLimit = minMoves + 10;
+    delete level.moveLimit;
     level.targetMoves = {
-      threeStars: Math.min(level.moveLimit, minMoves + 2),
-      twoStars: Math.min(level.moveLimit, minMoves + 6)
+      threeStars: minMoves + 2,
+      twoStars: minMoves + 6
     };
     level.difficultyScore = Math.round(minMoves * 16 + level.vehicles.length * 4 + level.obstacles.length * 8);
     level.difficulty = 10;

@@ -1,0 +1,20 @@
+{
+  "board": {
+    "width": 1024,
+    "height": 1024
+  },
+  "gridFrame": {
+    "left": 125,
+    "top": 125,
+    "right": 845,
+    "bottom": 845
+  },
+  "cell": 120,
+  "wideVisualExitFrame": {
+    "x": 845,
+    "y": 305,
+    "width": 179,
+    "height": 403,
+    "note": "Wide visual opening intentionally covers most of the right side so AI art does not need one-cell exit precision."
+  }
+}
