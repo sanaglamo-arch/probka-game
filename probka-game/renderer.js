@@ -2059,33 +2059,19 @@
     const roadY = y + (cellSize - roadHeight) / 2;
     const outWidth = Math.max(20, Math.min(boardPad * 0.78, cellSize * 0.62));
     const curbHeight = Math.max(5, cellSize * 0.14);
-    const markerWidth = Math.max(10, cellSize * 0.18);
-    const markerX = x - markerWidth * 1.16;
-    const markerY = roadY + cellSize * 0.05;
-    const markerHeight = roadHeight - cellSize * 0.1;
     const curbColor = env === "forest_parking" ? "#c4bba0" : env === "winter_premium" ? "#dcecf4" : palette.curb;
     const curbShadow = env === "forest_parking" ? "rgba(34, 31, 20, 0.42)" : "rgba(0, 0, 0, 0.28)";
     const roadColor = env === "winter_premium" ? "rgba(42, 57, 70, 0.82)" : env === "forest_parking" ? "rgba(30, 34, 29, 0.9)" : "rgba(14, 18, 24, 0.78)";
-    const hazard = palette.hazard || "#d9aa36";
-    const hazardDark = palette.hazardDark || "#17191c";
 
     if (options.foregroundOnly) {
+      // Поверх машины дорисовываем только торцы бордюров проезда,
+      // чтобы выезд сохранял объем; предупреждающих полос здесь нет.
       ctx.save();
-      ctx.shadowColor = "rgba(0, 0, 0, 0.38)";
-      ctx.shadowBlur = 5;
-      ctx.shadowOffsetY = 2;
-      roundedRect(ctx, markerX, markerY, markerWidth, markerHeight, 3);
-      ctx.clip();
-      ctx.fillStyle = hazardDark;
-      ctx.fillRect(markerX, markerY, markerWidth, markerHeight);
-      ctx.strokeStyle = hazard;
-      ctx.lineWidth = Math.max(3, markerWidth * 0.6);
-      for (let i = -2; i < 5; i += 1) {
-        ctx.beginPath();
-        ctx.moveTo(markerX - markerWidth + i * markerWidth * 0.9, markerY + markerHeight);
-        ctx.lineTo(markerX + i * markerWidth * 0.9, markerY);
-        ctx.stroke();
-      }
+      ctx.fillStyle = curbColor;
+      roundedRect(ctx, x - cellSize * 0.06, roadY - curbHeight * 1.45, cellSize * 0.12, curbHeight, 4);
+      ctx.fill();
+      roundedRect(ctx, x - cellSize * 0.06, roadY + roadHeight + curbHeight * 0.35, cellSize * 0.12, curbHeight, 4);
+      ctx.fill();
       ctx.restore();
       return;
     }
@@ -2136,20 +2122,15 @@
     roundedRect(ctx, x - cellSize * 0.12, roadY + roadHeight * 0.18, outWidth * 0.44, Math.max(1, cellSize * 0.035), 999);
     ctx.fill();
 
-    ctx.save();
-    roundedRect(ctx, markerX, markerY, markerWidth, markerHeight, 3);
-    ctx.clip();
-    ctx.fillStyle = hazardDark;
-    ctx.fillRect(markerX, markerY, markerWidth, markerHeight);
-    ctx.strokeStyle = hazard;
-    ctx.lineWidth = Math.max(3, markerWidth * 0.6);
-    for (let i = -2; i < 5; i += 1) {
-      ctx.beginPath();
-      ctx.moveTo(markerX - markerWidth + i * markerWidth * 0.9, markerY + markerHeight);
-      ctx.lineTo(markerX + i * markerWidth * 0.9, markerY);
-      ctx.stroke();
-    }
-    ctx.restore();
+    // Осевая разметка проезда вместо предупреждающего блока
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.26)";
+    ctx.lineWidth = Math.max(1.5, cellSize * 0.035);
+    ctx.setLineDash([cellSize * 0.14, cellSize * 0.12]);
+    ctx.beginPath();
+    ctx.moveTo(x - cellSize * 0.1, roadY + roadHeight / 2);
+    ctx.lineTo(x + outWidth + cellSize * 0.04, roadY + roadHeight / 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
 
     ctx.strokeStyle = colorWithAlpha(palette.exitGlow, 0.18 + pulse * 0.22);
     ctx.lineWidth = Math.max(1, cellSize * 0.025);

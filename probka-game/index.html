@@ -4,19 +4,100 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Пробка во дворе</title>
-    <link rel="icon" href="./favicon.svg?v=rc7-yard-fit" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=rc7-yard-fit" />
+    <link rel="icon" href="./favicon.svg?v=polish1" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css?v=polish1" />
   </head>
   <body>
+    <svg class="svg-defs" aria-hidden="true" focusable="false">
+      <defs>
+        <symbol id="i-car" viewBox="0 0 24 24">
+          <path d="M5.3 9.6 6.4 6.9A2.4 2.4 0 0 1 8.6 5.4h6.8a2.4 2.4 0 0 1 2.2 1.5l1.1 2.7a3 3 0 0 1 2.1 2.9v3.4c0 .7-.5 1.2-1.2 1.2h-.7c-.7 0-1.2-.5-1.2-1.2v-.5H6.3v.5c0 .7-.5 1.2-1.2 1.2h-.7c-.7 0-1.2-.5-1.2-1.2v-3.4a3 3 0 0 1 2.1-2.9Zm2.1-2-.9 2.2h11l-.9-2.2a1 1 0 0 0-.9-.6H8.3a1 1 0 0 0-.9.6ZM7 13.6a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4Zm10 0a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4Z" />
+        </symbol>
+        <symbol id="i-coin" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.6" />
+          <path d="M12 7.4v9.2M9.4 9.7c0-1.1 1.2-1.8 2.6-1.8s2.6.7 2.6 1.8c0 2.7-5.2 1.9-5.2 4.6 0 1.1 1.2 1.8 2.6 1.8s2.6-.7 2.6-1.8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-play" viewBox="0 0 24 24">
+          <path d="M8.2 5.5c0-1.1 1.2-1.8 2.2-1.2l9 5.4c1 .6 1 2 0 2.6l-9 5.4c-1 .6-2.2-.1-2.2-1.2V5.5Z" />
+        </symbol>
+        <symbol id="i-grid" viewBox="0 0 24 24">
+          <rect x="4" y="4" width="7" height="7" rx="2" />
+          <rect x="13" y="4" width="7" height="7" rx="2" />
+          <rect x="4" y="13" width="7" height="7" rx="2" />
+          <rect x="13" y="13" width="7" height="7" rx="2" opacity="0.45" />
+        </symbol>
+        <symbol id="i-star" viewBox="0 0 24 24">
+          <path d="M12 3.4c.3 0 .6.2.8.5l2.2 4.4 4.9.7c.7.1 1 1 .5 1.5l-3.5 3.4.8 4.8c.1.7-.6 1.2-1.2.9L12 17.3l-4.4 2.3c-.6.3-1.4-.2-1.2-.9l.8-4.8-3.5-3.4c-.5-.5-.2-1.4.5-1.5l4.9-.7 2.2-4.4c.1-.3.4-.5.7-.5Z" />
+        </symbol>
+        <symbol id="i-calendar" viewBox="0 0 24 24">
+          <rect x="3.6" y="5" width="16.8" height="15" rx="2.6" fill="none" stroke="currentColor" stroke-width="2" />
+          <path d="M3.6 9.6h16.8M8 3v3.4M16 3v3.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <path d="m9.4 14.6 1.9 1.9 3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </symbol>
+        <symbol id="i-back" viewBox="0 0 24 24">
+          <path d="M14.8 5.6 8.4 12l6.4 6.4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+        </symbol>
+        <symbol id="i-restart" viewBox="0 0 24 24">
+          <path d="M19 12a7 7 0 1 1-2.05-4.95" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+          <path d="M19.4 3.6v4h-4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+        </symbol>
+        <symbol id="i-sound-on" viewBox="0 0 24 24">
+          <path d="M4.5 9.4v5.2h3.2L13 19V5L7.7 9.4H4.5Z" />
+          <path d="M16 9c.9.8 1.4 1.8 1.4 3s-.5 2.2-1.4 3M18.3 6.6c1.5 1.4 2.3 3.2 2.3 5.4s-.8 4-2.3 5.4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-sound-off" viewBox="0 0 24 24">
+          <path d="M4.5 9.4v5.2h3.2L13 19V5L7.7 9.4H4.5Z" />
+          <path d="m16.4 9.6 4.8 4.8M21.2 9.6l-4.8 4.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-undo" viewBox="0 0 24 24">
+          <path d="M7.6 5.6 4 9.2l3.6 3.6" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M4.6 9.2h9a6 6 0 0 1 0 12h-3" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-bulb" viewBox="0 0 24 24">
+          <path d="M12 3.2a6.3 6.3 0 0 0-3.6 11.5c.7.5 1.1 1.2 1.1 2v.4h5v-.4c0-.8.4-1.5 1.1-2A6.3 6.3 0 0 0 12 3.2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+          <path d="M9.8 20.4h4.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-skip" viewBox="0 0 24 24">
+          <path d="M5.4 6.2c0-.9 1-1.5 1.8-1l7.2 5.2c.7.5.7 1.6 0 2.1l-7.2 5.2c-.8.5-1.8 0-1.8-1V6.2Z" />
+          <rect x="16.4" y="5" width="2.6" height="14" rx="1.2" />
+        </symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="2.2" />
+          <path d="M12 7.4V12l3.2 2.2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+        </symbol>
+        <symbol id="i-infinity" viewBox="0 0 24 24">
+          <path d="M7.2 8.6c-2 0-3.6 1.5-3.6 3.4s1.6 3.4 3.6 3.4c3.4 0 6.2-6.8 9.6-6.8 2 0 3.6 1.5 3.6 3.4s-1.6 3.4-3.6 3.4c-3.4 0-6.2-6.8-9.6-6.8Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-moves" viewBox="0 0 24 24">
+          <path d="M4 9h13.4M4 15h13.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+          <path d="m15 5.6 3.4 3.4L15 12.4M15 11.6l3.4 3.4L15 18.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+        </symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24">
+          <path d="M7.5 10V8.2a4.5 4.5 0 0 1 9 0V10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <rect x="5.5" y="10" width="13" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="2" />
+          <path d="M12 14.4v2.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-trophy" viewBox="0 0 24 24">
+          <path d="M8 4h8v3.6a4 4 0 0 1-8 0V4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+          <path d="M8 5.4H5a3 3 0 0 0 3 4.4M16 5.4h3a3 3 0 0 1-3 4.4M12 11.6v3M8.6 20h6.8M12 14.6c-1.2 0-2 .8-2 2.2V20h4v-3.2c0-1.4-.8-2.2-2-2.2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </symbol>
+      </defs>
+    </svg>
+
     <div id="app" class="app">
       <header class="topbar">
-        <div>
-          <p class="eyebrow">Головоломка во дворе</p>
-          <h1>Пробка во дворе</h1>
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><use href="#i-car" /></svg>
+          </span>
+          <div class="brand-copy">
+            <p class="eyebrow">Головоломка</p>
+            <h1>Пробка во дворе</h1>
+          </div>
         </div>
         <div class="wallet" aria-label="Монеты">
+          <span class="coin" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-coin" /></svg></span>
           <span id="coins">0</span>
-          <span class="coin">м</span>
         </div>
       </header>
 
@@ -28,8 +109,8 @@
                 <span>Уровень</span>
                 <strong id="currentLevelLabel">1</strong>
               </div>
-              <p id="modeStatusLabel">На счет ходов · уровень 1</p>
-              <p>Разбери двор за минимум ходов и выведи свою машину.</p>
+              <p class="hub-mode-status" id="modeStatusLabel">На счет ходов · уровень 1</p>
+              <p class="hub-tagline">Разбери затор за минимум ходов и выведи свою машину из двора.</p>
             </div>
             <div class="streak-panel" id="streakPanel" aria-label="Серия">
               <svg class="streak-flame" viewBox="0 0 64 80" aria-hidden="true">
@@ -53,34 +134,41 @@
                 <small id="streakBest">Рекорд 0</small>
               </div>
             </div>
-            <button class="primary-button play-cta" id="playButton">Играть</button>
-          </div>
-
-          <div class="hub-section">
-            <button class="daily-challenge-card daily-status-card" id="dailyButton" type="button">
-              <span class="daily-card-copy">
-                <span class="label">Уровень дня</span>
-                <strong id="dailyStatusLabel">Сложный двор</strong>
-                <small>Сложный пазл на сегодня</small>
-              </span>
-              <span class="daily-card-badge" aria-hidden="true">сложно</span>
+            <button class="primary-button play-cta" id="playButton">
+              <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-play" /></svg>
+              Играть
             </button>
           </div>
+
+          <div class="daily-week" id="dailyWeek" aria-label="Неделя ежедневных уровней"></div>
+
+          <button class="daily-challenge-card daily-status-card" id="dailyButton" type="button">
+            <span class="daily-card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><use href="#i-calendar" /></svg>
+            </span>
+            <span class="daily-card-copy">
+              <span class="label">Уровень дня</span>
+              <strong id="dailyStatusLabel">Сложный двор</strong>
+              <small>Один сложный пазл на сегодня</small>
+            </span>
+            <span class="daily-card-badge" aria-hidden="true">сложно</span>
+          </button>
 
           <div class="hub-nav">
             <button class="nav-tile" id="levelSelectButton">
-              <span class="nav-icon">300</span>
-              <span><strong>Уровни</strong><small>3 режима · 300 уровней</small></span>
+              <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-grid" /></svg></span>
+              <span class="nav-copy"><strong>Уровни</strong><small>3 режима · 300 уровней</small></span>
             </button>
             <button class="nav-tile" id="garageButton">
-              <span class="nav-icon">01</span>
-              <span><strong>Гараж</strong><small>Машины и дворы</small></span>
+              <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-car" /></svg></span>
+              <span class="nav-copy"><strong>Гараж</strong><small>Машины и дворы</small></span>
             </button>
             <button class="nav-tile" id="missionsButton">
-              <span class="nav-icon">★</span>
-              <span><strong>Миссии</strong><small id="missionStatusLabel">0/3 выполнено</small></span>
+              <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-star" /></svg></span>
+              <span class="nav-copy"><strong>Миссии</strong><small id="missionStatusLabel">0/3 выполнено</small></span>
             </button>
           </div>
+
           <details class="settings-strip">
             <summary>Настройки</summary>
             <button class="ghost-button settings-action-button" id="tutorialReplayButton">Повторить обучение</button>
@@ -90,7 +178,9 @@
 
         <section class="panel modes-panel" id="modeSelectPanel" hidden>
           <div class="panel-head">
-            <button class="icon-button" id="modesBackButton" aria-label="Назад">←</button>
+            <button class="icon-button" id="modesBackButton" aria-label="Назад">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back" /></svg>
+            </button>
             <div class="screen-title">
               <p class="eyebrow">Режимы</p>
               <h2>Выбери двор</h2>
@@ -101,7 +191,9 @@
 
         <section class="panel daily-panel" id="dailyPanel" hidden>
           <div class="panel-head">
-            <button class="icon-button" id="dailyBackButton" aria-label="Назад">←</button>
+            <button class="icon-button" id="dailyBackButton" aria-label="Назад">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back" /></svg>
+            </button>
             <div class="screen-title">
               <p class="eyebrow">365 вызовов</p>
               <h2>Уровень дня</h2>
@@ -113,16 +205,24 @@
 
         <section class="play-area" id="playArea" hidden>
           <div class="hud">
-            <button class="icon-button" id="backButton" aria-label="Назад">←</button>
+            <button class="icon-button" id="backButton" aria-label="Назад">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back" /></svg>
+            </button>
             <div class="level-meta">
               <span id="levelTitle">Первый выезд</span>
-              <strong id="movesLabel">0 ходов</strong>
-              <strong class="limit-label" id="limitLabel">Осталось 5</strong>
+              <div class="level-meta-row">
+                <strong id="movesLabel">0 ходов</strong>
+                <strong class="limit-label" id="limitLabel">Осталось 5</strong>
+              </div>
               <div class="move-meter" id="moveMeter" aria-hidden="true"><span></span></div>
             </div>
             <div class="hud-actions">
-              <button class="icon-button sound-button" id="muteButton" aria-label="Звук" aria-pressed="false">Звук</button>
-              <button class="icon-button" id="restartButton" aria-label="Заново">↻</button>
+              <button class="icon-button sound-button" id="muteButton" aria-label="Звук" aria-pressed="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sound-on" /></svg>
+              </button>
+              <button class="icon-button" id="restartButton" aria-label="Заново">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-restart" /></svg>
+              </button>
             </div>
           </div>
 
@@ -139,7 +239,9 @@
 
         <section class="panel levels-panel" id="levelsPanel" hidden>
           <div class="panel-head">
-            <button class="icon-button" id="levelsBackButton" aria-label="Назад">←</button>
+            <button class="icon-button" id="levelsBackButton" aria-label="Назад">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back" /></svg>
+            </button>
             <div class="screen-title">
               <p class="eyebrow" id="levelsEyebrow">Режим</p>
               <h2 id="levelsTitle">Уровни</h2>
@@ -150,7 +252,9 @@
 
         <section class="panel garage-panel" id="garagePanel" hidden>
           <div class="panel-head">
-            <button class="icon-button" id="garageBackButton" aria-label="Назад">←</button>
+            <button class="icon-button" id="garageBackButton" aria-label="Назад">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back" /></svg>
+            </button>
             <div class="screen-title">
               <p class="eyebrow">Косметика</p>
               <h2>Гараж</h2>
@@ -162,7 +266,9 @@
 
         <section class="panel missions-panel" id="missionsPanel" hidden>
           <div class="panel-head">
-            <button class="icon-button" id="missionsBackButton" aria-label="Назад">←</button>
+            <button class="icon-button" id="missionsBackButton" aria-label="Назад">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back" /></svg>
+            </button>
             <div class="screen-title">
               <p class="eyebrow">Награды</p>
               <h2>Миссии</h2>
@@ -186,6 +292,10 @@
 
     <div class="modal" id="winModal" hidden>
       <div class="modal-card win-card">
+        <span class="modal-glow win-glow" aria-hidden="true"></span>
+        <span class="modal-badge win-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><use href="#i-trophy" /></svg>
+        </span>
         <p class="eyebrow">Двор свободен</p>
         <h2 id="winTitle">Уровень пройден</h2>
         <p id="starsLabel" class="stars">★★★</p>
@@ -200,6 +310,7 @@
 
     <div class="modal" id="failModal" hidden>
       <div class="modal-card fail-card">
+        <span class="modal-glow fail-glow" aria-hidden="true"></span>
         <p class="eyebrow" id="failEyebrow">Ходы закончились</p>
         <h2 id="failTitle">Двор снова встал</h2>
         <p id="failText">Лимит ходов исчерпан. Попробуй заново.</p>
@@ -219,25 +330,25 @@
       </div>
     </div>
 
-    <script src="./level-bank.generated.js?v=dev-skeleton1"></script>
-    <script src="./levels.js?v=dev-skeleton1"></script>
-    <script src="./yards.js?v=dev-skeleton1"></script>
-    <script src="./skins.js?v=dev-skeleton1"></script>
-    <script src="./daily.js?v=dev-skeleton1"></script>
-    <script src="./config.js?v=dev-skeleton1"></script>
-    <script src="./texts.js?v=dev-skeleton1"></script>
-    <script src="./yandex-sdk.js?v=dev-skeleton1"></script>
-    <script src="./progress.js?v=dev-skeleton1"></script>
-    <script src="./economy.js?v=dev-skeleton1"></script>
-    <script src="./rules.js?v=dev-skeleton1"></script>
-    <script src="./session.js?v=dev-skeleton1"></script>
-    <script src="./renderer.js?v=dev-skeleton1"></script>
-    <script src="./screens.js?v=dev-skeleton1"></script>
-    <script src="./tutorial.js?v=dev-skeleton1"></script>
-    <script src="./actors.js?v=dev-skeleton1"></script>
-    <script src="./input.js?v=dev-skeleton1"></script>
-    <script src="./ads.js?v=dev-skeleton1"></script>
-    <script src="./audio.js?v=dev-skeleton1"></script>
-    <script src="./game.js?v=dev-skeleton1"></script>
+    <script src="./level-bank.generated.js?v=polish1"></script>
+    <script src="./levels.js?v=polish1"></script>
+    <script src="./yards.js?v=polish1"></script>
+    <script src="./skins.js?v=polish1"></script>
+    <script src="./daily.js?v=polish1"></script>
+    <script src="./config.js?v=polish1"></script>
+    <script src="./texts.js?v=polish1"></script>
+    <script src="./yandex-sdk.js?v=polish1"></script>
+    <script src="./progress.js?v=polish1"></script>
+    <script src="./economy.js?v=polish1"></script>
+    <script src="./rules.js?v=polish1"></script>
+    <script src="./session.js?v=polish1"></script>
+    <script src="./renderer.js?v=polish1"></script>
+    <script src="./screens.js?v=polish1"></script>
+    <script src="./tutorial.js?v=polish1"></script>
+    <script src="./actors.js?v=polish1"></script>
+    <script src="./input.js?v=polish1"></script>
+    <script src="./ads.js?v=polish1"></script>
+    <script src="./audio.js?v=polish1"></script>
+    <script src="./game.js?v=polish1"></script>
   </body>
 </html>

@@ -32,6 +32,13 @@
     const initialGarageTab = new URLSearchParams(window.location.search).get("garageTab") === "yards" ? "yards" : "skins";
     let garageTab = initialGarageTab;
 
+    function modeIconMarkup(mode) {
+      const byRule = { free: "i-infinity", moves: "i-moves", timed: "i-clock" };
+      const symbolId = byRule[mode && mode.rule];
+      if (!symbolId) return (mode && mode.icon) || "#";
+      return `<svg viewBox="0 0 24 24" aria-hidden="true" style="width:1em;height:1em;fill:none;stroke:currentColor"><use href="#${symbolId}" /></svg>`;
+    }
+
     function renderLevelSelect() {
       const els = getEls();
       const levels = getLevels();
@@ -54,7 +61,7 @@
         const from = start + 1;
         const to = Math.min(from + 19, modeLevels.length);
         title.innerHTML = `
-          <span class="pack-badge">${mode.icon}</span>
+          <span class="pack-badge">${modeIconMarkup(mode)}</span>
           <div class="pack-copy">
             <strong>${mode.title}</strong>
             <span>Уровни ${from}-${to} · ${mode.subtitle}</span>
@@ -86,7 +93,7 @@
         const card = document.createElement("button");
         card.className = `mode-card${mode.id === getSelectedModeId() ? " current" : ""}`;
         card.innerHTML = `
-          <span class="mode-card-icon" aria-hidden="true">${mode.icon}</span>
+          <span class="mode-card-icon" aria-hidden="true">${modeIconMarkup(mode)}</span>
           <span class="mode-card-copy">
             <strong>${mode.title}</strong>
             <small>${mode.subtitle}</small>
@@ -312,7 +319,8 @@
         const card = document.createElement("article");
         card.className = `mission-card${record.claimed ? " claimed" : ready ? " ready" : ""}`;
         const percent = Math.round((progress / mission.target) * 100);
-        const icon = mission.id === "daily_complete" ? "Д" : mission.id === "three_stars" ? "★" : "↶";
+        const iconId = mission.id === "daily_complete" ? "i-calendar" : mission.id === "three_stars" ? "i-star" : "i-undo";
+        const icon = `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#${iconId}" /></svg>`;
         card.innerHTML = `
           <div class="mission-icon" aria-hidden="true">${icon}</div>
           <div class="mission-meta">
@@ -520,13 +528,18 @@
       if (els.dailyButton) els.dailyButton.setAttribute("aria-label", `Уровень дня, награда до ${deps.getDailyRewardPreview()} монет`);
       if (els.skipButton) els.skipButton.disabled = activeMode === "daily";
       if (els.muteButton) {
-        els.muteButton.textContent = state.settings.muted ? "Тихо" : "Звук";
-        els.muteButton.setAttribute("aria-pressed", String(state.settings.muted));
+        const muted = Boolean(state.settings.muted);
+        if (els.muteButton.dataset.muted !== String(muted)) {
+          els.muteButton.dataset.muted = String(muted);
+          els.muteButton.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sound-${muted ? "off" : "on"}" /></svg>`;
+        }
+        els.muteButton.setAttribute("aria-label", muted ? "Включить звук" : "Выключить звук");
+        els.muteButton.setAttribute("aria-pressed", String(muted));
       }
       if (level && els.levelTitle) {
         const mode = deps.getLevelMode();
         els.levelTitle.textContent =
-          activeMode === "daily" ? `${level.title} · ${deps.formatShortDate(session.activeDailyDateKey)}` : `${mode.icon} ${level.modeOrder}. ${level.title}`;
+          activeMode === "daily" ? `${level.title} · ${deps.formatShortDate(session.activeDailyDateKey)}` : `${level.modeOrder}. ${level.title}`;
       }
       updateMenuStatus();
     }
@@ -535,9 +548,13 @@
       const els = getEls();
       const state = getState();
       const session = deps.getSessionSnapshot();
-      setToolButton(els.undoButton, "↶", "Отмена", "ход назад");
-      setToolButton(els.hintButton, "?", "Подсказка", state.hints > 0 ? `${state.hints} в запасе` : "за рекламу");
-      setToolButton(els.skipButton, "»", "Пропуск", session.activeMode === "daily" ? "не для дня" : "за рекламу");
+      setToolButton(els.undoButton, toolIcon("i-undo"), "Отмена", "ход назад");
+      setToolButton(els.hintButton, toolIcon("i-bulb"), "Подсказка", state.hints > 0 ? `${state.hints} в запасе` : "за рекламу");
+      setToolButton(els.skipButton, toolIcon("i-skip"), "Пропуск", session.activeMode === "daily" ? "не для дня" : "за рекламу");
+    }
+
+    function toolIcon(symbolId) {
+      return `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#${symbolId}" /></svg>`;
     }
 
     function setToolButton(button, icon, title, subtitle) {

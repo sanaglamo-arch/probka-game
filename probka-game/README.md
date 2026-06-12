@@ -47,6 +47,8 @@ node probka-game/tools/browser-smoke.js
 Для холодной локальной проверки синтаксиса, ассетов и runtime-файлов без долгого банка уровней используйте `node probka-game/tools/release-yandex.js --check --quick`.
 После уже пройденного полного `--check` релиз можно собрать без повторного прогона проверок: `node probka-game/tools/release-yandex.js --skip-checks`.
 `browser-smoke.js` запускает headless Chrome, поэтому его лучше оставлять для финальной UI-проверки.
+По умолчанию используется путь Chrome для macOS; на Linux/CI задайте бинарь и флаги через переменные окружения:
+`PROBKA_SMOKE_CHROME="$(which google-chrome)" PROBKA_SMOKE_CHROME_FLAGS="--no-sandbox --disable-dev-shm-usage" node probka-game/tools/browser-smoke.js`.
 `release-yandex.js --check` проверяет релизные файлы и данные, но не открывает браузерный smoke.
 
 ## Генерация черновиков уровней
