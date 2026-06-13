@@ -12,92 +12,64 @@
     <svg width="800" height="470" viewBox="0 0 800 470" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="coverBg" x1="0" y1="0" x2="800" y2="470">
-          <stop stop-color="#172436"/>
-          <stop offset="0.56" stop-color="#0b121d"/>
+          <stop stop-color="#1d2c42"/>
+          <stop offset="0.55" stop-color="#0c1420"/>
           <stop offset="1" stop-color="#070a10"/>
         </linearGradient>
-        <linearGradient id="title" x1="44" y1="62" x2="356" y2="168">
+        <linearGradient id="title" x1="44" y1="60" x2="360" y2="180">
           <stop stop-color="#ffffff"/>
           <stop offset="1" stop-color="#a9caff"/>
         </linearGradient>
-        <linearGradient id="target" x1="430" y1="260" x2="704" y2="260">
+        <linearGradient id="target" x1="0" y1="0" x2="0" y2="1">
           <stop stop-color="#ff7b86"/>
-          <stop offset="1" stop-color="#e9364d"/>
+          <stop offset="1" stop-color="#e2304a"/>
         </linearGradient>
-        <linearGradient id="road" x1="278" y1="456" x2="740" y2="58">
-          <stop stop-color="#273343"/>
-          <stop offset="0.52" stop-color="#17212e"/>
-          <stop offset="1" stop-color="#303b4a"/>
-        </linearGradient>
+        <radialGradient id="yardGlow" cx="62%" cy="42%" r="55%">
+          <stop offset="0" stop-color="#4f6fa0" stop-opacity="0.22"/>
+          <stop offset="1" stop-color="#4f6fa0" stop-opacity="0"/>
+        </radialGradient>
         <filter id="artShadow" x="-25%" y="-25%" width="150%" height="150%">
-          <feDropShadow dx="0" dy="22" stdDeviation="18" flood-color="#000" flood-opacity="0.36"/>
+          <feDropShadow dx="0" dy="20" stdDeviation="16" flood-color="#000" flood-opacity="0.4"/>
         </filter>
-        <filter id="yellowGlow" x="-40%" y="-40%" width="180%" height="180%">
-          <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#ffd35c" flood-opacity="0.45"/>
+        <filter id="exitGlow" x="-90%" y="-90%" width="280%" height="280%">
+          <feDropShadow dx="0" dy="0" stdDeviation="12" flood-color="#ffce5a" flood-opacity="0.8"/>
         </filter>
       </defs>
       <rect width="800" height="470" fill="url(#coverBg)"/>
-      <path d="M448 0h352v470H232z" fill="url(#road)" opacity="0.94"/>
-      <path d="M496 0h58L334 470h-66z" fill="#0c1119" opacity="0.35"/>
-      <path d="M660 0h42L468 470h-46z" fill="#0c1119" opacity="0.28"/>
-      <g opacity="0.32" stroke="#ffd35c" stroke-width="6" stroke-linecap="round" stroke-dasharray="34 28">
-        <path d="M584 28L392 444"/>
+      <rect width="800" height="470" fill="url(#yardGlow)"/>
+      <!-- площадка двора: асфальт с разметкой парковочных мест -->
+      <g transform="translate(372 26)">
+        <rect x="0" y="0" width="404" height="418" rx="26" fill="#1a2533"/>
+        <rect x="10" y="10" width="384" height="398" rx="20" fill="#222f40"/>
+        <g stroke="#cfd9e8" stroke-width="4" opacity="0.12" stroke-linecap="round">
+          <path d="M44 36v346M140 36v346M236 36v346M332 36v346"/>
+        </g>
+        <rect x="10" y="10" width="384" height="398" rx="20" fill="none" stroke="#3c4d63" stroke-width="3" opacity="0.5"/>
       </g>
-      <g opacity="0.22" stroke="#aebbd0" stroke-width="3">
-        <path d="M520 54l204 90"/>
-        <path d="M476 150l204 90"/>
-        <path d="M432 246l204 90"/>
-        <path d="M388 342l204 90"/>
-      </g>
-      <text x="52" y="106" font-family="Arial, sans-serif" font-size="54" font-weight="900" fill="url(#title)">Пробка</text>
-      <text x="52" y="166" font-family="Arial, sans-serif" font-size="54" font-weight="900" fill="url(#title)">во дворе</text>
-      <text x="56" y="214" font-family="Arial, sans-serif" font-size="24" font-weight="800" fill="#aebbd0">Двигай машины</text>
-      <text x="56" y="247" font-family="Arial, sans-serif" font-size="24" font-weight="800" fill="#aebbd0">и освободи выезд</text>
+      <!-- золотой выезд справа -->
+      <path d="M712 296h70" fill="none" stroke="#ffd35c" stroke-width="18" stroke-linecap="round" filter="url(#exitGlow)"/>
+      <path d="M772 268l40 28-40 28z" fill="#ffe08a" filter="url(#exitGlow)"/>
       <g filter="url(#artShadow)">
-        
-    <g>
-      <rect x="530" y="66" width="72" height="172" rx="18" fill="#69a4ff"/>
-      <rect x="545.84" y="90.08" width="39.6" height="41.28" rx="10" fill="#e9f2ff" opacity="0.82"/>
-      
-      <rect x="540" y="230" width="52" height="6" rx="3" fill="#000" opacity="0.12"/>
-    </g>
-        
-    <g>
-      <rect x="632" y="102" width="72" height="172" rx="18" fill="#55d19c"/>
-      <rect x="647.84" y="126.08" width="39.6" height="41.28" rx="10" fill="#ddfff1" opacity="0.82"/>
-      
-      <rect x="642" y="266" width="52" height="6" rx="3" fill="#000" opacity="0.12"/>
-    </g>
-        
-    <g>
-      <rect x="432" y="144" width="214" height="76" rx="20" fill="#e8b950"/>
-      <rect x="464.1" y="162.24" width="47.08" height="36.48" rx="10" fill="#fff3bc" opacity="0.82"/>
-      
-      <rect x="442" y="212" width="194" height="6" rx="3" fill="#000" opacity="0.12"/>
-    </g>
-        
-    <g>
-      <rect x="494" y="256" width="244" height="78" rx="22" fill="url(#target)"/>
-      <rect x="530.6" y="274.72" width="53.68" height="37.44" rx="10" fill="#fff0f2" opacity="0.82"/>
-      <rect x="611.12" y="264" width="12" height="62" rx="6" fill="#ffffff" opacity="0.24"/>
-      <rect x="504" y="326" width="224" height="6" rx="3" fill="#000" opacity="0.12"/>
-    </g>
-        
-    <g>
-      <rect x="348" y="330" width="76" height="150" rx="18" fill="#6f8fb8"/>
-      <rect x="364.72" y="351" width="41.800000000000004" height="36" rx="10" fill="#e9f2ff" opacity="0.82"/>
-      
-      <rect x="358" y="472" width="56" height="6" rx="3" fill="#000" opacity="0.12"/>
-    </g>
+        <g><rect x="435.3" y="91.8" width="11.8" height="33.6" rx="5.3" fill="#10151d" opacity="0.9"/><rect x="435.3" y="182.6" width="11.8" height="33.6" rx="5.3" fill="#10151d" opacity="0.9"/><rect x="506.9" y="91.8" width="11.8" height="33.6" rx="5.3" fill="#10151d" opacity="0.9"/><rect x="506.9" y="182.6" width="11.8" height="33.6" rx="5.3" fill="#10151d" opacity="0.9"/><rect x="440" y="70" width="74" height="168" rx="18" fill="#5aa0ff"/><rect x="443.7" y="81.8" width="66.6" height="53.8" rx="12.6" fill="#ffffff" opacity="0.16"/><rect x="451.1" y="120.4" width="51.8" height="73.9" rx="14.8" fill="#0b1016" opacity="0.16"/><rect x="455.5" y="157.4" width="42.9" height="31" rx="11.1" fill="#e9f2ff" opacity="0.88"/><rect x="457.8" y="125.6" width="38.5" height="23.7" rx="11.1" fill="#e9f2ff" opacity="0.68"/><rect x="451.1" y="228.6" width="12.6" height="5.9" rx="2.9" fill="#fff6cf"/><rect x="490.3" y="228.6" width="12.6" height="5.9" rx="2.9" fill="#fff6cf"/><rect x="451.1" y="73.5" width="12.6" height="5.9" rx="2.9" fill="#ff5a5f"/><rect x="490.3" y="73.5" width="12.6" height="5.9" rx="2.9" fill="#ff5a5f"/></g>
+        <g><rect x="572.4" y="65.4" width="37.6" height="11.5" rx="5.2" fill="#10151d" opacity="0.9"/><rect x="674" y="65.4" width="37.6" height="11.5" rx="5.2" fill="#10151d" opacity="0.9"/><rect x="572.4" y="135.1" width="37.6" height="11.5" rx="5.2" fill="#10151d" opacity="0.9"/><rect x="674" y="135.1" width="37.6" height="11.5" rx="5.2" fill="#10151d" opacity="0.9"/><rect x="548" y="70" width="188" height="72" rx="18" fill="#56d29c"/><rect x="557.4" y="75" width="169.2" height="23" rx="12.6" fill="#ffffff" opacity="0.16"/><rect x="604.4" y="80.8" width="82.7" height="50.4" rx="14.4" fill="#0b1016" opacity="0.16"/><rect x="645.8" y="85.1" width="34.7" height="41.8" rx="10.8" fill="#ddfff1" opacity="0.88"/><rect x="610.2" y="87.3" width="28.1" height="37.4" rx="10.8" fill="#ddfff1" opacity="0.68"/><rect x="725.5" y="80.8" width="6.6" height="12.2" rx="3.3" fill="#fff6cf"/><rect x="725.5" y="119" width="6.6" height="12.2" rx="3.3" fill="#fff6cf"/><rect x="551.9" y="82.2" width="6.6" height="12.2" rx="3.3" fill="#ff5a5f"/><rect x="551.9" y="117.5" width="6.6" height="12.2" rx="3.3" fill="#ff5a5f"/></g>
+        <g><rect x="643.3" y="179.8" width="11.8" height="33.6" rx="5.3" fill="#10151d" opacity="0.9"/><rect x="643.3" y="270.6" width="11.8" height="33.6" rx="5.3" fill="#10151d" opacity="0.9"/><rect x="714.9" y="179.8" width="11.8" height="33.6" rx="5.3" fill="#10151d" opacity="0.9"/><rect x="714.9" y="270.6" width="11.8" height="33.6" rx="5.3" fill="#10151d" opacity="0.9"/><rect x="648" y="158" width="74" height="168" rx="18" fill="#edc24f"/><rect x="651.7" y="169.8" width="66.6" height="53.8" rx="12.6" fill="#ffffff" opacity="0.16"/><rect x="659.1" y="208.4" width="51.8" height="73.9" rx="14.8" fill="#0b1016" opacity="0.16"/><rect x="663.5" y="245.4" width="42.9" height="31" rx="11.1" fill="#fff3bc" opacity="0.88"/><rect x="665.8" y="213.6" width="38.5" height="23.7" rx="11.1" fill="#fff3bc" opacity="0.68"/><rect x="659.1" y="316.6" width="12.6" height="5.9" rx="2.9" fill="#fff6cf"/><rect x="698.3" y="316.6" width="12.6" height="5.9" rx="2.9" fill="#fff6cf"/><rect x="659.1" y="161.5" width="12.6" height="5.9" rx="2.9" fill="#ff5a5f"/><rect x="698.3" y="161.5" width="12.6" height="5.9" rx="2.9" fill="#ff5a5f"/></g>
+        <g><rect x="484.8" y="250.9" width="50.4" height="12.8" rx="5.8" fill="#10151d" opacity="0.9"/><rect x="620.8" y="250.9" width="50.4" height="12.8" rx="5.8" fill="#10151d" opacity="0.9"/><rect x="484.8" y="328.3" width="50.4" height="12.8" rx="5.8" fill="#10151d" opacity="0.9"/><rect x="620.8" y="328.3" width="50.4" height="12.8" rx="5.8" fill="#10151d" opacity="0.9"/><rect x="452" y="256" width="252" height="80" rx="22" fill="url(#target)"/><rect x="464.6" y="261.6" width="226.8" height="25.6" rx="15.4" fill="#ffffff" opacity="0.16"/><rect x="527.6" y="268" width="110.9" height="56" rx="16" fill="#0b1016" opacity="0.16"/><rect x="583" y="272.8" width="46.6" height="46.4" rx="12" fill="#fff0f2" opacity="0.88"/><rect x="535.4" y="275.2" width="37.7" height="41.6" rx="12" fill="#fff0f2" opacity="0.68"/><rect x="689.9" y="268" width="8.8" height="13.6" rx="4.4" fill="#fff6cf"/><rect x="689.9" y="310.4" width="8.8" height="13.6" rx="4.4" fill="#fff6cf"/><rect x="457.3" y="269.6" width="8.8" height="13.6" rx="4.4" fill="#ff5a5f"/><rect x="457.3" y="308.8" width="8.8" height="13.6" rx="4.4" fill="#ff5a5f"/></g>
+        <g><rect x="474.1" y="355.5" width="34" height="11.2" rx="5" fill="#10151d" opacity="0.9"/><rect x="565.9" y="355.5" width="34" height="11.2" rx="5" fill="#10151d" opacity="0.9"/><rect x="474.1" y="423.3" width="34" height="11.2" rx="5" fill="#10151d" opacity="0.9"/><rect x="565.9" y="423.3" width="34" height="11.2" rx="5" fill="#10151d" opacity="0.9"/><rect x="452" y="360" width="170" height="70" rx="18" fill="#8f7bd6"/><rect x="460.5" y="364.9" width="153" height="22.4" rx="12.6" fill="#ffffff" opacity="0.16"/><rect x="503" y="370.5" width="74.8" height="49" rx="14" fill="#0b1016" opacity="0.16"/><rect x="540.4" y="374.7" width="31.4" height="40.6" rx="10.5" fill="#efeaff" opacity="0.88"/><rect x="508.2" y="376.8" width="25.4" height="36.4" rx="10.5" fill="#efeaff" opacity="0.68"/><rect x="612.5" y="370.5" width="6" height="11.9" rx="3" fill="#fff6cf"/><rect x="612.5" y="407.6" width="6" height="11.9" rx="3" fill="#fff6cf"/><rect x="455.6" y="371.9" width="6" height="11.9" rx="3" fill="#ff5a5f"/><rect x="455.6" y="406.2" width="6" height="11.9" rx="3" fill="#ff5a5f"/></g>
       </g>
-      <path d="M720 284h58v76h-58" fill="none" stroke="#76dfaa" stroke-width="12" stroke-linecap="round" filter="url(#yellowGlow)"/>
-      <path d="M680 282l46 36-46 36v-24h-98v-28h98z" fill="#fff3b6"/>
-      <g font-family="Arial, sans-serif" font-weight="900" fill="#dceaff">
-        <text x="56" y="342" font-size="28">300 уровней</text>
-        <text x="56" y="382" font-size="28">3 режима</text>
+      <!-- текстовый блок слева -->
+      <text x="50" y="120" font-family="Arial, sans-serif" font-size="58" font-weight="900" fill="url(#title)">Пробка</text>
+      <text x="50" y="184" font-family="Arial, sans-serif" font-size="58" font-weight="900" fill="url(#title)">во дворе</text>
+      <text x="52" y="232" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#9fb1cb">Двигай машины и</text>
+      <text x="52" y="262" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#9fb1cb">освободи выезд</text>
+      <g font-family="Arial, sans-serif" font-weight="900" fill="#e6eefb">
+        <circle cx="62" cy="322" r="6" fill="#ffd35c"/><text x="80" y="331" font-size="27">300 уровней</text>
+        <circle cx="62" cy="366" r="6" fill="#56d29c"/><text x="80" y="375" font-size="27">3 режима</text>
       </g>
-      <circle cx="76" cy="416" r="16" fill="#ffd35c"/>
-      <text x="106" y="425" font-family="Arial, sans-serif" font-size="22" font-weight="800" fill="#f2f6ff">Уровень дня</text>
+      <g transform="translate(50 400)">
+        <rect x="0" y="0" width="214" height="44" rx="22" fill="#ffffff" opacity="0.06"/>
+        <circle cx="26" cy="22" r="13" fill="#ffd35c"/><circle cx="26" cy="22" r="6" fill="#fff4be"/>
+        <text x="48" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="800" fill="#f2f6ff">Уровень дня</text>
+      </g>
     </svg>
   </body>
 </html>

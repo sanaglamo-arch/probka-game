@@ -99,40 +99,45 @@ function makeIconHtml() {
   return htmlShell(512, 512, `
     <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="bg" x1="60" y1="30" x2="460" y2="500">
-          <stop stop-color="#172334"/>
-          <stop offset="0.55" stop-color="#0e1622"/>
-          <stop offset="1" stop-color="#090d14"/>
+        <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512">
+          <stop stop-color="#20304a"/>
+          <stop offset="0.5" stop-color="#101a28"/>
+          <stop offset="1" stop-color="#080c13"/>
         </linearGradient>
-        <linearGradient id="red" x1="140" y1="270" x2="372" y2="270">
-          <stop stop-color="#ff7280"/>
-          <stop offset="1" stop-color="#e7354c"/>
+        <radialGradient id="vign" cx="48%" cy="40%" r="72%">
+          <stop offset="0.55" stop-color="#000000" stop-opacity="0"/>
+          <stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+        </radialGradient>
+        <linearGradient id="red" x1="0" y1="0" x2="0" y2="1">
+          <stop stop-color="#ff7a85"/>
+          <stop offset="1" stop-color="#e2304a"/>
         </linearGradient>
-        <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
-          <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000" flood-opacity="0.38"/>
+        <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%">
+          <feDropShadow dx="0" dy="16" stdDeviation="15" flood-color="#000" flood-opacity="0.42"/>
         </filter>
-        <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
-          <feDropShadow dx="0" dy="0" stdDeviation="12" flood-color="#ffcf5b" flood-opacity="0.55"/>
+        <filter id="exitGlow" x="-90%" y="-90%" width="280%" height="280%">
+          <feDropShadow dx="0" dy="0" stdDeviation="13" flood-color="#ffce5a" flood-opacity="0.85"/>
         </filter>
       </defs>
       <rect width="512" height="512" fill="url(#bg)"/>
-      <g opacity="0.23">
-        ${gridLines(76, 76, 6)}
+      <!-- лёгкая разметка парковочных рядов -->
+      <g stroke="#cdd8e8" stroke-width="5" opacity="0.09" stroke-linecap="round">
+        <path d="M70 150h372M70 256h372M70 362h372"/>
       </g>
-      <path d="M74 92c78-18 165-18 260 0 38 7 72 9 104 5" fill="none" stroke="#5d6d82" stroke-width="16" stroke-linecap="round" opacity="0.24"/>
-      <path d="M70 420c94 14 185 12 274-4 36-7 70-7 102 0" fill="none" stroke="#5d6d82" stroke-width="16" stroke-linecap="round" opacity="0.2"/>
-      <path d="M414 241h54v66h-54" fill="none" stroke="#74e0a4" stroke-width="16" stroke-linecap="round" filter="url(#glow)"/>
+      <!-- тёплый блик сверху-слева -->
+      <circle cx="150" cy="120" r="150" fill="#5a7bb0" opacity="0.10"/>
+      <!-- золотой выезд справа, на одной линии с красной машиной -->
+      <path d="M372 326h74" fill="none" stroke="#ffd35c" stroke-width="18" stroke-linecap="round" filter="url(#exitGlow)"/>
+      <path d="M438 298l44 28-44 28z" fill="#ffe08a" filter="url(#exitGlow)"/>
       <g filter="url(#shadow)">
-        ${car(110, 114, 74, 180, "#62a0ff", "#dbeafe", 22)}
-        ${car(204, 112, 170, 70, "#57d19c", "#ddfff1", 22)}
-        ${car(246, 206, 78, 190, "#e7b650", "#fff5c3", 22)}
-        ${car(132, 283, 260, 78, "url(#red)", "#fff0f2", 26, true)}
+        ${car(96, 92, 78, 182, "#5aa0ff", "#e8f2ff", 22)}
+        ${car(204, 92, 182, 74, "#56d29c", "#ddfff1", 22)}
+        ${car(250, 198, 78, 182, "#edc24f", "#fff6cf", 22)}
+        ${car(118, 286, 250, 80, "url(#red)", "#fff0f2", 26, true)}
       </g>
-      <g fill="#fff6d5" opacity="0.95">
-        <path d="M377 254l30 30-30 30v-18h-54v-24h54z"/>
-      </g>
-      <circle cx="402" cy="110" r="20" fill="#ffd35c"/>
-      <circle cx="402" cy="110" r="9" fill="#fff4be"/>
+      <rect width="512" height="512" fill="url(#vign)"/>
+      <circle cx="432" cy="92" r="22" fill="#ffd35c"/>
+      <circle cx="432" cy="92" r="10" fill="#fff4be"/>
     </svg>
   `);
 }
@@ -142,62 +147,64 @@ function makeCoverHtml() {
     <svg width="800" height="470" viewBox="0 0 800 470" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="coverBg" x1="0" y1="0" x2="800" y2="470">
-          <stop stop-color="#172436"/>
-          <stop offset="0.56" stop-color="#0b121d"/>
+          <stop stop-color="#1d2c42"/>
+          <stop offset="0.55" stop-color="#0c1420"/>
           <stop offset="1" stop-color="#070a10"/>
         </linearGradient>
-        <linearGradient id="title" x1="44" y1="62" x2="356" y2="168">
+        <linearGradient id="title" x1="44" y1="60" x2="360" y2="180">
           <stop stop-color="#ffffff"/>
           <stop offset="1" stop-color="#a9caff"/>
         </linearGradient>
-        <linearGradient id="target" x1="430" y1="260" x2="704" y2="260">
+        <linearGradient id="target" x1="0" y1="0" x2="0" y2="1">
           <stop stop-color="#ff7b86"/>
-          <stop offset="1" stop-color="#e9364d"/>
+          <stop offset="1" stop-color="#e2304a"/>
         </linearGradient>
-        <linearGradient id="road" x1="278" y1="456" x2="740" y2="58">
-          <stop stop-color="#273343"/>
-          <stop offset="0.52" stop-color="#17212e"/>
-          <stop offset="1" stop-color="#303b4a"/>
-        </linearGradient>
+        <radialGradient id="yardGlow" cx="62%" cy="42%" r="55%">
+          <stop offset="0" stop-color="#4f6fa0" stop-opacity="0.22"/>
+          <stop offset="1" stop-color="#4f6fa0" stop-opacity="0"/>
+        </radialGradient>
         <filter id="artShadow" x="-25%" y="-25%" width="150%" height="150%">
-          <feDropShadow dx="0" dy="22" stdDeviation="18" flood-color="#000" flood-opacity="0.36"/>
+          <feDropShadow dx="0" dy="20" stdDeviation="16" flood-color="#000" flood-opacity="0.4"/>
         </filter>
-        <filter id="yellowGlow" x="-40%" y="-40%" width="180%" height="180%">
-          <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#ffd35c" flood-opacity="0.45"/>
+        <filter id="exitGlow" x="-90%" y="-90%" width="280%" height="280%">
+          <feDropShadow dx="0" dy="0" stdDeviation="12" flood-color="#ffce5a" flood-opacity="0.8"/>
         </filter>
       </defs>
       <rect width="800" height="470" fill="url(#coverBg)"/>
-      <path d="M448 0h352v470H232z" fill="url(#road)" opacity="0.94"/>
-      <path d="M496 0h58L334 470h-66z" fill="#0c1119" opacity="0.35"/>
-      <path d="M660 0h42L468 470h-46z" fill="#0c1119" opacity="0.28"/>
-      <g opacity="0.32" stroke="#ffd35c" stroke-width="6" stroke-linecap="round" stroke-dasharray="34 28">
-        <path d="M584 28L392 444"/>
+      <rect width="800" height="470" fill="url(#yardGlow)"/>
+      <!-- площадка двора: асфальт с разметкой парковочных мест -->
+      <g transform="translate(372 26)">
+        <rect x="0" y="0" width="404" height="418" rx="26" fill="#1a2533"/>
+        <rect x="10" y="10" width="384" height="398" rx="20" fill="#222f40"/>
+        <g stroke="#cfd9e8" stroke-width="4" opacity="0.12" stroke-linecap="round">
+          <path d="M44 36v346M140 36v346M236 36v346M332 36v346"/>
+        </g>
+        <rect x="10" y="10" width="384" height="398" rx="20" fill="none" stroke="#3c4d63" stroke-width="3" opacity="0.5"/>
       </g>
-      <g opacity="0.22" stroke="#aebbd0" stroke-width="3">
-        <path d="M520 54l204 90"/>
-        <path d="M476 150l204 90"/>
-        <path d="M432 246l204 90"/>
-        <path d="M388 342l204 90"/>
-      </g>
-      <text x="52" y="106" font-family="Arial, sans-serif" font-size="54" font-weight="900" fill="url(#title)">Пробка</text>
-      <text x="52" y="166" font-family="Arial, sans-serif" font-size="54" font-weight="900" fill="url(#title)">во дворе</text>
-      <text x="56" y="214" font-family="Arial, sans-serif" font-size="24" font-weight="800" fill="#aebbd0">Двигай машины</text>
-      <text x="56" y="247" font-family="Arial, sans-serif" font-size="24" font-weight="800" fill="#aebbd0">и освободи выезд</text>
+      <!-- золотой выезд справа -->
+      <path d="M712 296h70" fill="none" stroke="#ffd35c" stroke-width="18" stroke-linecap="round" filter="url(#exitGlow)"/>
+      <path d="M772 268l40 28-40 28z" fill="#ffe08a" filter="url(#exitGlow)"/>
       <g filter="url(#artShadow)">
-        ${car(530, 66, 72, 172, "#69a4ff", "#e9f2ff", 18)}
-        ${car(632, 102, 72, 172, "#55d19c", "#ddfff1", 18)}
-        ${car(432, 144, 214, 76, "#e8b950", "#fff3bc", 20)}
-        ${car(494, 256, 244, 78, "url(#target)", "#fff0f2", 22, true)}
-        ${car(348, 330, 76, 150, "#6f8fb8", "#e9f2ff", 18)}
+        ${car(440, 70, 74, 168, "#5aa0ff", "#e9f2ff", 18)}
+        ${car(548, 70, 188, 72, "#56d29c", "#ddfff1", 18)}
+        ${car(648, 158, 74, 168, "#edc24f", "#fff3bc", 18)}
+        ${car(452, 256, 252, 80, "url(#target)", "#fff0f2", 22, true)}
+        ${car(452, 360, 170, 70, "#8f7bd6", "#efeaff", 18)}
       </g>
-      <path d="M720 284h58v76h-58" fill="none" stroke="#76dfaa" stroke-width="12" stroke-linecap="round" filter="url(#yellowGlow)"/>
-      <path d="M680 282l46 36-46 36v-24h-98v-28h98z" fill="#fff3b6"/>
-      <g font-family="Arial, sans-serif" font-weight="900" fill="#dceaff">
-        <text x="56" y="342" font-size="28">300 уровней</text>
-        <text x="56" y="382" font-size="28">3 режима</text>
+      <!-- текстовый блок слева -->
+      <text x="50" y="120" font-family="Arial, sans-serif" font-size="58" font-weight="900" fill="url(#title)">Пробка</text>
+      <text x="50" y="184" font-family="Arial, sans-serif" font-size="58" font-weight="900" fill="url(#title)">во дворе</text>
+      <text x="52" y="232" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#9fb1cb">Двигай машины и</text>
+      <text x="52" y="262" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#9fb1cb">освободи выезд</text>
+      <g font-family="Arial, sans-serif" font-weight="900" fill="#e6eefb">
+        <circle cx="62" cy="322" r="6" fill="#ffd35c"/><text x="80" y="331" font-size="27">300 уровней</text>
+        <circle cx="62" cy="366" r="6" fill="#56d29c"/><text x="80" y="375" font-size="27">3 режима</text>
       </g>
-      <circle cx="76" cy="416" r="16" fill="#ffd35c"/>
-      <text x="106" y="425" font-family="Arial, sans-serif" font-size="22" font-weight="800" fill="#f2f6ff">Уровень дня</text>
+      <g transform="translate(50 400)">
+        <rect x="0" y="0" width="214" height="44" rx="22" fill="#ffffff" opacity="0.06"/>
+        <circle cx="26" cy="22" r="13" fill="#ffd35c"/><circle cx="26" cy="22" r="6" fill="#fff4be"/>
+        <text x="48" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="800" fill="#f2f6ff">Уровень дня</text>
+      </g>
     </svg>
   `);
 }
@@ -228,22 +235,54 @@ function gridLines(x, y, cells, step = 55) {
   return lines.join("");
 }
 
+// Детальная машина вид сверху: корпус с бликом, кабина, лобовое/заднее стекло,
+// 4 колеса, фары (белые спереди) и стопы (красные сзади).
 function car(x, y, width, height, fill, windowFill, radius, target = false) {
   const horizontal = width >= height;
-  const winW = horizontal ? width * 0.22 : width * 0.55;
-  const winH = horizontal ? height * 0.48 : height * 0.24;
-  const winX = x + (horizontal ? width * 0.15 : width * 0.22);
-  const winY = y + (horizontal ? height * 0.24 : height * 0.14);
-  const stripe = target
-    ? `<rect x="${x + width * 0.48}" y="${y + 8}" width="${Math.max(8, horizontal ? 12 : width - 16)}" height="${horizontal ? height - 16 : 12}" rx="6" fill="#ffffff" opacity="0.24"/>`
-    : "";
-  return `
-    <g>
-      <rect x="${x}" y="${y}" width="${width}" height="${height}" rx="${radius}" fill="${fill}"/>
-      <rect x="${winX}" y="${winY}" width="${winW}" height="${winH}" rx="10" fill="${windowFill}" opacity="0.82"/>
-      ${stripe}
-      <rect x="${x + 10}" y="${y + height - 8}" width="${width - 20}" height="6" rx="3" fill="#000" opacity="0.12"/>
-    </g>`;
+  const bodyR = Math.min(radius, Math.min(width, height) * 0.46);
+  const glass = windowFill;
+  const n = (v) => Number(v.toFixed(1));
+  const p = [];
+  const wheel = (wx, wy, ww, wh) =>
+    `<rect x="${n(wx)}" y="${n(wy)}" width="${n(ww)}" height="${n(wh)}" rx="${n(Math.min(ww, wh) * 0.45)}" fill="#10151d" opacity="0.9"/>`;
+
+  if (horizontal) {
+    const ww = width * 0.2, wh = height * 0.16;
+    const rear = x + width * 0.13, front = x + width * 0.87 - ww;
+    p.push(wheel(rear, y - wh * 0.4, ww, wh), wheel(front, y - wh * 0.4, ww, wh));
+    p.push(wheel(rear, y + height - wh * 0.6, ww, wh), wheel(front, y + height - wh * 0.6, ww, wh));
+  } else {
+    const ww = width * 0.16, wh = height * 0.2;
+    const rear = y + height * 0.13, front = y + height * 0.87 - wh;
+    p.push(wheel(x - ww * 0.4, rear, ww, wh), wheel(x - ww * 0.4, front, ww, wh));
+    p.push(wheel(x + width - ww * 0.6, rear, ww, wh), wheel(x + width - ww * 0.6, front, ww, wh));
+  }
+
+  p.push(`<rect x="${n(x)}" y="${n(y)}" width="${n(width)}" height="${n(height)}" rx="${n(bodyR)}" fill="${fill}"/>`);
+  p.push(`<rect x="${n(x + width * 0.05)}" y="${n(y + height * 0.07)}" width="${n(width * 0.9)}" height="${n(height * 0.32)}" rx="${n(bodyR * 0.7)}" fill="#ffffff" opacity="0.16"/>`);
+
+  if (horizontal) {
+    const cx = x + width * 0.3, cw = width * 0.44;
+    p.push(`<rect x="${n(cx)}" y="${n(y + height * 0.15)}" width="${n(cw)}" height="${n(height * 0.7)}" rx="${n(height * 0.2)}" fill="#0b1016" opacity="0.16"/>`);
+    p.push(`<rect x="${n(cx + cw * 0.5)}" y="${n(y + height * 0.21)}" width="${n(cw * 0.42)}" height="${n(height * 0.58)}" rx="${n(height * 0.15)}" fill="${glass}" opacity="0.88"/>`);
+    p.push(`<rect x="${n(cx + cw * 0.07)}" y="${n(y + height * 0.24)}" width="${n(cw * 0.34)}" height="${n(height * 0.52)}" rx="${n(height * 0.15)}" fill="${glass}" opacity="0.68"/>`);
+    const hw = width * 0.035, hh = height * 0.17;
+    p.push(`<rect x="${n(x + width - hw * 1.6)}" y="${n(y + height * 0.15)}" width="${n(hw)}" height="${n(hh)}" rx="${n(hw * 0.5)}" fill="#fff6cf"/>`);
+    p.push(`<rect x="${n(x + width - hw * 1.6)}" y="${n(y + height * 0.68)}" width="${n(hw)}" height="${n(hh)}" rx="${n(hw * 0.5)}" fill="#fff6cf"/>`);
+    p.push(`<rect x="${n(x + hw * 0.6)}" y="${n(y + height * 0.17)}" width="${n(hw)}" height="${n(hh)}" rx="${n(hw * 0.5)}" fill="#ff5a5f"/>`);
+    p.push(`<rect x="${n(x + hw * 0.6)}" y="${n(y + height * 0.66)}" width="${n(hw)}" height="${n(hh)}" rx="${n(hw * 0.5)}" fill="#ff5a5f"/>`);
+  } else {
+    const cy = y + height * 0.3, ch = height * 0.44;
+    p.push(`<rect x="${n(x + width * 0.15)}" y="${n(cy)}" width="${n(width * 0.7)}" height="${n(ch)}" rx="${n(width * 0.2)}" fill="#0b1016" opacity="0.16"/>`);
+    p.push(`<rect x="${n(x + width * 0.21)}" y="${n(cy + ch * 0.5)}" width="${n(width * 0.58)}" height="${n(ch * 0.42)}" rx="${n(width * 0.15)}" fill="${glass}" opacity="0.88"/>`);
+    p.push(`<rect x="${n(x + width * 0.24)}" y="${n(cy + ch * 0.07)}" width="${n(width * 0.52)}" height="${n(ch * 0.32)}" rx="${n(width * 0.15)}" fill="${glass}" opacity="0.68"/>`);
+    const lw = width * 0.17, lh = height * 0.035;
+    p.push(`<rect x="${n(x + width * 0.15)}" y="${n(y + height - lh * 1.6)}" width="${n(lw)}" height="${n(lh)}" rx="${n(lh * 0.5)}" fill="#fff6cf"/>`);
+    p.push(`<rect x="${n(x + width * 0.85 - lw)}" y="${n(y + height - lh * 1.6)}" width="${n(lw)}" height="${n(lh)}" rx="${n(lh * 0.5)}" fill="#fff6cf"/>`);
+    p.push(`<rect x="${n(x + width * 0.15)}" y="${n(y + lh * 0.6)}" width="${n(lw)}" height="${n(lh)}" rx="${n(lh * 0.5)}" fill="#ff5a5f"/>`);
+    p.push(`<rect x="${n(x + width * 0.85 - lw)}" y="${n(y + lh * 0.6)}" width="${n(lw)}" height="${n(lh)}" rx="${n(lh * 0.5)}" fill="#ff5a5f"/>`);
+  }
+  return `<g>${p.join("")}</g>`;
 }
 
 function makeReadme() {
