@@ -675,7 +675,7 @@
 
     function showWinModal(options = {}) {
       const els = getEls();
-      if (els.winTitle) els.winTitle.textContent = options.title || "";
+      if (els.winTitle) els.winTitle.textContent = options.packComplete ? "Набор пройден!" : (options.title || "");
       if (els.starsLabel) els.starsLabel.textContent = options.starsLabel || "☆☆☆";
       if (els.rewardLabel) {
         const rewardText = options.rewardText || "";
@@ -687,6 +687,7 @@
       if (els.nextLevelButton) els.nextLevelButton.textContent = options.nextText || "Следующий";
       if (els.winMenuButton) els.winMenuButton.hidden = !options.showMenuButton;
       if (els.winModal) {
+        els.winModal.classList.toggle("pack-complete", Boolean(options.packComplete));
         els.winModal.hidden = false;
         requestAnimationFrame(() => {
           try {

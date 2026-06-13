@@ -94,6 +94,13 @@ body {
   overflow: hidden;
 }
 
+/* Пока идёт инициализация (восстановление облака/прогресса) — не мигаем
+   пустыми нулями; класс снимается в show() при первом показе экрана. */
+body.loading .topbar,
+body.loading .menu-panel {
+  opacity: 0;
+}
+
 /* Игровое поле не должно запускать жесты браузера (скролл/зум) и выделение. */
 #gameCanvas {
   touch-action: none;
@@ -2441,6 +2448,15 @@ canvas.skin-preview-sprite::after {
 
 .win-glow {
   background: radial-gradient(60% 100% at 50% 0%, rgba(255, 200, 87, 0.2), transparent 70%);
+}
+
+/* Праздник конца набора: модал победы получает зелёный акцент */
+#winModal.pack-complete .win-card {
+  border-color: rgba(111, 217, 168, 0.5);
+}
+
+#winModal.pack-complete .win-glow {
+  background: radial-gradient(60% 100% at 50% 0%, rgba(111, 217, 168, 0.24), transparent 70%);
 }
 
 .fail-glow {

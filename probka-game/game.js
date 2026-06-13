@@ -411,6 +411,7 @@
   }
 
   function show(view, options = {}) {
+    document.body.classList.remove("loading");
     if (isTutorialActive() && !options.fromTutorial) {
       const allowedView = getTutorialAllowedView();
       if (view !== allowedView) {
@@ -1269,6 +1270,7 @@
 
   function completeCampaignLevel(stars) {
     const coinsBefore = state.coins;
+    const isPackEnd = level.modeOrder > 0 && level.modeOrder % 20 === 0;
     const previous = state.completed[level.id];
     const previousStars = previous ? previous.stars || 0 : 0;
     const reward = Math.max(0, getCampaignStarReward(level, stars) - getCampaignStarReward(level, previousStars));
@@ -1300,11 +1302,13 @@
       rewardText: formatCampaignRewardLabel(reward, missionReward, elapsedMs),
       canDouble: reward > 0,
       nextText: "Следующий",
-      showMenuButton: false
+      showMenuButton: false,
+      packComplete: isPackEnd
     });
     updateHud();
     rewardCoinFeedback(coinsBefore);
     revealStars(stars);
+    if (isPackEnd) setTimeout(() => playSound("coin"), 720);
     updateGameplayMarker();
     if (missionReward) showToast(`Миссии: +${missionReward} монет`);
   }
@@ -2223,7 +2227,11 @@
   async function initializeGame() {
     loadGeneratedSkinPack();
     bindEvents();
-    await initializePlatform();
+    try {
+      await initializePlatform();
+    } catch (error) {
+      // Платформа не критична — продолжаем на локальном прогрессе.
+    }
     syncDailyMissions();
     saveProgress({ touch: false });
     applyAssetShowcaseState();
