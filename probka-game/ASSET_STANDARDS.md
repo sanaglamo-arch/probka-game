@@ -118,7 +118,7 @@ Before integration:
 - The themed sprite generator writes both runtime assets and matching `source/traffic` + `source/obstacles` copies.
 - To confirm every active yard has a procedural theme, use `node probka-game/tools/generate-themed-yard-sprites.js --check-coverage`.
 - To create a lightweight visual review page, use `node probka-game/tools/generate-themed-yard-sprites.js --gallery`.
-- To regenerate all full-art yard boards from AI source images and the deterministic shared skeleton, use `python3 probka-game/tools/generate-yard-boards.py`.
+- To regenerate all full-art yard boards procedurally (cartoon style, deterministic, no AI source images), use `python3 probka-game/tools/generate-yard-boards.py`.
 - Inspect every generated source and final sprite visually.
 - Validate final PNG dimensions.
 - Validate alpha: transparent corners for sprites, no colored background.
