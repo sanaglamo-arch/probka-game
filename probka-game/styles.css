@@ -242,6 +242,7 @@ h2 {
 }
 
 .wallet {
+  position: relative;
   display: inline-flex;
   min-width: 92px;
   min-height: 46px;
@@ -256,6 +257,28 @@ h2 {
     var(--surface-sunken);
   box-shadow: var(--elev-1);
   font-weight: 750;
+}
+
+.coin-pop {
+  position: absolute;
+  top: -22px;
+  right: 12px;
+  pointer-events: none;
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 850;
+  opacity: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.coin-pop.active {
+  animation: coinFloat 0.9s ease-out forwards;
+}
+
+@keyframes coinFloat {
+  0% { opacity: 0; transform: translateY(4px) scale(0.9); }
+  20% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-20px) scale(1); }
 }
 
 .coin {

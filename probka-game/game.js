@@ -38,6 +38,7 @@
   const els = {
     app: document.getElementById("app"),
     coins: document.getElementById("coins"),
+    coinPop: document.getElementById("coinPop"),
     currentLevelLabel: document.getElementById("currentLevelLabel"),
     modeStatusLabel: document.getElementById("modeStatusLabel"),
     dailyStatusLabel: document.getElementById("dailyStatusLabel"),
@@ -452,6 +453,37 @@
 
   function updateHud() {
     if (screenController) screenController.updateHud();
+  }
+
+  // Анимация прироста монет в кошельке + всплывающее «+N» после награды.
+  let coinAnimFrame = null;
+  function animateCoins(from, to, duration = 560) {
+    if (!els.coins) return;
+    const reduce = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (coinAnimFrame) cancelAnimationFrame(coinAnimFrame);
+    if (reduce || from === to) {
+      els.coins.textContent = String(to);
+      return;
+    }
+    const start = performance.now();
+    const step = (now) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      els.coins.textContent = String(Math.round(from + (to - from) * eased));
+      coinAnimFrame = t < 1 ? requestAnimationFrame(step) : null;
+    };
+    coinAnimFrame = requestAnimationFrame(step);
+  }
+
+  function rewardCoinFeedback(coinsBefore) {
+    const gain = state.coins - coinsBefore;
+    animateCoins(coinsBefore, state.coins);
+    if (gain > 0 && els.coinPop) {
+      els.coinPop.textContent = `+${gain}`;
+      els.coinPop.classList.remove("active");
+      void els.coinPop.offsetWidth;
+      els.coinPop.classList.add("active");
+    }
   }
 
   function renderActionButtons() {
@@ -1225,6 +1257,7 @@
   }
 
   function completeCampaignLevel(stars) {
+    const coinsBefore = state.coins;
     const previous = state.completed[level.id];
     const previousStars = previous ? previous.stars || 0 : 0;
     const reward = Math.max(0, getCampaignStarReward(level, stars) - getCampaignStarReward(level, previousStars));
@@ -1259,6 +1292,7 @@
       showMenuButton: false
     });
     updateHud();
+    rewardCoinFeedback(coinsBefore);
     revealStars(stars);
     updateGameplayMarker();
     if (missionReward) showToast(`Миссии: +${missionReward} монет`);
@@ -1282,6 +1316,7 @@
   }
 
   function completeDailyLevel(stars) {
+    const coinsBefore = state.coins;
     const dateKey = activeDailyDateKey || getDailyDateKey();
     const isToday = dateKey === getDailyDateKey();
     let completion = state.daily.completions[dateKey];
@@ -1327,6 +1362,7 @@
       showMenuButton: true
     });
     updateHud();
+    rewardCoinFeedback(coinsBefore);
     revealStars(stars);
     updateGameplayMarker();
     if (totalReward || archiveReward) showToast(`${isToday ? "Уровень дня" : "Архив"}: +${totalReward + archiveReward} монет`);
