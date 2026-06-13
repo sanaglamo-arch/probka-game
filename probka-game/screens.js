@@ -146,6 +146,21 @@
       return button;
     }
 
+    // Единое состояние кнопки покупки/надевания для скинов и дворов.
+    function applyOwnableButtonState(button, { equipped, owned, canBuy }) {
+      if (equipped) {
+        button.textContent = "Надето";
+        button.disabled = true;
+      } else if (owned) {
+        button.textContent = "Надеть";
+      } else if (canBuy) {
+        button.textContent = "Купить";
+      } else {
+        button.textContent = "Не хватает";
+        button.disabled = true;
+      }
+    }
+
     function renderGarage() {
       const els = getEls();
       if (!els.garageGrid) return;
@@ -223,17 +238,7 @@
         title.innerHTML = `<strong>${skin.name}</strong><span>${skin.price ? deps.formatCoinAmount(skin.price, { short: true }) : "База"}</span>`;
 
         const button = document.createElement("button");
-        if (equipped) {
-          button.textContent = "Надето";
-          button.disabled = true;
-        } else if (owned) {
-          button.textContent = "Надеть";
-        } else if (canBuy) {
-          button.textContent = "Купить";
-        } else {
-          button.textContent = "Не хватает";
-          button.disabled = true;
-        }
+        applyOwnableButtonState(button, { equipped, owned, canBuy });
         button.addEventListener("click", () => deps.buyOrEquipSkin(skin));
 
         meta.appendChild(title);
@@ -270,17 +275,7 @@
         rarity.textContent = yard.concept || yard.rarity || "Коллекция";
 
         const button = document.createElement("button");
-        if (equipped) {
-          button.textContent = "Надето";
-          button.disabled = true;
-        } else if (owned) {
-          button.textContent = "Надеть";
-        } else if (canBuy) {
-          button.textContent = "Купить";
-        } else {
-          button.textContent = "Не хватает";
-          button.disabled = true;
-        }
+        applyOwnableButtonState(button, { equipped, owned, canBuy });
         button.addEventListener("click", () => deps.buyOrEquipYard(yard));
 
         meta.appendChild(title);
