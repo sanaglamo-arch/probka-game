@@ -29,7 +29,7 @@
         hints: 3,
         completed: {},
         unlocked: Object.fromEntries(modes.map((mode) => [getModeLevels(mode.id)[0]?.id, true]).filter(([id]) => id)),
-        ad: { levelsSinceInterstitial: 0, completedLevels: 0 },
+        ad: { levelsSinceInterstitial: 0, completedLevels: 0, lastInterstitialAt: 0 },
         garage: {
           ownedSkins: { classic_red: true },
           equippedSkinId: "classic_red",

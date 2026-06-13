@@ -509,6 +509,7 @@
     if (timerFrame) cancelAnimationFrame(timerFrame);
     timerFrame = null;
     timerState = null;
+    updateGameplayMarker();
   }
 
   function pauseTimer() {
@@ -1563,9 +1564,16 @@
     return adsController ? adsController.runAdPause(showAdCallback) : showAdCallback();
   }
 
+  // Минимальный интервал между межстраничными роликами (рекомендация Яндекса —
+  // не показывать рекламу слишком часто; счётчик уровней дополняем таймером).
+  const MIN_INTERSTITIAL_INTERVAL_MS = 60000;
+
   function maybeShowInterstitial(callback) {
-    if (state.ad.completedLevels >= 3 && state.ad.levelsSinceInterstitial >= 1) {
+    const now = Date.now();
+    const sinceLast = now - (state.ad.lastInterstitialAt || 0);
+    if (state.ad.completedLevels >= 3 && state.ad.levelsSinceInterstitial >= 1 && sinceLast >= MIN_INTERSTITIAL_INTERVAL_MS) {
       state.ad.levelsSinceInterstitial = 0;
+      state.ad.lastInterstitialAt = now;
       saveProgress();
       showInterstitial(callback);
       return;
@@ -2120,8 +2128,9 @@
     await restoreCloudProgress();
   }
 
-  function applyPlatformLanguage(language) {
-    document.documentElement.lang = String(language || "ru").startsWith("ru") ? "ru" : "ru";
+  function applyPlatformLanguage() {
+    // Игра локализована только на русский; язык платформы не меняет контент.
+    document.documentElement.lang = "ru";
   }
 
   async function restoreCloudProgress() {
@@ -2441,6 +2450,21 @@
         pauseTimer();
         pauseAudio();
       } else if (!isPlatformPaused && !isPlatformAdOpen && els.winModal.hidden && els.failModal.hidden) {
+        resumeTimer();
+        resumeAudio();
+      }
+      updateGameplayMarker();
+    });
+
+    // Некоторые мобильные браузеры и WebView Яндекса не всегда шлют
+    // visibilitychange при сворачивании — дублируем паузу по blur/focus окна.
+    window.addEventListener("blur", () => {
+      pauseTimer();
+      pauseAudio();
+      updateGameplayMarker();
+    });
+    window.addEventListener("focus", () => {
+      if (!document.hidden && !isPlatformPaused && !isPlatformAdOpen && els.winModal.hidden && els.failModal.hidden) {
         resumeTimer();
         resumeAudio();
       }
