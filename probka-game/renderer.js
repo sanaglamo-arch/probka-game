@@ -2166,6 +2166,28 @@
       ctx.arc(x + Math.cos(angle) * distance, y + Math.sin(angle) * distance, Math.max(3, cellSize * 0.06), 0, Math.PI * 2);
       ctx.fill();
     }
+
+    // Конфетти-вспышка: детерминированные разлетающиеся прямоугольники
+    // с гравитацией, вращением и затуханием (без Math.random для повторяемости).
+    const frac = (v) => v - Math.floor(v);
+    const rand = (i, s) => frac(Math.sin((i + 1) * 12.9898 + s * 78.233) * 43758.5453);
+    const confetti = [palette.win, palette.winCoin, "#85b8ff", "#f2828d", "#6fd9a8", "#ffd97e"];
+    const fade = Math.max(0, 1 - progress * 1.05);
+    for (let i = 0; i < 26; i += 1) {
+      const angle = rand(i, 1) * Math.PI * 2;
+      const speed = 0.8 + rand(i, 2) * 1.5;
+      const dist = cellSize * speed * (0.6 + progress * 2.3);
+      const px = x + Math.cos(angle) * dist;
+      const py = y + Math.sin(angle) * dist + cellSize * progress * progress * 1.7;
+      const size = cellSize * (0.05 + rand(i, 3) * 0.045);
+      ctx.save();
+      ctx.globalAlpha = fade;
+      ctx.fillStyle = confetti[i % confetti.length];
+      ctx.translate(px, py);
+      ctx.rotate(angle + progress * (4 + rand(i, 1) * 4));
+      ctx.fillRect(-size / 2, -size / 4, size, size / 2);
+      ctx.restore();
+    }
     ctx.restore();
     return false;
   }

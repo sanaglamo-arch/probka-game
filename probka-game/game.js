@@ -258,7 +258,8 @@
         applyMove,
         startBump,
         draw,
-        clamp
+        clamp,
+        playSound
       })
     : null;
   const adsController = adsApi.createController
@@ -1116,6 +1117,7 @@
     const fromY = vehicle.y;
     const toX = vehicle.x + (vehicle.axis === "horizontal" ? delta : 0);
     const toY = vehicle.y + (vehicle.axis === "vertical" ? delta : 0);
+    vibrate(8);
 
     moveHistory.push({
       vehicles: vehicles.map(cloneVehicle),
@@ -1150,6 +1152,7 @@
     if (!vehicle || !sign || isAnimating) return;
     if (!isTutorialActive()) clearHint();
     playSound("bump");
+    vibrate([14, 8, 10]);
     startVehicleAnimation({
       type: "bump",
       vehicleId: vehicle.id,
@@ -1184,7 +1187,8 @@
     const fromX = target.x;
     const fromY = target.y;
     playSound("win");
-    winFx = { start: performance.now(), duration: 900 };
+    vibrate([12, 40, 30, 40, 60]);
+    winFx = { start: performance.now(), duration: 1400 };
     startVehicleAnimation({
       type: "win",
       vehicleId: target.id,
@@ -1358,6 +1362,7 @@
     clearHint();
     if (timerState) timerState.finished = true;
     playSound("bump");
+    vibrate([22, 10, 22]);
     let failOptions;
     if (reason === "time") {
       failOptions = {
@@ -1991,6 +1996,18 @@
 
   function playSound(name) {
     if (audio) audio.play(name);
+  }
+
+  // Тактильная отдача на мобильных. navigator.vibrate тихо игнорируется
+  // на iOS/десктопе; гейтится отдельной настройкой haptics.
+  function vibrate(pattern) {
+    if (typeof navigator !== "undefined" && navigator.vibrate && state.settings && state.settings.haptics !== false) {
+      try {
+        navigator.vibrate(pattern);
+      } catch {
+        // Некоторые встроенные браузеры бросают на vibrate — безопасно игнорируем.
+      }
+    }
   }
 
   function getVehicleColor(vehicle) {
