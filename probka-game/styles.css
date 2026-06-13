@@ -2536,6 +2536,13 @@ canvas.skin-preview-sprite::after {
   transform: scale(1.08);
 }
 
+#rewardLabel.reward-empty {
+  border-color: var(--line);
+  background: rgba(226, 234, 255, 0.04);
+  color: var(--muted);
+  font-weight: 650;
+}
+
 .modal-actions {
   position: relative;
   display: grid;
@@ -2574,6 +2581,14 @@ canvas.skin-preview-sprite::after {
 }
 
 /* ---------- обучение ---------- */
+
+body.tutorial-active .tutorial-overlay::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 5, 10, 0.42);
+  pointer-events: none;
+}
 
 .tutorial-overlay {
   position: fixed;

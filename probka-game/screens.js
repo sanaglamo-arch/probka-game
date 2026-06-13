@@ -80,6 +80,10 @@
         section.appendChild(grid);
         els.levelsGrid.appendChild(section);
       }
+      requestAnimationFrame(() => {
+        const current = els.levelsGrid.querySelector(".level-button.current");
+        if (current) current.scrollIntoView({ block: "nearest" });
+      });
     }
 
     function renderModeSelect() {
@@ -674,8 +678,10 @@
       if (els.winTitle) els.winTitle.textContent = options.title || "";
       if (els.starsLabel) els.starsLabel.textContent = options.starsLabel || "☆☆☆";
       if (els.rewardLabel) {
-        els.rewardLabel.textContent = options.rewardText || "";
+        const rewardText = options.rewardText || "";
+        els.rewardLabel.textContent = rewardText;
         els.rewardLabel.classList.remove("reward-pop");
+        els.rewardLabel.classList.toggle("reward-empty", !rewardText.includes("+"));
       }
       if (els.doubleRewardButton) els.doubleRewardButton.hidden = !options.canDouble;
       if (els.nextLevelButton) els.nextLevelButton.textContent = options.nextText || "Следующий";

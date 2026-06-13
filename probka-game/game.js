@@ -2519,8 +2519,16 @@
     els.canvas.addEventListener("pointermove", onPointerMove);
     els.canvas.addEventListener("pointerup", onPointerUp);
     els.canvas.addEventListener("pointercancel", onPointerUp);
-    window.addEventListener("resize", resizeCanvas);
-    if (window.visualViewport) window.visualViewport.addEventListener("resize", resizeCanvas);
+    let resizeRaf = null;
+    const scheduledResize = () => {
+      if (resizeRaf) return;
+      resizeRaf = requestAnimationFrame(() => {
+        resizeRaf = null;
+        resizeCanvas();
+      });
+    };
+    window.addEventListener("resize", scheduledResize);
+    if (window.visualViewport) window.visualViewport.addEventListener("resize", scheduledResize);
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         pauseTimer();
