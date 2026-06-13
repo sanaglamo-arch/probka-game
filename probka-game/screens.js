@@ -6,7 +6,8 @@
     game: "playArea",
     levels: "levelsPanel",
     garage: "garagePanel",
-    missions: "missionsPanel"
+    missions: "missionsPanel",
+    stats: "statsPanel"
   };
 
   function setVisibleView(els, view) {
@@ -355,6 +356,59 @@
       });
     }
 
+    function renderStats() {
+      const els = getEls();
+      if (!els.statsBody) return;
+      const state = getState();
+      const completed = state.completed || {};
+      const ids = Object.keys(completed);
+      let totalSolved = 0;
+      let threeStars = 0;
+      ids.forEach((id) => {
+        totalSolved += 1;
+        if ((completed[id].stars || 0) >= 3) threeStars += 1;
+      });
+      const completions = (state.daily && state.daily.completions) || {};
+      const dailyDone = Object.keys(completions).filter((key) => completions[key]).length;
+      const streak = (state.daily && state.daily.streak) || { current: 0, best: 0 };
+      const coins = state.coins || 0;
+
+      const tiles = [
+        { icon: "i-grid", value: totalSolved, label: "Уровней пройдено" },
+        { icon: "i-star", value: threeStars, label: "На три звезды" },
+        { icon: "i-calendar", value: dailyDone, label: "Дней пройдено" },
+        { icon: "i-trophy", value: streak.best || 0, label: "Лучшая серия" },
+        { icon: "i-clock", value: streak.current || 0, label: "Текущая серия" },
+        { icon: "i-coin", value: String(coins), label: "Монеты" }
+      ];
+
+      const modeRows = getModes().map((mode) => {
+        const modeLevels = deps.getModeLevels(mode.id);
+        const total = modeLevels.length;
+        const done = modeLevels.filter((lvl) => completed[lvl.id]).length;
+        return { title: mode.title || mode.id, done, total, pct: total ? Math.round((done / total) * 100) : 0 };
+      });
+
+      els.statsBody.innerHTML = `
+        <div class="stats-grid">
+          ${tiles.map((tile) => `
+            <div class="stat-tile">
+              <span class="stat-tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#${tile.icon}" /></svg></span>
+              <strong>${tile.value}</strong>
+              <span class="stat-tile-label">${tile.label}</span>
+            </div>`).join("")}
+        </div>
+        <p class="stats-section-title">Прогресс по режимам</p>
+        <div class="stats-modes">
+          ${modeRows.map((mode) => `
+            <div class="stats-mode-row">
+              <div class="stats-mode-head"><span>${mode.title}</span><strong>${mode.done}/${mode.total}</strong></div>
+              <div class="stats-mode-bar"><span style="width: ${mode.pct}%"></span></div>
+            </div>`).join("")}
+        </div>
+      `;
+    }
+
     function renderDailyPanel(options = {}) {
       const els = getEls();
       const dailyApi = deps.dailyApi;
@@ -670,6 +724,7 @@
       renderModeSelect,
       renderGarage,
       renderMissions,
+      renderStats,
       renderDailyWeek,
       renderDailyPanel,
       updateHud,

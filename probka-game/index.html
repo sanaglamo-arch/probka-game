@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <title>Пробка во дворе</title>
     <link rel="icon" href="./favicon.svg?v=polish1" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=polish5" />
+    <link rel="stylesheet" href="./styles.css?v=polish6" />
   </head>
   <body>
     <svg class="svg-defs" aria-hidden="true" focusable="false">
@@ -168,6 +168,10 @@
               <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-star" /></svg></span>
               <span class="nav-copy"><strong>Миссии</strong><small id="missionStatusLabel">0/3 выполнено</small></span>
             </button>
+            <button class="nav-tile" id="statsButton">
+              <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-trophy" /></svg></span>
+              <span class="nav-copy"><strong>Статистика</strong><small>Прогресс и рекорды</small></span>
+            </button>
           </div>
 
           <details class="settings-strip">
@@ -281,6 +285,19 @@
           </div>
           <div class="mission-refresh" id="missionRefreshLabel"></div>
           <div class="missions-list" id="missionsList"></div>
+        </section>
+
+        <section class="panel stats-panel" id="statsPanel" hidden>
+          <div class="panel-head">
+            <button class="icon-button" id="statsBackButton" aria-label="Назад">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back" /></svg>
+            </button>
+            <div class="screen-title">
+              <p class="eyebrow">Прогресс</p>
+              <h2>Статистика</h2>
+            </div>
+          </div>
+          <div class="stats-body" id="statsBody"></div>
         </section>
       </main>
 

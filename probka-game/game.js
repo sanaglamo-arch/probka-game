@@ -69,6 +69,10 @@
     dailyButton: document.getElementById("dailyButton"),
     garageButton: document.getElementById("garageButton"),
     missionsButton: document.getElementById("missionsButton"),
+    statsButton: document.getElementById("statsButton"),
+    statsPanel: document.getElementById("statsPanel"),
+    statsBody: document.getElementById("statsBody"),
+    statsBackButton: document.getElementById("statsBackButton"),
     levelSelectButton: document.getElementById("levelSelectButton"),
     resetButton: document.getElementById("resetButton"),
     tutorialReplayButton: document.getElementById("tutorialReplayButton"),
@@ -439,6 +443,7 @@
     if (view === "levels") renderLevelSelect();
     if (view === "garage") renderGarage();
     if (view === "missions") renderMissions();
+    if (view === "stats") renderStats();
     applyCaptureMode();
     if (view === "game") resizeCanvas();
     updateGameplayMarker();
@@ -967,6 +972,10 @@
 
   function renderMissions() {
     if (screenController) screenController.renderMissions();
+  }
+
+  function renderStats() {
+    if (screenController) screenController.renderStats();
   }
 
   function renderDailyWeek() {
@@ -2416,6 +2425,13 @@
       playSound("button");
       show("missions");
     });
+    if (els.statsButton) {
+      els.statsButton.addEventListener("click", () => {
+        if (blockTutorialEscape()) return;
+        playSound("button");
+        show("stats");
+      });
+    }
     els.levelSelectButton.addEventListener("click", () => {
       if (blockTutorialEscape()) return;
       playSound("button");
@@ -2473,6 +2489,13 @@
       playSound("button");
       show("menu");
     });
+    if (els.statsBackButton) {
+      els.statsBackButton.addEventListener("click", () => {
+        if (blockTutorialEscape()) return;
+        playSound("button");
+        show("menu");
+      });
+    }
     els.restartButton.addEventListener("click", restartLevel);
     els.muteButton.addEventListener("click", toggleMute);
     els.undoButton.addEventListener("click", () => requestToolAction("undo"));
