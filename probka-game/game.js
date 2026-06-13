@@ -72,6 +72,8 @@
     levelSelectButton: document.getElementById("levelSelectButton"),
     resetButton: document.getElementById("resetButton"),
     tutorialReplayButton: document.getElementById("tutorialReplayButton"),
+    soundToggleButton: document.getElementById("soundToggleButton"),
+    hapticsToggleButton: document.getElementById("hapticsToggleButton"),
     backButton: document.getElementById("backButton"),
     modesBackButton: document.getElementById("modesBackButton"),
     dailyBackButton: document.getElementById("dailyBackButton"),
@@ -2159,6 +2161,14 @@
     if (!state.settings.muted) playSound("button");
   }
 
+  function toggleHaptics() {
+    if (blockTutorialEscape()) return;
+    state.settings.haptics = state.settings.haptics === false;
+    saveProgress();
+    updateHud();
+    if (state.settings.haptics) vibrate(18);
+  }
+
   async function initializePlatform() {
     if (!yandex || !yandex.init) return;
     await yandex.init({
@@ -2427,6 +2437,8 @@
         startTutorialFlow(true);
       });
     }
+    if (els.soundToggleButton) els.soundToggleButton.addEventListener("click", toggleMute);
+    if (els.hapticsToggleButton) els.hapticsToggleButton.addEventListener("click", toggleHaptics);
     els.backButton.addEventListener("click", () => {
       if (isAnimating) return;
       if (blockTutorialEscape()) return;

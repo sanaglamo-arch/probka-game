@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <title>Пробка во дворе</title>
     <link rel="icon" href="./favicon.svg?v=polish1" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=polish3" />
+    <link rel="stylesheet" href="./styles.css?v=polish4" />
   </head>
   <body>
     <svg class="svg-defs" aria-hidden="true" focusable="false">
@@ -172,6 +172,10 @@
 
           <details class="settings-strip">
             <summary>Настройки</summary>
+            <div class="settings-toggles">
+              <button class="ghost-button settings-toggle-button" id="soundToggleButton" type="button" aria-pressed="true">Звук: вкл</button>
+              <button class="ghost-button settings-toggle-button" id="hapticsToggleButton" type="button" aria-pressed="true">Вибрация: вкл</button>
+            </div>
             <button class="ghost-button settings-action-button" id="tutorialReplayButton">Повторить обучение</button>
             <button class="ghost-button reset-button" id="resetButton">Сбросить прогресс</button>
           </details>

@@ -854,6 +854,24 @@ h2 {
   justify-items: center;
 }
 
+.settings-toggles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: min(100%, 290px);
+}
+
+.settings-toggle-button {
+  min-height: 42px;
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+.settings-toggle-button[aria-pressed="true"] {
+  border-color: rgba(111, 217, 168, 0.32);
+  color: var(--success);
+}
+
 .settings-action-button,
 .reset-button {
   min-height: 42px;

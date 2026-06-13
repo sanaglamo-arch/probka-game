@@ -531,6 +531,16 @@
         els.muteButton.setAttribute("aria-label", muted ? "Включить звук" : "Выключить звук");
         els.muteButton.setAttribute("aria-pressed", String(muted));
       }
+      if (els.soundToggleButton) {
+        const on = !state.settings.muted;
+        els.soundToggleButton.textContent = `Звук: ${on ? "вкл" : "выкл"}`;
+        els.soundToggleButton.setAttribute("aria-pressed", String(on));
+      }
+      if (els.hapticsToggleButton) {
+        const on = state.settings.haptics !== false;
+        els.hapticsToggleButton.textContent = `Вибрация: ${on ? "вкл" : "выкл"}`;
+        els.hapticsToggleButton.setAttribute("aria-pressed", String(on));
+      }
       if (level && els.levelTitle) {
         const mode = deps.getLevelMode();
         els.levelTitle.textContent =
