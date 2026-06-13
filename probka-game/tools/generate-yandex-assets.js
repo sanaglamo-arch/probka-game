@@ -36,12 +36,12 @@ const SHOT_CSS_HEIGHT = 880;
 const SHOT_SCALE = 3;
 const shotUrl = (params) => `${baseUrl}/probka-game/index.html?showcase=1&skin=classic_red&${params}`;
 const screenshots = [
-  { name: "screen1-quiet", url: shotUrl("mode=moves&level=3&yard=quiet_yard") },
-  { name: "screen2-night", url: shotUrl("mode=moves&level=24&yard=night_yard") },
+  { name: "screen1-night", url: shotUrl("mode=moves&level=24&yard=night_yard") },
+  { name: "screen2-neon", url: shotUrl("mode=moves&level=58&yard=neon_yard") },
   { name: "screen3-winter", url: shotUrl("mode=timed&level=41&yard=winter_yard") },
-  { name: "screen4-forest", url: shotUrl("mode=free&level=15&yard=forest_yard") },
-  { name: "screen5-neon", url: shotUrl("mode=moves&level=58&yard=neon_yard") },
-  { name: "screen6-business", url: shotUrl("mode=timed&level=72&yard=business_center") }
+  { name: "screen4-holiday", url: shotUrl("mode=free&level=33&yard=holiday_yard") },
+  { name: "screen5-forest", url: shotUrl("mode=moves&level=15&yard=forest_yard") },
+  { name: "screen6-rainy", url: shotUrl("mode=timed&level=66&yard=rainy_yard") }
 ].map((shot) => ({ ...shot, width: SHOT_CSS_WIDTH, height: SHOT_CSS_HEIGHT, scale: SHOT_SCALE }));
 
 main();
@@ -100,44 +100,38 @@ function makeIconHtml() {
     <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512">
-          <stop stop-color="#20304a"/>
+          <stop stop-color="#22344f"/>
           <stop offset="0.5" stop-color="#101a28"/>
-          <stop offset="1" stop-color="#080c13"/>
+          <stop offset="1" stop-color="#070a0e"/>
         </linearGradient>
-        <radialGradient id="vign" cx="48%" cy="40%" r="72%">
-          <stop offset="0.55" stop-color="#000000" stop-opacity="0"/>
-          <stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+        <radialGradient id="vign" cx="48%" cy="40%" r="74%">
+          <stop offset="0.5" stop-color="#000000" stop-opacity="0"/>
+          <stop offset="1" stop-color="#000000" stop-opacity="0.52"/>
         </radialGradient>
-        <linearGradient id="red" x1="0" y1="0" x2="0" y2="1">
-          <stop stop-color="#ff7a85"/>
-          <stop offset="1" stop-color="#e2304a"/>
-        </linearGradient>
-        <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%">
-          <feDropShadow dx="0" dy="16" stdDeviation="15" flood-color="#000" flood-opacity="0.42"/>
-        </filter>
-        <filter id="exitGlow" x="-90%" y="-90%" width="280%" height="280%">
-          <feDropShadow dx="0" dy="0" stdDeviation="13" flood-color="#ffce5a" flood-opacity="0.85"/>
-        </filter>
+        ${carArtDefs()}
       </defs>
       <rect width="512" height="512" fill="url(#bg)"/>
+      <!-- тёплое сияние от выезда справа -->
+      <ellipse cx="470" cy="332" rx="190" ry="190" fill="#ffce5a" opacity="0.12"/>
       <!-- лёгкая разметка парковочных рядов -->
-      <g stroke="#cdd8e8" stroke-width="5" opacity="0.09" stroke-linecap="round">
-        <path d="M70 150h372M70 256h372M70 362h372"/>
+      <g stroke="#cdd8e8" stroke-width="5" opacity="0.08" stroke-linecap="round">
+        <path d="M64 150h384M64 256h384M64 362h384"/>
       </g>
-      <!-- тёплый блик сверху-слева -->
-      <circle cx="150" cy="120" r="150" fill="#5a7bb0" opacity="0.10"/>
-      <!-- золотой выезд справа, на одной линии с красной машиной -->
-      <path d="M372 326h74" fill="none" stroke="#ffd35c" stroke-width="18" stroke-linecap="round" filter="url(#exitGlow)"/>
-      <path d="M438 298l44 28-44 28z" fill="#ffe08a" filter="url(#exitGlow)"/>
-      <g filter="url(#shadow)">
-        ${car(96, 92, 78, 182, "#5aa0ff", "#e8f2ff", 22)}
-        ${car(204, 92, 182, 74, "#56d29c", "#ddfff1", 22)}
-        ${car(250, 198, 78, 182, "#edc24f", "#fff6cf", 22)}
-        ${car(118, 286, 250, 80, "url(#red)", "#fff0f2", 26, true)}
+      <!-- золотые ворота выезда справа, на линии красной машины -->
+      <g filter="url(#exitGlow)">
+        <rect x="392" y="296" width="58" height="12" rx="6" fill="#ffd35c"/>
+        <rect x="392" y="358" width="58" height="12" rx="6" fill="#ffd35c"/>
+        <path d="M398 333h60" stroke="#ffe08a" stroke-width="16" stroke-linecap="round"/>
+        <path d="M452 309l40 24-40 24z" fill="#ffe08a"/>
       </g>
+      <!-- затор: блокирующие машины + красный герой, выезжающий вправо -->
+      ${car(90, 84, 76, 172, "url(#car-blue)", "#e9f2ff", 22)}
+      ${car(194, 84, 184, 74, "url(#car-green)", "#e2fff2", 22)}
+      ${car(252, 196, 76, 168, "url(#car-gold)", "#fff6d6", 22)}
+      ${car(92, 290, 270, 86, "url(#car-red)", "#ffe9ec", 26, true)}
       <rect width="512" height="512" fill="url(#vign)"/>
-      <circle cx="432" cy="92" r="22" fill="#ffd35c"/>
-      <circle cx="432" cy="92" r="10" fill="#fff4be"/>
+      <circle cx="436" cy="92" r="22" fill="#ffd35c"/>
+      <circle cx="436" cy="92" r="10" fill="#fff4be"/>
     </svg>
   `);
 }
@@ -155,20 +149,11 @@ function makeCoverHtml() {
           <stop stop-color="#ffffff"/>
           <stop offset="1" stop-color="#a9caff"/>
         </linearGradient>
-        <linearGradient id="target" x1="0" y1="0" x2="0" y2="1">
-          <stop stop-color="#ff7b86"/>
-          <stop offset="1" stop-color="#e2304a"/>
-        </linearGradient>
-        <radialGradient id="yardGlow" cx="62%" cy="42%" r="55%">
-          <stop offset="0" stop-color="#4f6fa0" stop-opacity="0.22"/>
-          <stop offset="1" stop-color="#4f6fa0" stop-opacity="0"/>
+        <radialGradient id="yardGlow" cx="64%" cy="44%" r="56%">
+          <stop offset="0" stop-color="#5a7bb0" stop-opacity="0.24"/>
+          <stop offset="1" stop-color="#5a7bb0" stop-opacity="0"/>
         </radialGradient>
-        <filter id="artShadow" x="-25%" y="-25%" width="150%" height="150%">
-          <feDropShadow dx="0" dy="20" stdDeviation="16" flood-color="#000" flood-opacity="0.4"/>
-        </filter>
-        <filter id="exitGlow" x="-90%" y="-90%" width="280%" height="280%">
-          <feDropShadow dx="0" dy="0" stdDeviation="12" flood-color="#ffce5a" flood-opacity="0.8"/>
-        </filter>
+        ${carArtDefs()}
       </defs>
       <rect width="800" height="470" fill="url(#coverBg)"/>
       <rect width="800" height="470" fill="url(#yardGlow)"/>
@@ -181,16 +166,18 @@ function makeCoverHtml() {
         </g>
         <rect x="10" y="10" width="384" height="398" rx="20" fill="none" stroke="#3c4d63" stroke-width="3" opacity="0.5"/>
       </g>
-      <!-- золотой выезд справа -->
-      <path d="M712 296h70" fill="none" stroke="#ffd35c" stroke-width="18" stroke-linecap="round" filter="url(#exitGlow)"/>
-      <path d="M772 268l40 28-40 28z" fill="#ffe08a" filter="url(#exitGlow)"/>
-      <g filter="url(#artShadow)">
-        ${car(440, 70, 74, 168, "#5aa0ff", "#e9f2ff", 18)}
-        ${car(548, 70, 188, 72, "#56d29c", "#ddfff1", 18)}
-        ${car(648, 158, 74, 168, "#edc24f", "#fff3bc", 18)}
-        ${car(452, 256, 252, 80, "url(#target)", "#fff0f2", 22, true)}
-        ${car(452, 360, 170, 70, "#8f7bd6", "#efeaff", 18)}
+      <!-- золотые ворота выезда справа, на линии красной машины -->
+      <g filter="url(#exitGlow)">
+        <rect x="724" y="268" width="54" height="11" rx="5" fill="#ffd35c"/>
+        <rect x="724" y="322" width="54" height="11" rx="5" fill="#ffd35c"/>
+        <path d="M730 296h54" stroke="#ffe08a" stroke-width="15" stroke-linecap="round"/>
+        <path d="M780 274l38 22-38 22z" fill="#ffe08a"/>
       </g>
+      ${car(440, 68, 74, 166, "url(#car-blue)", "#e9f2ff", 18)}
+      ${car(548, 70, 188, 72, "url(#car-green)", "#e2fff2", 18)}
+      ${car(648, 156, 74, 166, "url(#car-gold)", "#fff6d6", 18)}
+      ${car(452, 256, 256, 80, "url(#car-red)", "#ffe9ec", 22, true)}
+      ${car(452, 360, 170, 70, "url(#car-purple)", "#f0eaff", 18)}
       <!-- текстовый блок слева -->
       <text x="50" y="120" font-family="Arial, sans-serif" font-size="58" font-weight="900" fill="url(#title)">Пробка</text>
       <text x="50" y="184" font-family="Arial, sans-serif" font-size="58" font-weight="900" fill="url(#title)">во дворе</text>
@@ -282,7 +269,26 @@ function car(x, y, width, height, fill, windowFill, radius, target = false) {
     p.push(`<rect x="${n(x + width * 0.15)}" y="${n(y + lh * 0.6)}" width="${n(lw)}" height="${n(lh)}" rx="${n(lh * 0.5)}" fill="#ff5a5f"/>`);
     p.push(`<rect x="${n(x + width * 0.85 - lw)}" y="${n(y + lh * 0.6)}" width="${n(lw)}" height="${n(lh)}" rx="${n(lh * 0.5)}" fill="#ff5a5f"/>`);
   }
-  return `<g>${p.join("")}</g>`;
+  return `<g filter="url(#carShadow)">${p.join("")}</g>`;
+}
+
+// Общие defs: глянцевые градиенты кузовов, мягкая тень и свечение выезда.
+function carArtDefs() {
+  const grads = {
+    red: ["#ff8a93", "#d62a43"],
+    blue: ["#8cc0ff", "#2f6ad6"],
+    green: ["#7ce3b0", "#1f9e6a"],
+    gold: ["#ffd673", "#df991e"],
+    purple: ["#bba0f2", "#6e4ed0"],
+    teal: ["#74e2e8", "#1f9aa6"]
+  };
+  let s = "";
+  for (const k of Object.keys(grads)) {
+    s += `<linearGradient id="car-${k}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="${grads[k][0]}"/><stop offset="1" stop-color="${grads[k][1]}"/></linearGradient>`;
+  }
+  s += `<filter id="carShadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="9" stdDeviation="9" flood-color="#04060c" flood-opacity="0.5"/></filter>`;
+  s += `<filter id="exitGlow" x="-120%" y="-120%" width="340%" height="340%"><feDropShadow dx="0" dy="0" stdDeviation="12" flood-color="#ffce5a" flood-opacity="0.9"/></filter>`;
+  return s;
 }
 
 function makeReadme() {
@@ -294,7 +300,7 @@ function makeReadme() {
 
 - icon-512.png — иконка, 512x512 PNG, квадрат без скруглений и рамок (8.3.3).
 - cover-800x470.png — обложка, 800x470 PNG, ИЛЛЮСТРАЦИЯ (не скриншот, 5.6).
-- screen1-quiet.png … screen6-business.png — скриншоты геймплея, портрет
+- screen1-night.png … screen6-rainy.png — скриншоты геймплея, портрет
   1290x2640, 100% игрового UI на русском, разные дворы и режимы (5.1.1 / 8.2.3).
 
 Пересборка (Linux):

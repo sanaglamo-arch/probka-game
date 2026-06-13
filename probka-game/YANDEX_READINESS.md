@@ -48,7 +48,7 @@
 **Что залить в Консоль (перезаписать старые материалы):**
 - Иконка → `releases/yandex-assets/icon-512.png`
 - Обложка → `releases/yandex-assets/cover-800x470.png`
-- Скриншоты → `releases/yandex-assets/screen1-quiet.png` … `screen6-business.png` (портретные; игра портретно-ориентированная)
+- Скриншоты → `releases/yandex-assets/screen1-night.png` … `screen6-rainy.png` (портретные; игра портретно-ориентированная)
 - Сборка игры → пересобрать актуальный архив (см. ниже), НЕ старый 49.6 МБ.
 
 ## ⚠️ Сборка архива перед публикацией — ВАЖНО
