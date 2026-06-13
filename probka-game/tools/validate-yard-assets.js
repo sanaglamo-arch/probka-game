@@ -204,6 +204,9 @@ function readPng(file) {
   let width = 0;
   let height = 0;
   let colorType = 0;
+  let bitDepth = 8;
+  let palette = null;
+  let trns = null;
   const idat = [];
   while (offset < data.length) {
     const length = data.readUInt32BE(offset);
@@ -213,34 +216,79 @@ function readPng(file) {
     if (type === "IHDR") {
       width = payload.readUInt32BE(0);
       height = payload.readUInt32BE(4);
-      const bitDepth = payload[8];
+      bitDepth = payload[8];
       colorType = payload[9];
       const interlace = payload[12];
-      if (bitDepth !== 8 || ![2, 6].includes(colorType) || interlace !== 0) throw new Error("unsupported PNG format");
+      if (interlace !== 0) throw new Error("unsupported PNG interlace");
+      if (![0, 2, 3, 4, 6].includes(colorType)) throw new Error(`unsupported PNG color type ${colorType}`);
+      if (![1, 2, 4, 8, 16].includes(bitDepth)) throw new Error(`unsupported PNG bit depth ${bitDepth}`);
+    } else if (type === "PLTE") {
+      palette = Buffer.from(payload);
+    } else if (type === "tRNS") {
+      trns = Buffer.from(payload);
     } else if (type === "IDAT") {
       idat.push(payload);
     } else if (type === "IEND") {
       break;
     }
   }
-  const channels = colorType === 6 ? 4 : 3;
+  // Normalize any PNG (grayscale/RGB/palette/alpha, bit depth 1-16) into an RGBA buffer.
+  // pngquant ships palette PNGs (color type 3), optipng may drop bit depth below 8.
+  const channels = colorType === 0 ? 1 : colorType === 2 ? 3 : colorType === 3 ? 1 : colorType === 4 ? 2 : 4;
+  const bpp = Math.max(1, Math.ceil((bitDepth * channels) / 8));
+  const stride = Math.ceil((width * channels * bitDepth) / 8);
+  const maxSample = (1 << bitDepth) - 1;
   const raw = zlib.inflateSync(Buffer.concat(idat));
-  const stride = width * channels;
   const pixels = Buffer.alloc(width * height * 4);
+  const scale = (v) => (bitDepth === 8 || bitDepth === 16 ? v : Math.round((v * 255) / maxSample));
+  const sampleAt = (row, sampleIndex) => {
+    if (bitDepth === 8) return row[sampleIndex];
+    if (bitDepth === 16) return row[sampleIndex * 2];
+    const perByte = 8 / bitDepth;
+    const byteIndex = Math.floor(sampleIndex / perByte);
+    const shift = 8 - bitDepth * ((sampleIndex % perByte) + 1);
+    return (row[byteIndex] >> shift) & maxSample;
+  };
   let src = 0;
   let prev = Buffer.alloc(stride);
   for (let y = 0; y < height; y += 1) {
     const filter = raw[src++];
     const row = Buffer.from(raw.subarray(src, src + stride));
     src += stride;
-    unfilterRow(row, prev, channels, filter);
+    unfilterRow(row, prev, bpp, filter);
     for (let x = 0; x < width; x += 1) {
-      const from = x * channels;
       const to = (y * width + x) * 4;
-      pixels[to] = row[from];
-      pixels[to + 1] = row[from + 1];
-      pixels[to + 2] = row[from + 2];
-      pixels[to + 3] = channels === 4 ? row[from + 3] : 255;
+      let r = 0;
+      let g = 0;
+      let b = 0;
+      let a = 255;
+      if (colorType === 3) {
+        const idx = sampleAt(row, x);
+        if (palette) {
+          r = palette[idx * 3];
+          g = palette[idx * 3 + 1];
+          b = palette[idx * 3 + 2];
+        }
+        a = trns && idx < trns.length ? trns[idx] : 255;
+      } else if (colorType === 0) {
+        r = g = b = scale(sampleAt(row, x));
+      } else if (colorType === 4) {
+        r = g = b = scale(sampleAt(row, x * 2));
+        a = scale(sampleAt(row, x * 2 + 1));
+      } else if (colorType === 2) {
+        r = scale(sampleAt(row, x * 3));
+        g = scale(sampleAt(row, x * 3 + 1));
+        b = scale(sampleAt(row, x * 3 + 2));
+      } else {
+        r = scale(sampleAt(row, x * 4));
+        g = scale(sampleAt(row, x * 4 + 1));
+        b = scale(sampleAt(row, x * 4 + 2));
+        a = scale(sampleAt(row, x * 4 + 3));
+      }
+      pixels[to] = r;
+      pixels[to + 1] = g;
+      pixels[to + 2] = b;
+      pixels[to + 3] = a;
     }
     prev = row;
   }
