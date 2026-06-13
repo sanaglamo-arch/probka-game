@@ -2213,6 +2213,21 @@ canvas.skin-preview-sprite::after {
   background: linear-gradient(90deg, var(--blue), var(--success));
 }
 
+/* Статус-счётчик миссии — компактный чип слева, а не широкая пустая кнопка */
+.mission-card button {
+  justify-self: start;
+  min-height: 0;
+  padding: 6px 15px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.mission-card:not(.ready):not(.claimed) button {
+  border-color: rgba(226, 234, 255, 0.1);
+  background: rgba(226, 234, 255, 0.05);
+}
+
 /* ---------- модальные окна ---------- */
 
 .modal {
