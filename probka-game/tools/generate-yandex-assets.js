@@ -6,7 +6,11 @@ const { spawnSync } = require("child_process");
 
 const workspace = path.resolve(__dirname, "../..");
 const outDir = path.join(workspace, "releases", "yandex-assets");
-const chromePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const chromePath =
+  process.env.PROBKA_CHROME ||
+  process.env.PROBKA_SMOKE_CHROME ||
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const chromeExtraFlags = (process.env.PROBKA_CHROME_FLAGS || "").split(/\s+/).filter(Boolean);
 const baseUrl = process.argv[2] || "http://127.0.0.1:5174";
 
 const pages = [
@@ -24,50 +28,21 @@ const pages = [
   }
 ];
 
+// Скриншоты — полнокадровый портретный геймплей без промо-обёртки:
+// 100% игрового UI, русский язык, без внешних элементов (требования 5.1.1 / 5.1.1.2 / 8.2.3).
+// CSS-размер телефона + высокий DPR дают чёткое изображение 1290x2640.
+const SHOT_CSS_WIDTH = 430;
+const SHOT_CSS_HEIGHT = 880;
+const SHOT_SCALE = 3;
+const shotUrl = (params) => `${baseUrl}/probka-game/index.html?showcase=1&skin=classic_red&${params}`;
 const screenshots = [
-  {
-    name: "desktop1",
-    width: 1280,
-    height: 720,
-    url: `${baseUrl}/probka-game/?showcase=1&mode=moves&level=1&yard=quiet_yard&skin=classic_red&capture=promo-gameplay&asset=desktop-quiet-gameplay`
-  },
-  {
-    name: "desktop2",
-    width: 1280,
-    height: 720,
-    url: `${baseUrl}/probka-game/?showcase=1&mode=moves&level=49&yard=night_yard&skin=classic_red&capture=promo-gameplay&asset=desktop-night-gameplay`
-  },
-  {
-    name: "desktop3",
-    width: 1280,
-    height: 720,
-    url: `${baseUrl}/probka-game/?showcase=1&mode=timed&level=85&yard=winter_yard&skin=classic_red&capture=promo-gameplay&asset=desktop-winter-gameplay`
-  },
-  {
-    name: "desktop4",
-    width: 1280,
-    height: 720,
-    url: `${baseUrl}/probka-game/?showcase=1&mode=free&level=35&yard=forest_yard&skin=classic_red&capture=promo-gameplay&asset=desktop-forest-gameplay`
-  },
-  {
-    name: "desktop5",
-    width: 1280,
-    height: 720,
-    url: `${baseUrl}/probka-game/?showcase=1&mode=moves&level=72&yard=business_center&skin=classic_red&capture=promo-gameplay&asset=desktop-business-gameplay`
-  },
-  {
-    name: "mobile1",
-    width: 1280,
-    height: 720,
-    url: `${baseUrl}/probka-game/?showcase=1&mode=moves&level=12&yard=quiet_yard&skin=classic_red&capture=promo-gameplay&asset=mobile-quiet-gameplay`
-  },
-  {
-    name: "mobile2",
-    width: 1280,
-    height: 720,
-    url: `${baseUrl}/probka-game/?showcase=1&mode=timed&level=55&yard=rainy_yard&skin=classic_red&capture=promo-gameplay&asset=mobile-rainy-gameplay`
-  }
-];
+  { name: "screen1-quiet", url: shotUrl("mode=moves&level=3&yard=quiet_yard") },
+  { name: "screen2-night", url: shotUrl("mode=moves&level=24&yard=night_yard") },
+  { name: "screen3-winter", url: shotUrl("mode=timed&level=41&yard=winter_yard") },
+  { name: "screen4-forest", url: shotUrl("mode=free&level=15&yard=forest_yard") },
+  { name: "screen5-neon", url: shotUrl("mode=moves&level=58&yard=neon_yard") },
+  { name: "screen6-business", url: shotUrl("mode=timed&level=72&yard=business_center") }
+].map((shot) => ({ ...shot, width: SHOT_CSS_WIDTH, height: SHOT_CSS_HEIGHT, scale: SHOT_SCALE }));
 
 main();
 
@@ -84,7 +59,7 @@ function main() {
   });
 
   screenshots.forEach((shot) => {
-    capture(shot.url, path.join(outDir, `${shot.name}.png`), shot.width, shot.height, 2200);
+    capture(shot.url, path.join(outDir, `${shot.name}.png`), shot.width, shot.height, 2600, shot.scale || 1);
   });
 
   fs.writeFileSync(path.join(outDir, "README.md"), makeReadme());
@@ -93,14 +68,15 @@ function main() {
 
 function cleanOldScreenshotFiles() {
   fs.readdirSync(outDir).forEach((file) => {
-    if (/^(screenshot-|desktop\d+|mobile\d+).*\.png$/i.test(file)) {
+    if (/^(screenshot-|desktop\d+|mobile\d+|screen\d+).*\.png$/i.test(file)) {
       fs.unlinkSync(path.join(outDir, file));
     }
   });
 }
 
-function capture(url, outputPath, width, height, virtualTime = 600) {
+function capture(url, outputPath, width, height, virtualTime = 600, scale = 1) {
   const result = spawnSync(chromePath, [
+    ...chromeExtraFlags,
     "--headless=new",
     "--disable-gpu",
     "--disable-background-networking",
@@ -110,10 +86,11 @@ function capture(url, outputPath, width, height, virtualTime = 600) {
     "--no-first-run",
     "--no-default-browser-check",
     `--window-size=${width},${height}`,
+    `--force-device-scale-factor=${scale}`,
     `--screenshot=${outputPath}`,
     `--virtual-time-budget=${virtualTime}`,
     url
-  ], { stdio: "inherit", timeout: 20000 });
+  ], { stdio: "inherit", timeout: 30000 });
   if (result.error) throw result.error;
   if (result.status !== 0) throw new Error(`Chrome screenshot failed for ${url}`);
 }
@@ -270,18 +247,22 @@ function car(x, y, width, height, fill, windowFill, radius, target = false) {
 }
 
 function makeReadme() {
-  return `# Yandex Games assets
+  return `# Ассеты для Яндекс Игр
 
-- icon-512.png: icon upload, 512x512 PNG
-- cover-800x470.png: illustrated cover upload, 800x470 PNG
-- desktop1.png: desktop gameplay screenshot, quiet yard
-- desktop2.png: desktop gameplay screenshot, night yard
-- desktop3.png: desktop gameplay screenshot, winter yard
-- desktop4.png: desktop gameplay screenshot, forest yard
-- desktop5.png: desktop gameplay screenshot, business center yard
-- mobile1.png: mobile gameplay screenshot, 16:9
-- mobile2.png: mobile gameplay screenshot, 16:9
+Все материалы соответствуют требованиям платформы (раздел 5 и 8):
+без скруглённых углов/рамок, обложка — иллюстрация (не скриншот),
+скриншоты — полнокадровый реальный геймплей на русском без внешних элементов.
 
-Videos are optional for the first moderation pass.
+- icon-512.png — иконка, 512x512 PNG, квадрат без скруглений и рамок (8.3.3).
+- cover-800x470.png — обложка, 800x470 PNG, ИЛЛЮСТРАЦИЯ (не скриншот, 5.6).
+- screen1-quiet.png … screen6-business.png — скриншоты геймплея, портрет
+  1290x2640, 100% игрового UI на русском, разные дворы и режимы (5.1.1 / 8.2.3).
+
+Пересборка (Linux):
+  PROBKA_CHROME="$(which google-chrome)" PROBKA_CHROME_FLAGS="--no-sandbox --disable-dev-shm-usage" \\
+    node probka-game/tools/generate-yandex-assets.js http://127.0.0.1:<порт>
+  (сервер должен отдавать корень воркспейса, чтобы путь /probka-game/ работал)
+
+Видео для первой модерации не обязательно.
 `;
 }

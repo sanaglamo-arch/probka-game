@@ -1,13 +1,17 @@
-# Yandex Games assets
+# Ассеты для Яндекс Игр
 
-- icon-512.png: icon upload, 512x512 PNG
-- cover-800x470.png: illustrated cover upload, 800x470 PNG
-- desktop1.png: desktop gameplay screenshot, quiet yard
-- desktop2.png: desktop gameplay screenshot, night yard
-- desktop3.png: desktop gameplay screenshot, winter yard
-- desktop4.png: desktop gameplay screenshot, forest yard
-- desktop5.png: desktop gameplay screenshot, business center yard
-- mobile1.png: mobile gameplay screenshot, 16:9
-- mobile2.png: mobile gameplay screenshot, 16:9
+Все материалы соответствуют требованиям платформы (раздел 5 и 8):
+без скруглённых углов/рамок, обложка — иллюстрация (не скриншот),
+скриншоты — полнокадровый реальный геймплей на русском без внешних элементов.
 
-Videos are optional for the first moderation pass.
+- icon-512.png — иконка, 512x512 PNG, квадрат без скруглений и рамок (8.3.3).
+- cover-800x470.png — обложка, 800x470 PNG, ИЛЛЮСТРАЦИЯ (не скриншот, 5.6).
+- screen1-quiet.png … screen6-business.png — скриншоты геймплея, портрет
+  1290x2640, 100% игрового UI на русском, разные дворы и режимы (5.1.1 / 8.2.3).
+
+Пересборка (Linux):
+  PROBKA_CHROME="$(which google-chrome)" PROBKA_CHROME_FLAGS="--no-sandbox --disable-dev-shm-usage" \
+    node probka-game/tools/generate-yandex-assets.js http://127.0.0.1:<порт>
+  (сервер должен отдавать корень воркспейса, чтобы путь /probka-game/ работал)
+
+Видео для первой модерации не обязательно.
