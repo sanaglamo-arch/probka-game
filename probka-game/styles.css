@@ -1141,11 +1141,14 @@ body:has(#missionsPanel:not([hidden])) .app {
 .level-pack-progress i,
 .garage-meter {
   display: block;
-  width: 80px;
   height: 6px;
   overflow: hidden;
   border-radius: 999px;
   background: rgba(226, 234, 255, 0.09);
+}
+
+.level-pack-progress i {
+  width: 80px;
 }
 
 .level-pack-progress i span,

@@ -1599,8 +1599,7 @@
     }
     ctx.restore();
     const exitLaneY = level.exit.row * cellSize;
-    const usesCurbExit = true;
-    ctx.fillStyle = usesCurbExit ? colorWithAlpha(palette.exitGlow, 0.045) : palette.exitLane;
+    ctx.fillStyle = colorWithAlpha(palette.exitGlow, 0.045);
     ctx.fillRect(cellSize * 0.08, exitLaneY + cellSize * 0.24, boardWidth - cellSize * 0.08, cellSize * 0.52);
 
     const lineWidth = Math.max(1, Math.min(2, cellSize * 0.04));

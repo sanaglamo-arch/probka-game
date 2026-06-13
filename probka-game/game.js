@@ -727,16 +727,8 @@
     resetRunState();
   }
 
-  function getTutorialCards() {
-    return tutorialController ? tutorialController.getCards() : tutorialApi.getMenuCards ? tutorialApi.getMenuCards() : [];
-  }
-
   function updateTutorialStep() {
     if (tutorialController) tutorialController.updateStep();
-  }
-
-  function setTutorialCard(step) {
-    if (tutorialController) tutorialController.setCard(step);
   }
 
   function setTutorialDomFocus(ids) {
@@ -749,10 +741,6 @@
 
   function getTutorialExpectedMove() {
     return tutorialController ? tutorialController.getExpectedMove() : null;
-  }
-
-  function getTutorialGuidedMove() {
-    return tutorialController ? tutorialController.getGuidedMove() : null;
   }
 
   function showTutorialExpectedHint(move) {
@@ -2124,7 +2112,7 @@
       onPause: handlePlatformPause,
       onResume: handlePlatformResume
     });
-    applyPlatformLanguage(yandex.getLanguage ? yandex.getLanguage() : "ru");
+    applyPlatformLanguage();
     await restoreCloudProgress();
   }
 
@@ -2373,7 +2361,7 @@
     els.resetButton.addEventListener("click", () => {
       if (blockTutorialEscape()) return;
       playSound("button");
-      localStorage.removeItem(storageKey);
+      localStorage.removeItem(config.storageKey || "probka_vo_dvore_progress_v1");
       state = defaultProgress();
       selectedModeId = state.lastModeId;
       syncDailyMissions();
