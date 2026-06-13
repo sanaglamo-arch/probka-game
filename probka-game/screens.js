@@ -626,7 +626,16 @@
       if (els.doubleRewardButton) els.doubleRewardButton.hidden = !options.canDouble;
       if (els.nextLevelButton) els.nextLevelButton.textContent = options.nextText || "Следующий";
       if (els.winMenuButton) els.winMenuButton.hidden = !options.showMenuButton;
-      if (els.winModal) els.winModal.hidden = false;
+      if (els.winModal) {
+        els.winModal.hidden = false;
+        requestAnimationFrame(() => {
+          try {
+            if (els.nextLevelButton) els.nextLevelButton.focus();
+          } catch {
+            // фокус не критичен — безопасно игнорируем
+          }
+        });
+      }
     }
 
     function setWinStars(label) {
@@ -644,7 +653,16 @@
       if (els.failEyebrow) els.failEyebrow.textContent = options.eyebrow || "";
       if (els.failTitle) els.failTitle.textContent = options.title || "";
       if (els.failText) els.failText.textContent = options.text || "";
-      if (els.failModal) els.failModal.hidden = false;
+      if (els.failModal) {
+        els.failModal.hidden = false;
+        requestAnimationFrame(() => {
+          try {
+            if (els.retryButton) els.retryButton.focus();
+          } catch {
+            // фокус не критичен — безопасно игнорируем
+          }
+        });
+      }
     }
 
     return {

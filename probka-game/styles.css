@@ -1430,6 +1430,16 @@ body:has(#missionsPanel:not([hidden])) .app {
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
+.board-wrap:focus-within {
+  outline: 3px solid rgba(133, 184, 255, 0.45);
+  outline-offset: 2px;
+}
+
+#gameCanvas:focus,
+#gameCanvas:focus-visible {
+  outline: none;
+}
+
 canvas#gameCanvas {
   display: block;
   width: 100%;

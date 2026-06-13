@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <title>Пробка во дворе</title>
     <link rel="icon" href="./favicon.svg?v=polish1" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=polish4" />
+    <link rel="stylesheet" href="./styles.css?v=polish5" />
   </head>
   <body>
     <svg class="svg-defs" aria-hidden="true" focusable="false">
@@ -232,7 +232,7 @@
           </div>
 
           <div class="board-wrap">
-            <canvas id="gameCanvas" width="720" height="720" aria-label="Игровое поле"></canvas>
+            <canvas id="gameCanvas" width="720" height="720" tabindex="0" aria-label="Игровое поле"></canvas>
           </div>
 
           <div class="actions">
@@ -284,7 +284,7 @@
         </section>
       </main>
 
-      <div class="toast" id="toast" hidden></div>
+      <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
       <div class="tutorial-overlay" id="tutorialOverlay" hidden>
         <div class="tutorial-card">
           <span class="tutorial-step" id="tutorialStepLabel">Обучение</span>
@@ -295,7 +295,7 @@
       </div>
     </div>
 
-    <div class="modal" id="winModal" hidden>
+    <div class="modal" id="winModal" role="dialog" aria-modal="true" aria-labelledby="winTitle" hidden>
       <div class="modal-card win-card">
         <span class="modal-glow win-glow" aria-hidden="true"></span>
         <span class="modal-badge win-badge" aria-hidden="true">
@@ -313,7 +313,7 @@
       </div>
     </div>
 
-    <div class="modal" id="failModal" hidden>
+    <div class="modal" id="failModal" role="dialog" aria-modal="true" aria-labelledby="failTitle" hidden>
       <div class="modal-card fail-card">
         <span class="modal-glow fail-glow" aria-hidden="true"></span>
         <p class="eyebrow" id="failEyebrow">Ходы закончились</p>
@@ -323,7 +323,7 @@
       </div>
     </div>
 
-    <div class="modal" id="archiveConfirmModal" hidden>
+    <div class="modal" id="archiveConfirmModal" role="dialog" aria-modal="true" aria-labelledby="archiveConfirmTitle" hidden>
       <div class="modal-card archive-confirm-card">
         <p class="eyebrow">Архив уровня дня</p>
         <h2 id="archiveConfirmTitle">Открыть архивный уровень?</h2>
