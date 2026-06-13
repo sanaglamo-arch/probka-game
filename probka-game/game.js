@@ -2460,13 +2460,8 @@
     });
   }
 
-  function isInsidePlayArea(target) {
-    return Boolean(els.playArea && target && els.playArea.contains(target));
-  }
-
-  function preventGameAreaDefault(event) {
-    if (currentView !== "game" || !isInsidePlayArea(event.target) || !event.cancelable) return;
-    event.preventDefault();
+  function preventNativeMenuDefault(event) {
+    if (event.cancelable) event.preventDefault();
   }
 
   function preventGameViewportGesture(event) {
@@ -2475,8 +2470,10 @@
   }
 
   function bindGameplayNativeGestureBlockers() {
+    // Контекстное меню, выделение и перетаскивание игре не нужны нигде —
+    // блокируем по всему документу (требования платформы 1.6.1.8 / 1.6.2.7).
     ["contextmenu", "selectstart", "dragstart"].forEach((type) => {
-      document.addEventListener(type, preventGameAreaDefault, { capture: true });
+      document.addEventListener(type, preventNativeMenuDefault, { capture: true });
     });
     document.addEventListener("touchmove", preventGameViewportGesture, { passive: false });
     document.addEventListener("gesturestart", preventGameViewportGesture, { passive: false });

@@ -67,6 +67,13 @@ body {
   width: 100%;
   min-height: 100%;
   overflow-x: hidden;
+  /* Запрет выделения текста, контекстного меню iOS и прокрутки-цепочки
+     (pull-to-refresh, bounce) — требования платформы 1.6 и 1.10. */
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
   background:
     radial-gradient(120% 70% at 50% -12%, rgba(96, 134, 204, 0.16), transparent 52%),
     radial-gradient(90% 50% at 85% 108%, rgba(240, 159, 46, 0.05), transparent 55%),
@@ -85,6 +92,14 @@ body {
   width: 0;
   height: 0;
   overflow: hidden;
+}
+
+/* Игровое поле не должно запускать жесты браузера (скролл/зум) и выделение. */
+#gameCanvas {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 button {
