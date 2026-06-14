@@ -428,6 +428,26 @@ h2 {
   box-shadow: var(--elev-2);
 }
 
+/* Мягкое «дышащее» сияние героя — живой премиум-акцент. */
+.hub-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(58% 80% at 82% 6%, rgba(133, 184, 255, 0.14), transparent 60%);
+  opacity: 0.6;
+  pointer-events: none;
+  animation: heroGlow 6.5s ease-in-out infinite alternate;
+}
+
+.hub-hero > * {
+  position: relative;
+}
+
+@keyframes heroGlow {
+  from { opacity: 0.4; }
+  to { opacity: 0.85; }
+}
+
 .hub-hero-copy {
   display: grid;
   align-content: start;
