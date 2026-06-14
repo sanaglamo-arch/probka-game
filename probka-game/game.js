@@ -88,6 +88,7 @@
     tutorialReplayButton: document.getElementById("tutorialReplayButton"),
     soundToggleButton: document.getElementById("soundToggleButton"),
     hapticsToggleButton: document.getElementById("hapticsToggleButton"),
+    musicToggleButton: document.getElementById("musicToggleButton"),
     langToggleButton: document.getElementById("langToggleButton"),
     backButton: document.getElementById("backButton"),
     modesBackButton: document.getElementById("modesBackButton"),
@@ -2191,7 +2192,12 @@
     state.settings.muted = !state.settings.muted;
     saveProgress();
     updateHud();
-    if (!state.settings.muted) playSound("button");
+    if (state.settings.muted) {
+      if (audio && audio.stopMusic) audio.stopMusic();
+    } else {
+      playSound("button");
+      if (state.settings.music && audio && audio.startMusic) audio.startMusic();
+    }
   }
 
   function toggleHaptics() {
@@ -2200,6 +2206,20 @@
     saveProgress();
     updateHud();
     if (state.settings.haptics) vibrate(18);
+  }
+
+  function toggleMusic() {
+    if (blockTutorialEscape()) return;
+    state.settings.music = !state.settings.music;
+    saveProgress();
+    updateHud();
+    playSound("button");
+    if (!audio) return;
+    if (state.settings.music && !state.settings.muted) {
+      if (audio.startMusic) audio.startMusic();
+    } else if (audio.stopMusic) {
+      audio.stopMusic();
+    }
   }
 
   function toggleLang() {
@@ -2509,7 +2529,15 @@
     }
     if (els.soundToggleButton) els.soundToggleButton.addEventListener("click", toggleMute);
     if (els.hapticsToggleButton) els.hapticsToggleButton.addEventListener("click", toggleHaptics);
+    if (els.musicToggleButton) els.musicToggleButton.addEventListener("click", toggleMusic);
     if (els.langToggleButton) els.langToggleButton.addEventListener("click", toggleLang);
+    // Автозапуск фоновой музыки по первому жесту (политика автоплея браузера).
+    document.addEventListener("pointerdown", function startMusicOnGesture() {
+      document.removeEventListener("pointerdown", startMusicOnGesture);
+      if (state.settings && state.settings.music && !state.settings.muted && audio && audio.startMusic) {
+        audio.startMusic();
+      }
+    }, { once: true });
     els.backButton.addEventListener("click", () => {
       if (isAnimating) return;
       if (blockTutorialEscape()) return;

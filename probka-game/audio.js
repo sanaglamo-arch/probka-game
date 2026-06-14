@@ -57,7 +57,67 @@
       });
     }
 
-    return { play, pause, resume };
+    // --- Фоновая музыка: мягкий генеративный эмбиент на пентатонике ---
+    // Пентатоника + тихий sine + медленные ноты практически не дают диссонанса.
+    let musicOn = false;
+    let musicTimer = null;
+    let musicBus = null;
+    const PENTA = [220.0, 261.63, 293.66, 329.63, 392.0, 440.0]; // A-minor pentatonic
+
+    function ensureMusicBus(context) {
+      if (!musicBus || musicBus.context !== context) {
+        musicBus = context.createGain();
+        musicBus.gain.value = 0.6;
+        musicBus.connect(context.destination);
+      }
+      return musicBus;
+    }
+
+    function voice(context, bus, freq, now, dur, peak) {
+      const osc = context.createOscillator();
+      const g = context.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, now);
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(peak, now + 0.9);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+      osc.connect(g);
+      g.connect(bus);
+      osc.start(now);
+      osc.stop(now + dur + 0.05);
+    }
+
+    function scheduleNote() {
+      if (!musicOn) return;
+      const context = ensure();
+      if (!context) {
+        musicTimer = setTimeout(scheduleNote, 1500);
+        return;
+      }
+      const bus = ensureMusicBus(context);
+      const now = context.currentTime;
+      const freq = PENTA[Math.floor(Math.random() * PENTA.length)] * (Math.random() < 0.25 ? 0.5 : 1);
+      const dur = 2.6 + Math.random() * 2.2;
+      voice(context, bus, freq, now, dur, 0.05);
+      if (Math.random() < 0.4) voice(context, bus, freq * 1.5, now, dur, 0.03); // тихая квинта
+      musicTimer = setTimeout(scheduleNote, 1600 + Math.random() * 1800);
+    }
+
+    function startMusic() {
+      if (musicOn || isMuted()) return;
+      musicOn = true;
+      scheduleNote();
+    }
+
+    function stopMusic() {
+      musicOn = false;
+      if (musicTimer) {
+        clearTimeout(musicTimer);
+        musicTimer = null;
+      }
+    }
+
+    return { play, pause, resume, startMusic, stopMusic, isMusicOn: () => musicOn };
   }
 
   window.PROBKA_AUDIO = { createController };

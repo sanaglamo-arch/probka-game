@@ -640,6 +640,11 @@
         els.hapticsToggleButton.textContent = on ? t("settings.haptics.on") : t("settings.haptics.off");
         els.hapticsToggleButton.setAttribute("aria-pressed", String(on));
       }
+      if (els.musicToggleButton) {
+        const on = Boolean(state.settings.music);
+        els.musicToggleButton.textContent = on ? t("settings.music.on") : t("settings.music.off");
+        els.musicToggleButton.setAttribute("aria-pressed", String(on));
+      }
       if (els.langToggleButton) {
         const lang = window.PROBKA_LANG || "ru";
         els.langToggleButton.textContent = lang === "ru" ? t("settings.lang.ru") : t("settings.lang.en");
