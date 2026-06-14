@@ -1940,6 +1940,17 @@
         outlineRadius
       );
       ctx.stroke();
+    } else if (visual.isSelected) {
+      // Кольцо выделения для захваченной блокирующей машины — тактильная обратная связь.
+      const ring = 3;
+      const radius = getVehicleBodyRadius(trafficKind, vehicle) + ring;
+      ctx.fillStyle = "rgba(130, 182, 255, 0.06)";
+      roundedRect(ctx, x - ring, y - ring, bodyWidth + ring * 2, bodyHeight + ring * 2, radius);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(178, 212, 255, 0.72)";
+      ctx.lineWidth = 2;
+      roundedRect(ctx, x - ring, y - ring, bodyWidth + ring * 2, bodyHeight + ring * 2, radius);
+      ctx.stroke();
     }
 
     const paintColor = getVehicleColor(vehicle);
