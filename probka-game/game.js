@@ -1914,6 +1914,18 @@
       ? renderer.getSkinSpriteDrawRect(targetSkin, x, y, bodyWidth, bodyHeight, vehicle.axis)
       : null;
     const trafficKind = getTrafficVehicleKind(vehicle);
+    const bodyRadius = isTarget ? 14 : getVehicleBodyRadius(trafficKind, vehicle);
+
+    // Контактная тень под машиной — объём на поле. Рисуется первой, корпус
+    // её перекрывает, наружу выходит мягкий ореол.
+    ctx.save();
+    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+    ctx.shadowBlur = cellSize * 0.16;
+    ctx.shadowOffsetY = cellSize * 0.06;
+    ctx.fillStyle = "rgba(4, 7, 12, 0.4)";
+    roundedRect(ctx, x + 2, y + 2, bodyWidth - 4, bodyHeight - 4, bodyRadius);
+    ctx.fill();
+    ctx.restore();
 
     ctx.save();
     if (isTarget) {
