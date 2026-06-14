@@ -340,6 +340,9 @@
       "move.form.1": "ход",
       "move.form.2": "хода",
       "move.form.3": "ходов",
+      "level.form.1": "уровень",
+      "level.form.2": "уровня",
+      "level.form.3": "уровней",
 
       // Streak
       "streak.record": "Рекорд ${n}",
@@ -734,6 +737,9 @@
       "move.form.1": "move",
       "move.form.2": "moves",
       "move.form.3": "moves",
+      "level.form.1": "level",
+      "level.form.2": "levels",
+      "level.form.3": "levels",
 
       // Streak
       "streak.record": "Best ${n}",
@@ -849,6 +855,15 @@
       return pluralRu(value, [t("move.form.1"), t("move.form.2"), t("move.form.3")]);
     }
     return pluralEn(value, [t("move.form.1"), t("move.form.2")]);
+  }
+
+  function formatLevelCountI18n(value) {
+    var count = Math.max(0, Math.round(value || 0));
+    var lang = window.PROBKA_LANG || "ru";
+    var suffix = lang === "ru"
+      ? pluralRu(count, [t("level.form.1"), t("level.form.2"), t("level.form.3")])
+      : pluralEn(count, [t("level.form.1"), t("level.form.2")]);
+    return count + " " + suffix;
   }
 
   function formatCoinAmountI18n(value, options) {
@@ -977,6 +992,7 @@
   texts.pluralMoves = pluralMoves;
   texts.pluralEn = pluralEn;
   texts.formatCoinAmountI18n = formatCoinAmountI18n;
+  texts.formatLevelCountI18n = formatLevelCountI18n;
   texts.formatTimeI18n = formatTimeI18n;
   texts.applyI18n = applyI18n;
   texts.setLang = setLang;

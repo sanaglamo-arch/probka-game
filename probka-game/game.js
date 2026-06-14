@@ -230,6 +230,7 @@
         syncDailyMissions,
         createMissionRecord,
         formatCoinAmount,
+        formatLevelCount,
         formatTime,
         plural,
         pluralMoves,
@@ -497,10 +498,10 @@
     }
     const start = performance.now();
     const step = (now) => {
-      const t = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - t, 3);
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
       els.coins.textContent = String(Math.round(from + (to - from) * eased));
-      coinAnimFrame = t < 1 ? requestAnimationFrame(step) : null;
+      coinAnimFrame = progress < 1 ? requestAnimationFrame(step) : null;
     };
     coinAnimFrame = requestAnimationFrame(step);
   }
@@ -548,6 +549,11 @@
 
   function formatCoinAmount(value, options = {}) {
     return texts.formatCoinAmount ? texts.formatCoinAmount(value, options) : String(Math.max(0, Math.round(value || 0)));
+  }
+
+  function formatLevelCount(value) {
+    const count = Math.max(0, Math.round(value || 0));
+    return texts.formatLevelCount ? texts.formatLevelCount(count) : String(count);
   }
 
   function formatTime(seconds) {

@@ -18,6 +18,13 @@
     return `${amount} ${suffix}`;
   }
 
+  function formatLevelCount(value) {
+    const self = window.PROBKA_TEXTS;
+    if (self && self.formatLevelCountI18n) return self.formatLevelCountI18n(value);
+    const count = Math.max(0, Math.round(value || 0));
+    return `${count} ${plural(count, ["уровень", "уровня", "уровней"])}`;
+  }
+
   function formatTime(seconds) {
     const self = window.PROBKA_TEXTS;
     if (self && self.formatTimeI18n) return self.formatTimeI18n(seconds);
@@ -43,6 +50,7 @@
     },
     plural,
     formatCoinAmount,
+    formatLevelCount,
     formatTime
   };
 })();

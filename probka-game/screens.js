@@ -460,7 +460,12 @@
       const state = getState();
       const today = deps.getDailyDateKey();
       const todayCompletion = deps.getValidDailyCompletion(today);
-      const todayLevel = dailyApi.getDailyLevel(today);
+      let todayLevel = null;
+      try {
+        todayLevel = dailyApi.getDailyLevel(today);
+      } catch (err) {
+        todayLevel = null;
+      }
       const year = Number(today.slice(0, 4));
       const currentMonth = Number(today.slice(5, 7));
       const rewardPreview = deps.getDailyRewardPreview();
@@ -468,7 +473,7 @@
         <div class="daily-overview-copy">
           <span class="label">${t("daily.overview.today", { date: deps.formatShortDate(today) })}</span>
           <strong>${todayCompletion ? t("daily.overview.done", { stars: todayCompletion.stars }) : t("daily.overview.open")}</strong>
-          <small>${t("daily.overview.subtitle", { minMoves: todayLevel.minMoves, coins: rewardPreview })}</small>
+          <small>${t("daily.overview.subtitle", { minMoves: todayLevel ? todayLevel.minMoves : "—", coins: rewardPreview })}</small>
         </div>
         <button class="primary-button" id="dailyTodayStartButton">${todayCompletion ? t("daily.overview.playAgain") : t("daily.overview.start")}</button>
       `;
@@ -491,7 +496,7 @@
         const monthNumber = monthIndex + 1;
         section.className = `daily-month${monthNumber === currentMonth ? " current" : ""}`;
         section.dataset.dailyMonth = String(monthNumber);
-        section.innerHTML = `<div class="daily-month-title"><strong>${name}</strong><span>${t("daily.month.levels", { n: monthDays.length })}</span></div>`;
+        section.innerHTML = `<div class="daily-month-title"><strong>${name}</strong><span>${deps.formatLevelCount(monthDays.length)}</span></div>`;
         const grid = document.createElement("div");
         grid.className = "daily-month-grid";
         monthDays.forEach((slot) => grid.appendChild(createDailyDayButton(slot, today, state)));
