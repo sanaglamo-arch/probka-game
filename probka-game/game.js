@@ -8,6 +8,16 @@
   const yandex = window.PROBKA_YANDEX;
   const config = window.PROBKA_CONFIG || {};
   const texts = window.PROBKA_TEXTS || {};
+  // i18n shorthand — available after i18n.js loads (which is before game.js)
+  const t = (texts.t && typeof texts.t === "function") ? texts.t.bind(texts) : ((k) => k);
+  const pluralMoves = (texts.pluralMoves && typeof texts.pluralMoves === "function") ? texts.pluralMoves.bind(texts) : null;
+  const translateLevelTitle = (texts.translateLevelTitle && typeof texts.translateLevelTitle === "function") ? texts.translateLevelTitle.bind(texts) : ((s) => s);
+  const tSkinName = (texts.tSkinName && typeof texts.tSkinName === "function") ? texts.tSkinName.bind(texts) : ((id) => id);
+  const tYardName = (texts.tYardName && typeof texts.tYardName === "function") ? texts.tYardName.bind(texts) : ((id) => id);
+  const tModeTitle = (texts.tModeTitle && typeof texts.tModeTitle === "function") ? texts.tModeTitle.bind(texts) : ((id) => id);
+  const tModeSubtitle = (texts.tModeSubtitle && typeof texts.tModeSubtitle === "function") ? texts.tModeSubtitle.bind(texts) : (() => "");
+  const tMissionTitle = (texts.tMissionTitle && typeof texts.tMissionTitle === "function") ? texts.tMissionTitle.bind(texts) : ((id) => id);
+  const tMissionText = (texts.tMissionText && typeof texts.tMissionText === "function") ? texts.tMissionText.bind(texts) : ((id) => id);
   const economy = window.PROBKA_ECONOMY || {};
   const rules = window.PROBKA_RULES || {};
   const screens = window.PROBKA_SCREENS || {};
@@ -78,6 +88,7 @@
     tutorialReplayButton: document.getElementById("tutorialReplayButton"),
     soundToggleButton: document.getElementById("soundToggleButton"),
     hapticsToggleButton: document.getElementById("hapticsToggleButton"),
+    langToggleButton: document.getElementById("langToggleButton"),
     backButton: document.getElementById("backButton"),
     modesBackButton: document.getElementById("modesBackButton"),
     dailyBackButton: document.getElementById("dailyBackButton"),
@@ -218,7 +229,16 @@
         createMissionRecord,
         formatCoinAmount,
         formatTime,
-        plural
+        plural,
+        pluralMoves,
+        t,
+        translateLevelTitle,
+        tSkinName,
+        tYardName,
+        tModeTitle,
+        tModeSubtitle,
+        tMissionTitle,
+        tMissionText
       })
     : null;
   const tutorialController = tutorialApi.createController
@@ -304,7 +324,7 @@
       daily: { completions: {}, archiveUnlocks: {}, attempts: {}, streak: { current: 0, best: 0, lastDateKey: "" } },
       missions: { dateKey: "", records: {} },
       tutorial: { completedVersion: 0 },
-      settings: { muted: false }
+      settings: { muted: false, lang: null }
     };
   }
 
@@ -327,7 +347,7 @@
   }
 
   function getMode(modeId = selectedModeId) {
-    return modes.find((mode) => mode.id === modeId) || modes[0] || { id: "moves", title: "На счет ходов", rule: "moves", icon: "#" };
+    return modes.find((mode) => mode.id === modeId) || modes[0] || { id: "moves", title: t("mode.fallback.title"), rule: "moves", icon: "#" };
   }
 
   function getModeLevels(modeId = selectedModeId) {
@@ -349,7 +369,7 @@
   }
 
   function getLevelMode(current = level) {
-    if (activeMode === "daily") return { id: "daily", title: "Уровень дня", rule: "free", icon: "◆" };
+    if (activeMode === "daily") return { id: "daily", title: t("mode.daily.title"), rule: "free", icon: "◆" };
     return getMode(current ? current.modeId : selectedModeId);
   }
 
@@ -401,9 +421,9 @@
     syncTutorialLock();
   }
 
-  function blockTutorialEscape(message = "Сначала закончи обучение") {
+  function blockTutorialEscape(message) {
     if (!isTutorialActive()) return false;
-    showToast(message);
+    showToast(message || t("toast.tutorialBlock"));
     const allowedView = getTutorialAllowedView();
     if (allowedView && currentView !== allowedView) show(allowedView, { fromTutorial: true });
     else updateTutorialStep();
@@ -415,7 +435,7 @@
     if (isTutorialActive() && !options.fromTutorial) {
       const allowedView = getTutorialAllowedView();
       if (view !== allowedView) {
-        showToast("Сначала закончи обучение");
+        showToast(t("toast.tutorialBlock"));
         view = allowedView;
       }
     }
@@ -525,7 +545,7 @@
   }
 
   function formatCoinAmount(value, options = {}) {
-    return texts.formatCoinAmount ? texts.formatCoinAmount(value, options) : `${Math.max(0, Math.round(value || 0))} монет`;
+    return texts.formatCoinAmount ? texts.formatCoinAmount(value, options) : String(Math.max(0, Math.round(value || 0)));
   }
 
   function formatTime(seconds) {
@@ -687,12 +707,12 @@
   function startDailyLevel(date = new Date()) {
     if (blockTutorialEscape()) return;
     if (!dailyApi) {
-      showToast("Уровень дня пока недоступен");
+      showToast(t("toast.dailyUnavailable"));
       return;
     }
     const dateKey = dailyApi.getDateKey(date);
     if (!isDailyDatePlayable(dateKey)) {
-      showToast(dateKey > getDailyDateKey() ? "Будущий уровень еще закрыт" : "Сначала открой архивный день");
+      showToast(dateKey > getDailyDateKey() ? t("toast.dailyFuture") : t("toast.dailyNeedUnlock"));
       show("daily");
       return;
     }
@@ -797,8 +817,8 @@
       targetX: vehicle.x + (vehicle.axis === "horizontal" ? move.delta : 0),
       targetY: vehicle.y + (vehicle.axis === "vertical" ? move.delta : 0),
       direction: { axis: vehicle.axis, sign: Math.sign(move.delta) },
-      sourceLabel: vehicle.id === level.targetVehicleId ? "Твоя машина" : "Тащи эту",
-      targetLabel: "Сюда",
+      sourceLabel: vehicle.id === level.targetVehicleId ? t("hint.source.target") : t("hint.source.other"),
+      targetLabel: t("hint.target"),
       until: Number.POSITIVE_INFINITY
     };
     draw();
@@ -809,15 +829,15 @@
     if (!isTutorialActive()) return true;
     const expected = getTutorialExpectedMove();
     if (!expected) {
-      showToast("Следуй шагу обучения");
+      showToast(t("toast.tutorialStep"));
       return false;
     }
     if (!vehicle || vehicle.id !== expected.id) {
-      showToast("Сейчас нужна подсвеченная машина");
+      showToast(t("toast.tutorialHighlighted"));
       return false;
     }
     if (delta !== null && delta !== expected.delta) {
-      showToast("Двигай до подсвеченной позиции");
+      showToast(t("toast.tutorialPosition"));
       return false;
     }
     return true;
@@ -885,14 +905,14 @@
     if (els.tutorialOverlay) els.tutorialOverlay.hidden = true;
     state.tutorial.completedVersion = tutorialVersion;
     saveProgress({ flush: true });
-    showToast("Обучение пройдено");
+    showToast(t("toast.tutorialDone"));
     show("menu");
   }
 
   function restartLevel() {
     if (isAnimating) return;
     if (tutorialState && tutorialState.active) {
-      showToast("Сначала закончи обучение");
+      showToast(t("toast.tutorialBlock"));
       return;
     }
     playSound("button");
@@ -922,14 +942,14 @@
       state.garage.equippedSkinId = skin.id;
       saveProgress({ flush: true });
       playSound("button");
-      showToast(`${skin.name}: надето`);
+      showToast(t("toast.skinEquipped", { name: tSkinName(skin.id) }));
       renderGarage();
       draw();
       return;
     }
     if (state.coins < skin.price) {
       playSound("bump");
-      showToast("Не хватает монет");
+      showToast(t("toast.notEnoughCoins"));
       return;
     }
     state.coins -= skin.price;
@@ -937,7 +957,7 @@
     state.garage.equippedSkinId = skin.id;
     saveProgress({ flush: true });
     playSound("coin");
-    showToast(`${skin.name}: куплено`);
+    showToast(t("toast.skinBought", { name: tSkinName(skin.id) }));
     updateHud();
     renderGarage();
     draw();
@@ -950,14 +970,14 @@
       state.garage.equippedYardId = yard.id;
       saveProgress({ flush: true });
       playSound("button");
-      showToast(`${yard.name}: надето`);
+      showToast(t("toast.skinEquipped", { name: tYardName(yard.id) }));
       renderGarage();
       resizeCanvas();
       return;
     }
     if (state.coins < yard.price) {
       playSound("bump");
-      showToast("Не хватает монет");
+      showToast(t("toast.notEnoughCoins"));
       return;
     }
     state.coins -= yard.price;
@@ -965,7 +985,7 @@
     state.garage.equippedYardId = yard.id;
     saveProgress({ flush: true });
     playSound("coin");
-    showToast(`${yard.name}: куплено`);
+    showToast(t("toast.skinBought", { name: tYardName(yard.id) }));
     updateHud();
     renderGarage();
     resizeCanvas();
@@ -994,8 +1014,8 @@
       return;
     }
     pendingDailyArchiveDateKey = dateKey;
-    if (els.archiveConfirmTitle) els.archiveConfirmTitle.textContent = `Открыть ${formatShortDate(dateKey)}?`;
-    if (els.archiveConfirmText) els.archiveConfirmText.textContent = "Посмотри рекламу, чтобы сыграть этот архивный уровень дня.";
+    if (els.archiveConfirmTitle) els.archiveConfirmTitle.textContent = t("archive.title.date", { date: formatShortDate(dateKey) });
+    if (els.archiveConfirmText) els.archiveConfirmText.textContent = t("archive.text");
     if (els.archiveWatchButton) els.archiveWatchButton.disabled = false;
     if (els.archiveConfirmModal) els.archiveConfirmModal.hidden = false;
   }
@@ -1026,10 +1046,10 @@
     const unlock = () => {
       state.daily.archiveUnlocks[dateKey] = true;
       saveProgress({ flush: true });
-      showToast(`Архив ${formatShortDate(dateKey)} открыт`);
+      showToast(t("toast.archiveUnlocked", { date: formatShortDate(dateKey) }));
       renderDailyPanel();
     };
-    return showRewarded("Архив уровня дня", "После ролика откроется выбранный архивный уровень.", unlock);
+    return showRewarded(t("rewarded.archive.title"), t("rewarded.archive.text"), unlock);
   }
 
   function isDailyDatePlayable(dateKey) {
@@ -1298,10 +1318,10 @@
     saveProgress({ flush: true });
 
     showWinModal({
-      title: `${level.title}`,
+      title: translateLevelTitle(level.title),
       rewardText: formatCampaignRewardLabel(reward, missionReward, elapsedMs),
       canDouble: reward > 0,
-      nextText: "Следующий",
+      nextText: t("win.next"),
       showMenuButton: false,
       packComplete: isPackEnd
     });
@@ -1310,7 +1330,7 @@
     revealStars(stars);
     if (isPackEnd) setTimeout(() => playSound("coin"), 720);
     updateGameplayMarker();
-    if (missionReward) showToast(`Миссии: +${missionReward} монет`);
+    if (missionReward) showToast(t("toast.missionsReward", { coins: missionReward }));
   }
 
   function getCampaignStarReward(item, stars) {
@@ -1322,11 +1342,11 @@
   function formatCampaignRewardLabel(reward, missionReward, elapsedMs) {
     const parts = [];
     if (reward > 0) {
-      parts.push(getRuleType() === "timed" && elapsedMs ? `+${reward} монет · ${formatTime(elapsedMs / 1000)}` : `+${reward} монет`);
+      parts.push(getRuleType() === "timed" && elapsedMs ? t("reward.coinsTimed", { n: reward, time: formatTime(elapsedMs / 1000) }) : t("reward.coins", { n: reward }));
     } else {
-      parts.push("Монеты уже получены");
+      parts.push(t("reward.alreadyClaimed"));
     }
-    if (missionReward) parts.push(`миссии +${missionReward}`);
+    if (missionReward) parts.push(t("reward.missionSuffix", { n: missionReward }));
     return parts.join(" · ");
   }
 
@@ -1364,23 +1384,23 @@
 
     lastReward = 0;
     showWinModal({
-      title: `${level.title}`,
+      title: translateLevelTitle(level.title),
       rewardText: isToday
         ? totalReward
-          ? `+${totalReward} монет за сегодня${streakReward ? ` · серия +${streakReward}` : ""}`
-          : "Награда дня уже получена"
+          ? t("reward.daily.earned", { total: totalReward }) + (streakReward ? ` · ${t("reward.daily.streak", { n: streakReward })}` : "")
+          : t("reward.daily.claimed")
         : archiveReward
-          ? `Архив ${formatShortDate(dateKey)} · +${archiveReward} монет`
-          : "Архив уже закрыт на лучший результат",
+          ? t("reward.archive.earned", { date: formatShortDate(dateKey), coins: archiveReward })
+          : t("reward.archive.done"),
       canDouble: false,
-      nextText: "Календарь",
+      nextText: t("win.nextDaily"),
       showMenuButton: true
     });
     updateHud();
     rewardCoinFeedback(coinsBefore);
     revealStars(stars);
     updateGameplayMarker();
-    if (totalReward || archiveReward) showToast(`${isToday ? "Уровень дня" : "Архив"}: +${totalReward + archiveReward} монет`);
+    if (totalReward || archiveReward) showToast(isToday ? t("toast.dailyReward.today", { coins: totalReward + archiveReward }) : t("toast.dailyReward.archive", { coins: totalReward + archiveReward }));
   }
 
   function showWinModal(options) {
@@ -1417,21 +1437,21 @@
     let failOptions;
     if (reason === "time") {
       failOptions = {
-        eyebrow: "Таймер",
-        title: "Время вышло",
-        text: "Время вышло. Двор начнется заново."
+        eyebrow: t("fail.eyebrow.time"),
+        title: t("fail.title.time"),
+        text: t("fail.text.time")
       };
     } else if (activeMode === "daily" || !Number.isFinite(getMoveLimit())) {
       failOptions = {
-        eyebrow: "Без лимита",
-        title: "Еще попытка",
-        text: "Попробуй еще раз, этот режим не ограничивает ходы."
+        eyebrow: t("fail.eyebrow.free"),
+        title: t("fail.title.free"),
+        text: t("fail.text.free")
       };
     } else {
       failOptions = {
-        eyebrow: "Лимит ходов",
-        title: "Ходы закончились",
-        text: `Лимит ${getMoveLimit()} ходов исчерпан. Двор начнется заново.`
+        eyebrow: t("fail.eyebrow.moves"),
+        title: t("fail.title.moves"),
+        text: t("fail.text.moves", { n: getMoveLimit() })
       };
     }
     showFailModal(failOptions);
@@ -1474,7 +1494,7 @@
       const hint = findHint();
       if (!hint) {
         playSound("bump");
-        showToast("Сейчас нет полезной подсказки");
+        showToast(t("toast.noHint"));
         return;
       }
       state.hints -= 1;
@@ -1483,14 +1503,14 @@
       flashHint(hint);
       return;
     }
-    showRewarded("Подсказка", "После короткого ролика появится следующий правильный ход.", () => {
-      showToast("Ищу лучший ход");
+    showRewarded(t("rewarded.hint.title"), t("rewarded.hint.text"), () => {
+      showToast(t("toast.searching"));
       requestAnimationFrame(() => {
         const hint = findHint();
         if (hint) flashHint(hint);
         else {
           playSound("bump");
-          showToast("Сейчас нет полезной подсказки");
+          showToast(t("toast.noHint"));
         }
       });
     });
@@ -1510,7 +1530,7 @@
 
   function requestToolAction(action) {
     if (tutorialState && tutorialState.active) {
-      showToast("В обучении следуй подсветке");
+      showToast(t("toast.tutorialInGame"));
       return;
     }
     if (queueToolAction(action)) return;
@@ -1530,7 +1550,7 @@
 
   function flashHint(hint = findHint()) {
     if (!hint) {
-      showToast("Сейчас нет полезной подсказки");
+      showToast(t("toast.noHint"));
       return;
     }
     activeHint = {
@@ -1566,14 +1586,14 @@
 
   function skipLevel() {
     if (isAnimating) return;
-    if (blockTutorialEscape("В обучении следуй подсветке")) return;
+    if (blockTutorialEscape(t("toast.tutorialInGame"))) return;
     if (activeMode === "daily") {
       playSound("bump");
-      showToast("Уровень дня нельзя пропустить");
+      showToast(t("toast.dailyNoSkip"));
       return;
     }
     playSound("button");
-    showRewarded("Пропуск уровня", "После короткого ролика следующий двор откроется сразу.", () => {
+    showRewarded(t("rewarded.skip.title"), t("rewarded.skip.text"), () => {
       const nextIndex = getNextLevelIndexInMode();
       const next = levels[nextIndex];
       if (next) {
@@ -1655,12 +1675,12 @@
     if (blockTutorialEscape()) return;
     if (activeMode === "daily" || lastReward <= 0) {
       playSound("bump");
-      showToast(activeMode === "daily" ? "Уровень дня не удваивается" : "Нечего удваивать");
+      showToast(activeMode === "daily" ? t("toast.dailyNoDouble") : t("toast.nothingToDouble"));
       return;
     }
     playSound("button");
     els.winModal.hidden = true;
-    showRewarded("Удвоить награду", "После рекламного ролика монеты за уровень удвоятся.", () => {
+    showRewarded(t("rewarded.double.title"), t("rewarded.double.text"), () => {
       state.coins += lastReward;
       saveProgress({ flush: true });
       updateHud();
@@ -2182,6 +2202,26 @@
     if (state.settings.haptics) vibrate(18);
   }
 
+  function toggleLang() {
+    if (blockTutorialEscape()) return;
+    const current = window.PROBKA_LANG || "ru";
+    const next = current === "ru" ? "en" : "ru";
+    window.PROBKA_LANG = next;
+    if (!state.settings) state.settings = {};
+    state.settings.lang = next;
+    saveProgress();
+    if (texts.applyI18n) texts.applyI18n(document);
+    updateHud();
+    updateMenuStatus();
+    // Re-render the current view so all dynamic strings update
+    if (currentView === "modes") renderModeSelect();
+    else if (currentView === "levels") renderLevelSelect();
+    else if (currentView === "garage") renderGarage();
+    else if (currentView === "missions") renderMissions();
+    else if (currentView === "stats") renderStats();
+    else if (currentView === "daily") renderDailyPanel();
+  }
+
   async function initializePlatform() {
     if (!yandex || !yandex.init) return;
     await yandex.init({
@@ -2193,8 +2233,14 @@
   }
 
   function applyPlatformLanguage() {
-    // Игра локализована только на русский; язык платформы не меняет контент.
-    document.documentElement.lang = "ru";
+    // Resolve language: saved preference → platform lang (ru/en only) → "ru"
+    const savedLang = state.settings && state.settings.lang;
+    const platformLang = yandex && yandex.getLanguage ? yandex.getLanguage() : null;
+    const resolvedLang = savedLang || (platformLang === "en" ? "en" : null) || "ru";
+    window.PROBKA_LANG = resolvedLang;
+    if (texts.applyI18n) texts.applyI18n(document);
+    else document.documentElement.lang = resolvedLang;
+    updateHud();
   }
 
   async function restoreCloudProgress() {
@@ -2463,6 +2509,7 @@
     }
     if (els.soundToggleButton) els.soundToggleButton.addEventListener("click", toggleMute);
     if (els.hapticsToggleButton) els.hapticsToggleButton.addEventListener("click", toggleHaptics);
+    if (els.langToggleButton) els.langToggleButton.addEventListener("click", toggleLang);
     els.backButton.addEventListener("click", () => {
       if (isAnimating) return;
       if (blockTutorialEscape()) return;

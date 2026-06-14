@@ -1,4 +1,57 @@
 (function () {
+  // i18n helper — loaded after i18n.js
+  const t = (typeof window !== "undefined" && window.PROBKA_TEXTS && window.PROBKA_TEXTS.t) ? window.PROBKA_TEXTS.t.bind(window.PROBKA_TEXTS) : ((k) => k);
+
+  // These are functions rather than constants so they always return the current language strings.
+  function getMiniStepsI18n() {
+    return [
+      {
+        label: t("tutorial.mini.0.label"),
+        title: t("tutorial.mini.0.title"),
+        text: t("tutorial.mini.0.text"),
+        button: t("tutorial.mini.0.button")
+      },
+      {
+        label: t("tutorial.mini.1.label"),
+        title: t("tutorial.mini.1.title"),
+        text: t("tutorial.mini.1.text"),
+        expected: { id: "tutorial_blocker", delta: 2 }
+      },
+      {
+        label: t("tutorial.mini.2.label"),
+        title: t("tutorial.mini.2.title"),
+        text: t("tutorial.mini.2.text"),
+        expected: { id: "red", delta: 3 }
+      }
+    ];
+  }
+
+  function getMenuCardsI18n() {
+    return [
+      {
+        title: t("tutorial.card.0.title"),
+        text: t("tutorial.card.0.text"),
+        focusIds: ["levelSelectButton"]
+      },
+      {
+        title: t("tutorial.card.1.title"),
+        text: t("tutorial.card.1.text"),
+        focusIds: ["dailyButton", "streakPanel"]
+      },
+      {
+        title: t("tutorial.card.2.title"),
+        text: t("tutorial.card.2.text"),
+        focusIds: ["garageButton"]
+      },
+      {
+        title: t("tutorial.card.3.title"),
+        text: t("tutorial.card.3.text"),
+        focusIds: ["missionsButton"]
+      }
+    ];
+  }
+
+  // Keep static arrays for backward-compat (used by getMiniSteps/getMenuCards exports)
   const miniSteps = [
     {
       label: "Шаг 1 из 3",
@@ -62,7 +115,7 @@
 
   function createController(deps) {
     function getCards() {
-      return menuCards;
+      return getMenuCardsI18n();
     }
 
     function updateStep() {
@@ -74,24 +127,27 @@
       overlay.hidden = false;
       deps.syncTutorialLock();
 
+      const currentMiniSteps = getMiniStepsI18n();
+      const currentMenuCards = getMenuCardsI18n();
+
       if (state.phase === "mini") {
-        const step = miniSteps[state.step] || miniSteps[0];
+        const step = currentMiniSteps[state.step] || currentMiniSteps[0];
         setCard(step);
         if (step.expected) deps.showExpectedHint(step.expected);
         return;
       }
 
       if (state.phase === "cards") {
-        const card = menuCards[state.step];
+        const card = currentMenuCards[state.step];
         if (!card) {
           deps.startGuidedLevel();
           return;
         }
         setCard({
-          label: `Меню · ${state.step + 1}/${menuCards.length}`,
+          label: t("tutorial.menu.label", { n: state.step + 1, total: currentMenuCards.length }),
           title: card.title,
           text: card.text,
-          button: "Дальше",
+          button: t("tutorial.btn.next"),
           focusIds: card.focusIds || []
         });
         return;
@@ -100,9 +156,9 @@
       if (state.phase === "guided") {
         const move = getGuidedMove();
         setCard({
-          label: "Первый уровень",
-          title: move ? "Повтори подсвеченный ход" : "Двор почти свободен",
-          text: move ? "Желтая рамка показывает машину, пунктирная рамка показывает место, куда ее нужно перетащить." : "Доведи машину до выезда.",
+          label: t("tutorial.guided.label"),
+          title: move ? t("tutorial.guided.move.title") : t("tutorial.guided.finish.title"),
+          text: move ? t("tutorial.guided.move.text") : t("tutorial.guided.finish.text"),
           expected: move || null
         });
         if (move) deps.showExpectedHint(move);
@@ -113,12 +169,12 @@
     function setCard(step) {
       const els = deps.getEls();
       setDomFocus(step.focusIds || []);
-      if (els.tutorialStepLabel) els.tutorialStepLabel.textContent = step.label || "Обучение";
+      if (els.tutorialStepLabel) els.tutorialStepLabel.textContent = step.label || t("tutorial.step.label");
       if (els.tutorialTitle) els.tutorialTitle.textContent = step.title || "";
       if (els.tutorialText) els.tutorialText.textContent = step.text || "";
       if (els.tutorialNextButton) {
         els.tutorialNextButton.hidden = Boolean(step.expected);
-        els.tutorialNextButton.textContent = step.button || "Дальше";
+        els.tutorialNextButton.textContent = step.button || t("tutorial.btn.next");
       }
       deps.syncTutorialLock();
     }
@@ -138,6 +194,7 @@
       if (!state || !state.active || deps.isAnimating()) return;
       deps.playSound("button");
       if (state.phase === "mini") {
+        const currentMiniSteps = getMiniStepsI18n();
         state.step = Math.min(1, state.step + 1);
         updateStep();
         deps.draw();
@@ -178,6 +235,8 @@
     createController,
     getMiniSteps,
     getMenuCards,
+    getMiniStepsI18n,
+    getMenuCardsI18n,
     getExpectedMove
   };
 })();

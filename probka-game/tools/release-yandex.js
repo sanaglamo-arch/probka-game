@@ -64,6 +64,7 @@ const syntaxFiles = [
   "daily.js",
   "config.js",
   "texts.js",
+  "i18n.js",
   "yandex-sdk.js",
   "progress.js",
   "economy.js",

@@ -44,7 +44,7 @@
         },
         missions: { dateKey: "", records: {} },
         tutorial: { completedVersion: 0 },
-        settings: { muted: false, haptics: true }
+        settings: { muted: false, haptics: true, lang: null }
       };
     }
 
