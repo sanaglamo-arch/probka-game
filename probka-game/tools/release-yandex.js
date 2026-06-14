@@ -41,6 +41,7 @@ const baseRuntimeFiles = [
   "daily.js",
   "config.js",
   "texts.js",
+  "i18n.js",
   "yandex-sdk.js",
   "progress.js",
   "economy.js",
@@ -391,7 +392,7 @@ function getRuntimeHash() {
 }
 
 function applyCacheVersion(index, versionHash) {
-  return index.replace(/(\.\/(?:(?:favicon|styles|yandex-sdk|level-bank\.generated|levels|yards|skins|daily|config|texts|progress|economy|rules|session|renderer|screens|tutorial|actors|input|ads|audio|game)\.(?:svg|css|js)|assets\/skins\/v3\/[a-z0-9_-]+\.png))\?v=[^"']+/g, `$1?v=${versionHash}`);
+  return index.replace(/(\.\/(?:(?:favicon|styles|yandex-sdk|level-bank\.generated|levels|yards|skins|daily|config|texts|i18n|progress|economy|rules|session|renderer|screens|tutorial|actors|input|ads|audio|game)\.(?:svg|css|js)|assets\/skins\/v3\/[a-z0-9_-]+\.png))\?v=[^"']+/g, `$1?v=${versionHash}`);
 }
 
 function formatBytes(bytes) {
