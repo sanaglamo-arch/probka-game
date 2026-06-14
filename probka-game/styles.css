@@ -213,6 +213,7 @@ h2 {
 
 .brand {
   display: flex;
+  flex: 1 1 auto;
   min-width: 0;
   align-items: center;
   gap: 12px;
@@ -247,28 +248,34 @@ h2 {
 .topbar h1 {
   min-width: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
   text-shadow: 0 10px 34px rgba(0, 0, 0, 0.35);
 }
 
 .topbar-right {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 10px;
 }
 
 .lang-chip {
-  min-height: 38px;
-  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
   background: var(--surface-sunken);
   color: var(--text-soft);
   font-weight: 800;
   font-size: 13px;
-  letter-spacing: 0.6px;
-  transition: border-color 0.16s ease, color 0.16s ease;
+  letter-spacing: 0.4px;
+  transition: border-color 0.16s ease, color 0.16s ease, background 0.16s ease;
 }
 
 .lang-chip:hover {
@@ -2973,6 +2980,11 @@ body.game-active #gameCanvas {
     font-size: 21px;
   }
 
+  .topbar h1 {
+    font-size: 19px;
+    letter-spacing: -0.2px;
+  }
+
   .eyebrow {
     font-size: 10px;
   }
@@ -2987,15 +2999,19 @@ body.game-active #gameCanvas {
     height: 24px;
   }
 
+  .topbar-right {
+    gap: 8px;
+  }
+
   .wallet {
-    min-width: 84px;
+    min-width: 74px;
     min-height: 44px;
-    padding: 7px 13px 7px 9px;
+    padding: 7px 11px 7px 9px;
   }
 
   .lang-chip {
-    min-height: 36px;
-    padding: 0 10px;
+    width: 36px;
+    height: 36px;
     font-size: 12.5px;
   }
 
@@ -3257,9 +3273,9 @@ body.game-active #gameCanvas {
   }
 
   .lang-chip {
-    min-height: 34px;
-    padding: 0 8px;
-    font-size: 12px;
+    width: 34px;
+    height: 34px;
+    font-size: 11.5px;
   }
 
   .hub-hero {
