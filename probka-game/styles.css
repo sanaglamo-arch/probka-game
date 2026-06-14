@@ -245,7 +245,35 @@ h2 {
 }
 
 .topbar h1 {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   text-shadow: 0 10px 34px rgba(0, 0, 0, 0.35);
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lang-chip {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  color: var(--text-soft);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.6px;
+  transition: border-color 0.16s ease, color 0.16s ease;
+}
+
+.lang-chip:hover {
+  border-color: rgba(133, 184, 255, 0.4);
+  color: var(--text);
 }
 
 .wallet {
@@ -2965,6 +2993,12 @@ body.game-active #gameCanvas {
     padding: 7px 13px 7px 9px;
   }
 
+  .lang-chip {
+    min-height: 36px;
+    padding: 0 10px;
+    font-size: 12.5px;
+  }
+
   #coins {
     font-size: 17px;
   }
@@ -3213,13 +3247,19 @@ body.game-active #gameCanvas {
   }
 
   h1 {
-    font-size: 19px;
+    font-size: 17px;
   }
 
   .wallet {
     min-width: 74px;
     padding-right: 10px;
     padding-left: 8px;
+  }
+
+  .lang-chip {
+    min-height: 34px;
+    padding: 0 8px;
+    font-size: 12px;
   }
 
   .hub-hero {

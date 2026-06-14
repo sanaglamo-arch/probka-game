@@ -644,6 +644,9 @@
         els.musicToggleButton.textContent = on ? t("settings.music.on") : t("settings.music.off");
         els.musicToggleButton.setAttribute("aria-pressed", String(on));
       }
+      if (els.topLangButton) {
+        els.topLangButton.textContent = (window.PROBKA_LANG || "ru") === "ru" ? "RU" : "EN";
+      }
       if (els.langToggleButton) {
         const lang = window.PROBKA_LANG || "ru";
         els.langToggleButton.textContent = lang === "ru" ? t("settings.lang.ru") : t("settings.lang.en");

@@ -89,6 +89,7 @@
     soundToggleButton: document.getElementById("soundToggleButton"),
     hapticsToggleButton: document.getElementById("hapticsToggleButton"),
     musicToggleButton: document.getElementById("musicToggleButton"),
+    topLangButton: document.getElementById("topLangButton"),
     langToggleButton: document.getElementById("langToggleButton"),
     backButton: document.getElementById("backButton"),
     modesBackButton: document.getElementById("modesBackButton"),
@@ -2542,6 +2543,7 @@
     if (els.hapticsToggleButton) els.hapticsToggleButton.addEventListener("click", toggleHaptics);
     if (els.musicToggleButton) els.musicToggleButton.addEventListener("click", toggleMusic);
     if (els.langToggleButton) els.langToggleButton.addEventListener("click", toggleLang);
+    if (els.topLangButton) els.topLangButton.addEventListener("click", toggleLang);
     // Автозапуск фоновой музыки по первому жесту (политика автоплея браузера).
     document.addEventListener("pointerdown", function startMusicOnGesture() {
       document.removeEventListener("pointerdown", startMusicOnGesture);
