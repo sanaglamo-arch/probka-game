@@ -95,43 +95,49 @@ function capture(url, outputPath, width, height, virtualTime = 600, scale = 1) {
   if (result.status !== 0) throw new Error(`Chrome screenshot failed for ${url}`);
 }
 
+// Новый концепт «Побег героя»: одна крупная красная машина в динамике
+// вырывается к светящемуся выезду со скоростными штрихами.
 function makeIconHtml() {
   return htmlShell(512, 512, `
     <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512">
-          <stop stop-color="#22344f"/>
-          <stop offset="0.5" stop-color="#101a28"/>
-          <stop offset="1" stop-color="#070a0e"/>
+          <stop stop-color="#243a59"/>
+          <stop offset="0.55" stop-color="#111d2e"/>
+          <stop offset="1" stop-color="#070a10"/>
         </linearGradient>
-        <radialGradient id="vign" cx="48%" cy="40%" r="74%">
-          <stop offset="0.5" stop-color="#000000" stop-opacity="0"/>
-          <stop offset="1" stop-color="#000000" stop-opacity="0.52"/>
+        <radialGradient id="vign" cx="50%" cy="46%" r="74%">
+          <stop offset="0.52" stop-color="#000000" stop-opacity="0"/>
+          <stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
         </radialGradient>
         ${carArtDefs()}
       </defs>
       <rect width="512" height="512" fill="url(#bg)"/>
-      <!-- тёплое сияние от выезда справа -->
-      <ellipse cx="470" cy="332" rx="190" ry="190" fill="#ffce5a" opacity="0.12"/>
-      <!-- лёгкая разметка парковочных рядов -->
-      <g stroke="#cdd8e8" stroke-width="5" opacity="0.08" stroke-linecap="round">
-        <path d="M64 150h384M64 256h384M64 362h384"/>
+      <ellipse cx="432" cy="150" rx="250" ry="250" fill="#ffce5a" opacity="0.16"/>
+      <!-- тусклые машины затора, из которого вырвался герой -->
+      <g opacity="0.4">
+        ${car(18, 392, 70, 150, "url(#car-blue)", "#dfe9f6", 18)}
+        ${car(300, 432, 172, 66, "url(#car-gold)", "#fff1cf", 18)}
       </g>
-      <!-- золотые ворота выезда справа, на линии красной машины -->
-      <g filter="url(#exitGlow)">
-        <rect x="392" y="296" width="58" height="12" rx="6" fill="#ffd35c"/>
-        <rect x="392" y="358" width="58" height="12" rx="6" fill="#ffd35c"/>
-        <path d="M398 333h60" stroke="#ffe08a" stroke-width="16" stroke-linecap="round"/>
-        <path d="M452 309l40 24-40 24z" fill="#ffe08a"/>
+      <!-- штрихи скорости + герой + стрелка выезда, повёрнуты по ходу -->
+      <g transform="rotate(-24 246 282)">
+        <g>
+          <rect x="-18" y="250" width="92" height="12" rx="6" fill="#ffe7a6" opacity="0.5"/>
+          <rect x="4" y="276" width="80" height="10" rx="5" fill="#ffffff" opacity="0.38"/>
+          <rect x="-6" y="300" width="88" height="11" rx="5" fill="#ffd27a" opacity="0.42"/>
+        </g>
+        ${car(96, 232, 300, 100, "url(#car-red)", "#ffe9ec", 28, true)}
+        <g filter="url(#exitGlow)">
+          <path d="M404 282h72" stroke="#ffe08a" stroke-width="20" stroke-linecap="round"/>
+          <path d="M462 250l56 32-56 32z" fill="#ffe08a"/>
+        </g>
       </g>
-      <!-- затор: блокирующие машины + красный герой, выезжающий вправо -->
-      ${car(90, 84, 76, 172, "url(#car-blue)", "#e9f2ff", 22)}
-      ${car(194, 84, 184, 74, "url(#car-green)", "#e2fff2", 22)}
-      ${car(252, 196, 76, 168, "url(#car-gold)", "#fff6d6", 22)}
-      ${car(92, 290, 270, 86, "url(#car-red)", "#ffe9ec", 26, true)}
       <rect width="512" height="512" fill="url(#vign)"/>
-      <circle cx="436" cy="92" r="22" fill="#ffd35c"/>
-      <circle cx="436" cy="92" r="10" fill="#fff4be"/>
+      <g fill="#ffe9b0">
+        <circle cx="486" cy="150" r="6"/>
+        <circle cx="452" cy="98" r="4"/>
+        <circle cx="500" cy="206" r="4"/>
+      </g>
     </svg>
   `);
 }
@@ -140,54 +146,47 @@ function makeCoverHtml() {
   return htmlShell(800, 470, `
     <svg width="800" height="470" viewBox="0 0 800 470" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="coverBg" x1="0" y1="0" x2="800" y2="470">
-          <stop stop-color="#1d2c42"/>
-          <stop offset="0.55" stop-color="#0c1420"/>
+        <linearGradient id="coverBg2" x1="0" y1="0" x2="800" y2="470">
+          <stop stop-color="#21344f"/>
+          <stop offset="0.55" stop-color="#0e1828"/>
           <stop offset="1" stop-color="#070a10"/>
         </linearGradient>
-        <linearGradient id="title" x1="44" y1="60" x2="360" y2="180">
+        <linearGradient id="title" x1="44" y1="60" x2="360" y2="190">
           <stop stop-color="#ffffff"/>
           <stop offset="1" stop-color="#a9caff"/>
         </linearGradient>
-        <radialGradient id="yardGlow" cx="64%" cy="44%" r="56%">
-          <stop offset="0" stop-color="#5a7bb0" stop-opacity="0.24"/>
-          <stop offset="1" stop-color="#5a7bb0" stop-opacity="0"/>
-        </radialGradient>
         ${carArtDefs()}
       </defs>
-      <rect width="800" height="470" fill="url(#coverBg)"/>
-      <rect width="800" height="470" fill="url(#yardGlow)"/>
-      <!-- площадка двора: асфальт с разметкой парковочных мест -->
-      <g transform="translate(372 26)">
-        <rect x="0" y="0" width="404" height="418" rx="26" fill="#1a2533"/>
-        <rect x="10" y="10" width="384" height="398" rx="20" fill="#222f40"/>
-        <g stroke="#cfd9e8" stroke-width="4" opacity="0.12" stroke-linecap="round">
-          <path d="M44 36v346M140 36v346M236 36v346M332 36v346"/>
+      <rect width="800" height="470" fill="url(#coverBg2)"/>
+      <ellipse cx="700" cy="150" rx="320" ry="300" fill="#ffce5a" opacity="0.14"/>
+      <!-- тусклый затор -->
+      <g opacity="0.38">
+        ${car(560, 372, 72, 150, "url(#car-blue)", "#dfe9f6", 18)}
+        ${car(648, 392, 150, 64, "url(#car-gold)", "#fff1cf", 18)}
+      </g>
+      <!-- герой вырывается к выезду -->
+      <g transform="rotate(-18 600 252)">
+        <g>
+          <rect x="392" y="222" width="96" height="12" rx="6" fill="#ffe7a6" opacity="0.5"/>
+          <rect x="414" y="248" width="84" height="10" rx="5" fill="#ffffff" opacity="0.36"/>
+          <rect x="400" y="272" width="92" height="11" rx="5" fill="#ffd27a" opacity="0.42"/>
         </g>
-        <rect x="10" y="10" width="384" height="398" rx="20" fill="none" stroke="#3c4d63" stroke-width="3" opacity="0.5"/>
+        ${car(500, 206, 252, 92, "url(#car-red)", "#ffe9ec", 24, true)}
+        <g filter="url(#exitGlow)">
+          <path d="M762 252h54" stroke="#ffe08a" stroke-width="18" stroke-linecap="round"/>
+          <path d="M812 226l44 26-44 26z" fill="#ffe08a"/>
+        </g>
       </g>
-      <!-- золотые ворота выезда справа, на линии красной машины -->
-      <g filter="url(#exitGlow)">
-        <rect x="724" y="268" width="54" height="11" rx="5" fill="#ffd35c"/>
-        <rect x="724" y="322" width="54" height="11" rx="5" fill="#ffd35c"/>
-        <path d="M730 296h54" stroke="#ffe08a" stroke-width="15" stroke-linecap="round"/>
-        <path d="M780 274l38 22-38 22z" fill="#ffe08a"/>
-      </g>
-      ${car(440, 68, 74, 166, "url(#car-blue)", "#e9f2ff", 18)}
-      ${car(548, 70, 188, 72, "url(#car-green)", "#e2fff2", 18)}
-      ${car(648, 156, 74, 166, "url(#car-gold)", "#fff6d6", 18)}
-      ${car(452, 256, 256, 80, "url(#car-red)", "#ffe9ec", 22, true)}
-      ${car(452, 360, 170, 70, "url(#car-purple)", "#f0eaff", 18)}
       <!-- текстовый блок слева -->
-      <text x="50" y="120" font-family="Arial, sans-serif" font-size="58" font-weight="900" fill="url(#title)">Пробка</text>
-      <text x="50" y="184" font-family="Arial, sans-serif" font-size="58" font-weight="900" fill="url(#title)">во дворе</text>
-      <text x="52" y="232" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#9fb1cb">Двигай машины и</text>
-      <text x="52" y="262" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#9fb1cb">освободи выезд</text>
+      <text x="50" y="122" font-family="Arial, sans-serif" font-size="60" font-weight="900" fill="url(#title)">Пробка</text>
+      <text x="50" y="188" font-family="Arial, sans-serif" font-size="60" font-weight="900" fill="url(#title)">во дворе</text>
+      <text x="52" y="236" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#9fb1cb">Двигай машины и</text>
+      <text x="52" y="266" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#9fb1cb">освободи выезд</text>
       <g font-family="Arial, sans-serif" font-weight="900" fill="#e6eefb">
-        <circle cx="62" cy="322" r="6" fill="#ffd35c"/><text x="80" y="331" font-size="27">300 уровней</text>
-        <circle cx="62" cy="366" r="6" fill="#56d29c"/><text x="80" y="375" font-size="27">3 режима</text>
+        <circle cx="62" cy="326" r="6" fill="#ffd35c"/><text x="80" y="335" font-size="27">300 уровней</text>
+        <circle cx="62" cy="370" r="6" fill="#56d29c"/><text x="80" y="379" font-size="27">3 режима</text>
       </g>
-      <g transform="translate(50 400)">
+      <g transform="translate(50 404)">
         <rect x="0" y="0" width="214" height="44" rx="22" fill="#ffffff" opacity="0.06"/>
         <circle cx="26" cy="22" r="13" fill="#ffd35c"/><circle cx="26" cy="22" r="6" fill="#fff4be"/>
         <text x="48" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="800" fill="#f2f6ff">Уровень дня</text>

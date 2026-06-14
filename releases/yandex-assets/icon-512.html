@@ -12,38 +12,42 @@
     <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512">
-          <stop stop-color="#22344f"/>
-          <stop offset="0.5" stop-color="#101a28"/>
-          <stop offset="1" stop-color="#070a0e"/>
+          <stop stop-color="#243a59"/>
+          <stop offset="0.55" stop-color="#111d2e"/>
+          <stop offset="1" stop-color="#070a10"/>
         </linearGradient>
-        <radialGradient id="vign" cx="48%" cy="40%" r="74%">
-          <stop offset="0.5" stop-color="#000000" stop-opacity="0"/>
-          <stop offset="1" stop-color="#000000" stop-opacity="0.52"/>
+        <radialGradient id="vign" cx="50%" cy="46%" r="74%">
+          <stop offset="0.52" stop-color="#000000" stop-opacity="0"/>
+          <stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
         </radialGradient>
         <linearGradient id="car-red" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ff8a93"/><stop offset="1" stop-color="#d62a43"/></linearGradient><linearGradient id="car-blue" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#8cc0ff"/><stop offset="1" stop-color="#2f6ad6"/></linearGradient><linearGradient id="car-green" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#7ce3b0"/><stop offset="1" stop-color="#1f9e6a"/></linearGradient><linearGradient id="car-gold" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffd673"/><stop offset="1" stop-color="#df991e"/></linearGradient><linearGradient id="car-purple" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#bba0f2"/><stop offset="1" stop-color="#6e4ed0"/></linearGradient><linearGradient id="car-teal" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#74e2e8"/><stop offset="1" stop-color="#1f9aa6"/></linearGradient><filter id="carShadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="9" stdDeviation="9" flood-color="#04060c" flood-opacity="0.5"/></filter><filter id="exitGlow" x="-120%" y="-120%" width="340%" height="340%"><feDropShadow dx="0" dy="0" stdDeviation="12" flood-color="#ffce5a" flood-opacity="0.9"/></filter>
       </defs>
       <rect width="512" height="512" fill="url(#bg)"/>
-      <!-- тёплое сияние от выезда справа -->
-      <ellipse cx="470" cy="332" rx="190" ry="190" fill="#ffce5a" opacity="0.12"/>
-      <!-- лёгкая разметка парковочных рядов -->
-      <g stroke="#cdd8e8" stroke-width="5" opacity="0.08" stroke-linecap="round">
-        <path d="M64 150h384M64 256h384M64 362h384"/>
+      <ellipse cx="432" cy="150" rx="250" ry="250" fill="#ffce5a" opacity="0.16"/>
+      <!-- тусклые машины затора, из которого вырвался герой -->
+      <g opacity="0.4">
+        <g filter="url(#carShadow)"><rect x="13.5" y="411.5" width="11.2" height="30" rx="5" fill="#10151d" opacity="0.9"/><rect x="13.5" y="492.5" width="11.2" height="30" rx="5" fill="#10151d" opacity="0.9"/><rect x="81.3" y="411.5" width="11.2" height="30" rx="5" fill="#10151d" opacity="0.9"/><rect x="81.3" y="492.5" width="11.2" height="30" rx="5" fill="#10151d" opacity="0.9"/><rect x="18" y="392" width="70" height="150" rx="18" fill="url(#car-blue)"/><rect x="21.5" y="402.5" width="63" height="48" rx="12.6" fill="#ffffff" opacity="0.16"/><rect x="28.5" y="437" width="49" height="66" rx="14" fill="#0b1016" opacity="0.16"/><rect x="32.7" y="470" width="40.6" height="27.7" rx="10.5" fill="#dfe9f6" opacity="0.88"/><rect x="34.8" y="441.6" width="36.4" height="21.1" rx="10.5" fill="#dfe9f6" opacity="0.68"/><rect x="28.5" y="533.6" width="11.9" height="5.3" rx="2.6" fill="#fff6cf"/><rect x="65.6" y="533.6" width="11.9" height="5.3" rx="2.6" fill="#fff6cf"/><rect x="28.5" y="395.1" width="11.9" height="5.3" rx="2.6" fill="#ff5a5f"/><rect x="65.6" y="395.1" width="11.9" height="5.3" rx="2.6" fill="#ff5a5f"/></g>
+        <g filter="url(#carShadow)"><rect x="322.4" y="427.8" width="34.4" height="10.6" rx="4.8" fill="#10151d" opacity="0.9"/><rect x="415.2" y="427.8" width="34.4" height="10.6" rx="4.8" fill="#10151d" opacity="0.9"/><rect x="322.4" y="491.7" width="34.4" height="10.6" rx="4.8" fill="#10151d" opacity="0.9"/><rect x="415.2" y="491.7" width="34.4" height="10.6" rx="4.8" fill="#10151d" opacity="0.9"/><rect x="300" y="432" width="172" height="66" rx="18" fill="url(#car-gold)"/><rect x="308.6" y="436.6" width="154.8" height="21.1" rx="12.6" fill="#ffffff" opacity="0.16"/><rect x="351.6" y="441.9" width="75.7" height="46.2" rx="13.2" fill="#0b1016" opacity="0.16"/><rect x="389.4" y="445.9" width="31.8" height="38.3" rx="9.9" fill="#fff1cf" opacity="0.88"/><rect x="356.9" y="447.8" width="25.7" height="34.3" rx="9.9" fill="#fff1cf" opacity="0.68"/><rect x="462.4" y="441.9" width="6" height="11.2" rx="3" fill="#fff6cf"/><rect x="462.4" y="476.9" width="6" height="11.2" rx="3" fill="#fff6cf"/><rect x="303.6" y="443.2" width="6" height="11.2" rx="3" fill="#ff5a5f"/><rect x="303.6" y="475.6" width="6" height="11.2" rx="3" fill="#ff5a5f"/></g>
       </g>
-      <!-- золотые ворота выезда справа, на линии красной машины -->
-      <g filter="url(#exitGlow)">
-        <rect x="392" y="296" width="58" height="12" rx="6" fill="#ffd35c"/>
-        <rect x="392" y="358" width="58" height="12" rx="6" fill="#ffd35c"/>
-        <path d="M398 333h60" stroke="#ffe08a" stroke-width="16" stroke-linecap="round"/>
-        <path d="M452 309l40 24-40 24z" fill="#ffe08a"/>
+      <!-- штрихи скорости + герой + стрелка выезда, повёрнуты по ходу -->
+      <g transform="rotate(-24 246 282)">
+        <g>
+          <rect x="-18" y="250" width="92" height="12" rx="6" fill="#ffe7a6" opacity="0.5"/>
+          <rect x="4" y="276" width="80" height="10" rx="5" fill="#ffffff" opacity="0.38"/>
+          <rect x="-6" y="300" width="88" height="11" rx="5" fill="#ffd27a" opacity="0.42"/>
+        </g>
+        <g filter="url(#carShadow)"><rect x="135" y="225.6" width="60" height="16" rx="7.2" fill="#10151d" opacity="0.9"/><rect x="297" y="225.6" width="60" height="16" rx="7.2" fill="#10151d" opacity="0.9"/><rect x="135" y="322.4" width="60" height="16" rx="7.2" fill="#10151d" opacity="0.9"/><rect x="297" y="322.4" width="60" height="16" rx="7.2" fill="#10151d" opacity="0.9"/><rect x="96" y="232" width="300" height="100" rx="28" fill="url(#car-red)"/><rect x="111" y="239" width="270" height="32" rx="19.6" fill="#ffffff" opacity="0.16"/><rect x="186" y="247" width="132" height="70" rx="20" fill="#0b1016" opacity="0.16"/><rect x="252" y="253" width="55.4" height="58" rx="15" fill="#ffe9ec" opacity="0.88"/><rect x="195.2" y="256" width="44.9" height="52" rx="15" fill="#ffe9ec" opacity="0.68"/><rect x="379.2" y="247" width="10.5" height="17" rx="5.3" fill="#fff6cf"/><rect x="379.2" y="300" width="10.5" height="17" rx="5.3" fill="#fff6cf"/><rect x="102.3" y="249" width="10.5" height="17" rx="5.3" fill="#ff5a5f"/><rect x="102.3" y="298" width="10.5" height="17" rx="5.3" fill="#ff5a5f"/></g>
+        <g filter="url(#exitGlow)">
+          <path d="M404 282h72" stroke="#ffe08a" stroke-width="20" stroke-linecap="round"/>
+          <path d="M462 250l56 32-56 32z" fill="#ffe08a"/>
+        </g>
       </g>
-      <!-- затор: блокирующие машины + красный герой, выезжающий вправо -->
-      <g filter="url(#carShadow)"><rect x="85.1" y="106.4" width="12.2" height="34.4" rx="5.5" fill="#10151d" opacity="0.9"/><rect x="85.1" y="199.2" width="12.2" height="34.4" rx="5.5" fill="#10151d" opacity="0.9"/><rect x="158.7" y="106.4" width="12.2" height="34.4" rx="5.5" fill="#10151d" opacity="0.9"/><rect x="158.7" y="199.2" width="12.2" height="34.4" rx="5.5" fill="#10151d" opacity="0.9"/><rect x="90" y="84" width="76" height="172" rx="22" fill="url(#car-blue)"/><rect x="93.8" y="96" width="68.4" height="55" rx="15.4" fill="#ffffff" opacity="0.16"/><rect x="101.4" y="135.6" width="53.2" height="75.7" rx="15.2" fill="#0b1016" opacity="0.16"/><rect x="106" y="173.4" width="44.1" height="31.8" rx="11.4" fill="#e9f2ff" opacity="0.88"/><rect x="108.2" y="140.9" width="39.5" height="24.2" rx="11.4" fill="#e9f2ff" opacity="0.68"/><rect x="101.4" y="246.4" width="12.9" height="6" rx="3" fill="#fff6cf"/><rect x="141.7" y="246.4" width="12.9" height="6" rx="3" fill="#fff6cf"/><rect x="101.4" y="87.6" width="12.9" height="6" rx="3" fill="#ff5a5f"/><rect x="141.7" y="87.6" width="12.9" height="6" rx="3" fill="#ff5a5f"/></g>
-      <g filter="url(#carShadow)"><rect x="217.9" y="79.3" width="36.8" height="11.8" rx="5.3" fill="#10151d" opacity="0.9"/><rect x="317.3" y="79.3" width="36.8" height="11.8" rx="5.3" fill="#10151d" opacity="0.9"/><rect x="217.9" y="150.9" width="36.8" height="11.8" rx="5.3" fill="#10151d" opacity="0.9"/><rect x="317.3" y="150.9" width="36.8" height="11.8" rx="5.3" fill="#10151d" opacity="0.9"/><rect x="194" y="84" width="184" height="74" rx="22" fill="url(#car-green)"/><rect x="203.2" y="89.2" width="165.6" height="23.7" rx="15.4" fill="#ffffff" opacity="0.16"/><rect x="249.2" y="95.1" width="81" height="51.8" rx="14.8" fill="#0b1016" opacity="0.16"/><rect x="289.7" y="99.5" width="34" height="42.9" rx="11.1" fill="#e2fff2" opacity="0.88"/><rect x="254.9" y="101.8" width="27.5" height="38.5" rx="11.1" fill="#e2fff2" opacity="0.68"/><rect x="367.7" y="95.1" width="6.4" height="12.6" rx="3.2" fill="#fff6cf"/><rect x="367.7" y="134.3" width="6.4" height="12.6" rx="3.2" fill="#fff6cf"/><rect x="197.9" y="96.6" width="6.4" height="12.6" rx="3.2" fill="#ff5a5f"/><rect x="197.9" y="132.8" width="6.4" height="12.6" rx="3.2" fill="#ff5a5f"/></g>
-      <g filter="url(#carShadow)"><rect x="247.1" y="217.8" width="12.2" height="33.6" rx="5.5" fill="#10151d" opacity="0.9"/><rect x="247.1" y="308.6" width="12.2" height="33.6" rx="5.5" fill="#10151d" opacity="0.9"/><rect x="320.7" y="217.8" width="12.2" height="33.6" rx="5.5" fill="#10151d" opacity="0.9"/><rect x="320.7" y="308.6" width="12.2" height="33.6" rx="5.5" fill="#10151d" opacity="0.9"/><rect x="252" y="196" width="76" height="168" rx="22" fill="url(#car-gold)"/><rect x="255.8" y="207.8" width="68.4" height="53.8" rx="15.4" fill="#ffffff" opacity="0.16"/><rect x="263.4" y="246.4" width="53.2" height="73.9" rx="15.2" fill="#0b1016" opacity="0.16"/><rect x="268" y="283.4" width="44.1" height="31" rx="11.4" fill="#fff6d6" opacity="0.88"/><rect x="270.2" y="251.6" width="39.5" height="23.7" rx="11.4" fill="#fff6d6" opacity="0.68"/><rect x="263.4" y="354.6" width="12.9" height="5.9" rx="2.9" fill="#fff6cf"/><rect x="303.7" y="354.6" width="12.9" height="5.9" rx="2.9" fill="#fff6cf"/><rect x="263.4" y="199.5" width="12.9" height="5.9" rx="2.9" fill="#ff5a5f"/><rect x="303.7" y="199.5" width="12.9" height="5.9" rx="2.9" fill="#ff5a5f"/></g>
-      <g filter="url(#carShadow)"><rect x="127.1" y="284.5" width="54" height="13.8" rx="6.2" fill="#10151d" opacity="0.9"/><rect x="272.9" y="284.5" width="54" height="13.8" rx="6.2" fill="#10151d" opacity="0.9"/><rect x="127.1" y="367.7" width="54" height="13.8" rx="6.2" fill="#10151d" opacity="0.9"/><rect x="272.9" y="367.7" width="54" height="13.8" rx="6.2" fill="#10151d" opacity="0.9"/><rect x="92" y="290" width="270" height="86" rx="26" fill="url(#car-red)"/><rect x="105.5" y="296" width="243" height="27.5" rx="18.2" fill="#ffffff" opacity="0.16"/><rect x="173" y="302.9" width="118.8" height="60.2" rx="17.2" fill="#0b1016" opacity="0.16"/><rect x="232.4" y="308.1" width="49.9" height="49.9" rx="12.9" fill="#ffe9ec" opacity="0.88"/><rect x="181.3" y="310.6" width="40.4" height="44.7" rx="12.9" fill="#ffe9ec" opacity="0.68"/><rect x="346.9" y="302.9" width="9.5" height="14.6" rx="4.7" fill="#fff6cf"/><rect x="346.9" y="348.5" width="9.5" height="14.6" rx="4.7" fill="#fff6cf"/><rect x="97.7" y="304.6" width="9.5" height="14.6" rx="4.7" fill="#ff5a5f"/><rect x="97.7" y="346.8" width="9.5" height="14.6" rx="4.7" fill="#ff5a5f"/></g>
       <rect width="512" height="512" fill="url(#vign)"/>
-      <circle cx="436" cy="92" r="22" fill="#ffd35c"/>
-      <circle cx="436" cy="92" r="10" fill="#fff4be"/>
+      <g fill="#ffe9b0">
+        <circle cx="486" cy="150" r="6"/>
+        <circle cx="452" cy="98" r="4"/>
+        <circle cx="500" cy="206" r="4"/>
+      </g>
     </svg>
   </body>
 </html>
