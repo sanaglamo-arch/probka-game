@@ -1768,6 +1768,7 @@
     ctx.clearRect(0, 0, width, height);
 
     drawYard(width, height);
+    drawExitGlow();
     drawActorRoutes();
     drawMoveGuide();
     if (!isTutorialHintActive()) drawHint();
@@ -1783,6 +1784,21 @@
 
   function drawYard(width, height) {
     if (renderer.drawYard) renderer.drawYard(ctx, { level, cellSize, boardPad, width, height, yardTheme: getEquippedYard() });
+  }
+
+  // Мягкое свечение в точке выезда — цель «манит» (зелёный = go).
+  // Рисуется за машинами; для запечённого в board.png выезда подсвечивает зону.
+  function drawExitGlow() {
+    if (!level || !level.exit) return;
+    const p = boardToScreen(level.width, level.exit.row + 0.5);
+    ctx.save();
+    const r = cellSize * 0.85;
+    const grad = ctx.createRadialGradient(p.x - cellSize * 0.1, p.y, 0, p.x - cellSize * 0.1, p.y, r);
+    grad.addColorStop(0, "rgba(120, 226, 170, 0.3)");
+    grad.addColorStop(1, "rgba(120, 226, 170, 0)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(p.x - r, p.y - r, r * 2, r * 2);
+    ctx.restore();
   }
 
   function drawActorRoutes() {
