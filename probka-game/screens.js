@@ -567,11 +567,10 @@
       return button;
     }
 
-    function getDailyCalendarStatus({ completion, isToday, isFuture, unlocked }) {
-      if (completion) return completion.stars >= 3 ? "★★★" : `${completion.stars}★`;
-      if (isToday) return "";
-      if (isFuture) return t("daily.day.status.future");
-      if (unlocked) return t("daily.day.status.unlocked");
+    function getDailyCalendarStatus({ completion }) {
+      // Текстовые метки убраны ради чистоты: состояние читается по стилю/иконке.
+      // У пройденных дней — звёзды результата.
+      if (completion) return "★".repeat(Math.max(1, completion.stars || 0));
       return "";
     }
 
