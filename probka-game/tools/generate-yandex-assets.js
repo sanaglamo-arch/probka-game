@@ -35,7 +35,9 @@ const pages = [
 const SHOT_CSS_WIDTH = 450;
 const SHOT_CSS_HEIGHT = 800;
 const SHOT_SCALE = 3;
-const shotUrl = (params) => `${baseUrl}/probka-game/index.html?showcase=1&skin=classic_red&${params}`;
+// capture=mobile прячет брендовый топбар → геймплей-экран (HUD+доска+кнопки)
+// занимает ≥70% кадра (требование Яндекса 5.1.1.2).
+const shotUrl = (params) => `${baseUrl}/probka-game/index.html?showcase=1&capture=mobile&skin=classic_red&${params}`;
 const screenshots = [
   { name: "screen1-night", url: shotUrl("mode=moves&level=24&yard=night_yard") },
   { name: "screen2-neon", url: shotUrl("mode=moves&level=58&yard=neon_yard") },

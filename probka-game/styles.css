@@ -70,10 +70,11 @@ html,
 body {
   margin: 0;
   width: 100%;
-  min-height: 100%;
-  overflow-x: hidden;
-  /* Запрет выделения текста, контекстного меню iOS и прокрутки-цепочки
-     (pull-to-refresh, bounce) — требования платформы 1.6 и 1.10. */
+  height: 100%;
+  /* Документ полностью залочен: никакого скролла страницы, pull-to-refresh,
+     bounce, выделения текста и контекстного меню (требования 1.6 и 1.10).
+     Прокрутка контента живёт во внутреннем контейнере .app. */
+  overflow: hidden;
   overscroll-behavior: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -90,6 +91,12 @@ body {
   line-height: 1.35;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* Тело зафиксировано к вьюпорту — страница не скроллится и не «оттягивается». */
+body {
+  position: fixed;
+  inset: 0;
 }
 
 /* Дисплейный шрифт (Nunito, округлый) — для брендовых и крупных акцентов.
@@ -158,9 +165,13 @@ button:disabled {
 .app {
   width: 100%;
   max-width: 600px;
-  min-height: 100vh;
+  height: 100%;
   margin: 0 auto;
-  padding: max(16px, env(safe-area-inset-top)) 16px calc(72px + env(safe-area-inset-bottom));
+  padding: max(16px, env(safe-area-inset-top)) 16px calc(48px + env(safe-area-inset-bottom));
+  /* Единственный скролл-контейнер игры; цепочка к документу обрезана. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .game-shell {
