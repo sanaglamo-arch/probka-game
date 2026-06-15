@@ -10,7 +10,7 @@
     <link rel="preload" href="./assets/fonts/nunito-800-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/fonts/nunito-800-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="./assets/fonts/fonts.css?v=polish1" />
-    <link rel="stylesheet" href="./styles.css?v=polish23" />
+    <link rel="stylesheet" href="./styles.css?v=polish24" />
   </head>
   <body class="loading">
     <svg class="svg-defs" aria-hidden="true" focusable="false">
@@ -19,9 +19,12 @@
           <path d="M5.3 9.6 6.4 6.9A2.4 2.4 0 0 1 8.6 5.4h6.8a2.4 2.4 0 0 1 2.2 1.5l1.1 2.7a3 3 0 0 1 2.1 2.9v3.4c0 .7-.5 1.2-1.2 1.2h-.7c-.7 0-1.2-.5-1.2-1.2v-.5H6.3v.5c0 .7-.5 1.2-1.2 1.2h-.7c-.7 0-1.2-.5-1.2-1.2v-3.4a3 3 0 0 1 2.1-2.9Zm2.1-2-.9 2.2h11l-.9-2.2a1 1 0 0 0-.9-.6H8.3a1 1 0 0 0-.9.6ZM7 13.6a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4Zm10 0a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4Z" />
         </symbol>
         <symbol id="i-coin" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="9.4" fill="currentColor" />
-          <circle cx="12" cy="12" r="7.1" fill="none" stroke="rgba(58, 36, 4, 0.22)" stroke-width="1.2" />
-          <path d="M10.2 16.6V7.7h3.05a2.55 2.55 0 0 1 0 5.1H10.2" fill="none" stroke="rgba(58, 36, 4, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          <circle cx="12" cy="12" r="9.6" fill="url(#coinFace)" />
+          <circle cx="12" cy="12" r="9.6" fill="none" stroke="rgba(120, 68, 8, 0.42)" stroke-width="0.7" />
+          <circle cx="12" cy="12" r="7" fill="none" stroke="rgba(255, 248, 214, 0.5)" stroke-width="0.9" />
+          <circle cx="12" cy="12.6" r="7" fill="none" stroke="rgba(120, 68, 8, 0.16)" stroke-width="0.8" />
+          <path d="M10.4 16.2V8.1h2.8a2.45 2.45 0 0 1 0 4.9h-2.8" fill="none" stroke="rgba(122, 60, 6, 0.5)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+          <ellipse cx="8.8" cy="8.2" rx="3" ry="1.7" fill="rgba(255, 255, 255, 0.32)" transform="rotate(-28 8.8 8.2)" />
         </symbol>
         <symbol id="i-play" viewBox="0 0 24 24">
           <path d="M8.2 5.5c0-1.1 1.2-1.8 2.2-1.2l9 5.4c1 .6 1 2 0 2.6l-9 5.4c-1 .6-2.2-.1-2.2-1.2V5.5Z" />
@@ -109,6 +112,12 @@
           <stop offset="0" stop-color="#fff7b0" />
           <stop offset="1" stop-color="#ffd24f" />
         </linearGradient>
+        <radialGradient id="coinFace" cx="0.36" cy="0.30" r="0.85">
+          <stop offset="0" stop-color="#fff0bf" />
+          <stop offset="0.45" stop-color="#ffce5a" />
+          <stop offset="0.82" stop-color="#f2a32c" />
+          <stop offset="1" stop-color="#d2811a" />
+        </radialGradient>
       </defs>
     </svg>
 
@@ -416,7 +425,7 @@
     <script src="./rules.js?v=polish1"></script>
     <script src="./session.js?v=polish1"></script>
     <script src="./renderer.js?v=polish5"></script>
-    <script src="./screens.js?v=polish8"></script>
+    <script src="./screens.js?v=polish9"></script>
     <script src="./tutorial.js?v=polish2"></script>
     <script src="./actors.js?v=polish1"></script>
     <script src="./input.js?v=polish1"></script>

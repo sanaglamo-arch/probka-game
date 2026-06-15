@@ -251,7 +251,7 @@
         meta.className = "skin-meta";
         const title = document.createElement("div");
         title.className = "skin-title";
-        title.innerHTML = `<strong>${skinDisplayName}</strong><span>${skin.price ? deps.formatCoinAmount(skin.price, { short: true }) : t("garage.base")}</span>`;
+        title.innerHTML = `<strong>${skinDisplayName}</strong><span>${skin.price ? `${skin.price}<svg class="amount-coin" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-coin" /></svg>` : t("garage.base")}</span>`;
 
         const button = document.createElement("button");
         applyOwnableButtonState(button, { equipped, owned, canBuy });
@@ -285,7 +285,7 @@
         meta.className = "skin-meta";
         const title = document.createElement("div");
         title.className = "skin-title";
-        title.innerHTML = `<strong>${yardDisplayName}</strong><span>${yard.price ? deps.formatCoinAmount(yard.price, { short: true }) : t("garage.base")}</span>`;
+        title.innerHTML = `<strong>${yardDisplayName}</strong><span>${yard.price ? `${yard.price}<svg class="amount-coin" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-coin" /></svg>` : t("garage.base")}</span>`;
 
         const rarity = document.createElement("span");
         rarity.className = "yard-rarity";
@@ -366,7 +366,7 @@
         card.innerHTML = `
           <div class="mission-icon" aria-hidden="true">${icon}</div>
           <div class="mission-meta">
-            <div class="mission-title"><strong>${missionTitle}</strong><span>+${deps.formatCoinAmount(mission.reward, { short: true })}</span></div>
+            <div class="mission-title"><strong>${missionTitle}</strong><span>+${mission.reward}<svg class="amount-coin" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-coin" /></svg></span></div>
             <span class="label">${missionText}</span>
             <div class="mission-progress"><span style="width: ${percent}%"></span></div>
             <button disabled>${record.claimed ? t("missions.btn.claimed") : progress >= mission.target ? t("missions.btn.ready") : `${progress} / ${mission.target}`}</button>
