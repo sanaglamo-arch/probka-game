@@ -85,7 +85,7 @@
 
       // Mode select panel
       "modes.eyebrow": "Режимы",
-      "modes.title": "Выбери двор",
+      "modes.title": "Выбери режим",
 
       // Daily panel
       "daily.eyebrow": "365 вызовов",
@@ -207,7 +207,7 @@
       "hud.noLimit": "Без лимита",
       "hud.canvas.aria": "Игровое поле",
       "hud.levelTitle.daily": "${title} · ${date}",
-      "hud.levelTitle.campaign": "${n}. ${title}",
+      "hud.levelTitle.campaign": "${title}",
       "hud.modeStatus": "${modeTitle} · уровень ${n}",
       "hud.dailyBtn.aria": "Уровень дня, награда до ${coins} монет",
 
@@ -371,16 +371,16 @@
       "mission.three_stars.title": "Три звезды",
       "mission.three_stars.text": "Пройди уровень идеально",
       "mission.no_undo.title": "Без отмены",
-      "mission.no_undo.text": "Пройди любой уровень без отката",
+      "mission.no_undo.text": "Пройди уровень без отмены",
 
       // Modes in texts.js
       "mode.daily.title": "Уровень дня",
-      "mode.fallback.title": "На счет ходов",
+      "mode.fallback.title": "На счёт ходов",
 
       // Mode titles and subtitles (from config/levels)
       "mode.free.title": "Свободный двор",
       "mode.free.subtitle": "без правил",
-      "mode.moves.title": "На счет ходов",
+      "mode.moves.title": "На счёт ходов",
       "mode.moves.subtitle": "на рекорд",
       "mode.timed.title": "На время",
       "mode.timed.subtitle": "на скорость",
@@ -499,7 +499,7 @@
 
       // Mode select panel
       "modes.eyebrow": "Modes",
-      "modes.title": "Choose a yard",
+      "modes.title": "Choose a mode",
 
       // Daily panel
       "daily.eyebrow": "365 challenges",
@@ -621,7 +621,7 @@
       "hud.noLimit": "No limit",
       "hud.canvas.aria": "Game board",
       "hud.levelTitle.daily": "${title} · ${date}",
-      "hud.levelTitle.campaign": "${n}. ${title}",
+      "hud.levelTitle.campaign": "${title}",
       "hud.modeStatus": "${modeTitle} · level ${n}",
       "hud.dailyBtn.aria": "Daily level, reward up to ${coins} coins",
 

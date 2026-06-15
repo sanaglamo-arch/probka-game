@@ -262,11 +262,14 @@ h2 {
 }
 
 .topbar h1 {
+  display: -webkit-box;
   min-width: 0;
   overflow: hidden;
   white-space: normal;
   line-height: 1.08;
   overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   text-shadow: 0 10px 34px rgba(0, 0, 0, 0.35);
 }
 
