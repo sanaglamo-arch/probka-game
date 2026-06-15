@@ -10,7 +10,7 @@
     <link rel="preload" href="./assets/fonts/nunito-800-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/fonts/nunito-800-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="./assets/fonts/fonts.css?v=polish1" />
-    <link rel="stylesheet" href="./styles.css?v=polish21" />
+    <link rel="stylesheet" href="./styles.css?v=polish22" />
   </head>
   <body class="loading">
     <svg class="svg-defs" aria-hidden="true" focusable="false">
@@ -100,6 +100,15 @@
           <circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="2" />
           <path d="M3.7 12h16.6M12 3.6c2.3 2.3 3.5 5.1 3.5 8.4s-1.2 6.1-3.5 8.4c-2.3-2.3-3.5-5.1-3.5-8.4S9.7 5.9 12 3.6Z" fill="none" stroke="currentColor" stroke-width="1.7" />
         </symbol>
+        <linearGradient id="flameOuter" x1="32" y1="3" x2="32" y2="77" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#ffe66d" />
+          <stop offset="0.46" stop-color="#ff9f2f" />
+          <stop offset="1" stop-color="#ff5f45" />
+        </linearGradient>
+        <linearGradient id="flameInner" x1="32" y1="32" x2="32" y2="68" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#fff7b0" />
+          <stop offset="1" stop-color="#ffd24f" />
+        </linearGradient>
       </defs>
     </svg>
 
@@ -115,6 +124,13 @@
           </div>
         </div>
         <div class="topbar-right">
+          <button class="streak-chip" id="streakChip" type="button" hidden aria-label="Серия">
+            <svg class="streak-chip-flame" viewBox="0 0 64 80" aria-hidden="true">
+              <path d="M32 4C34 14 42 20 46 30 50 39 51 46 51 52 51 65 43 75 32 75 21 75 13 65 13 52 13 46 14 39 18 30 22 20 30 14 32 4Z" fill="url(#flameOuter)" />
+              <path d="M32 34C34 41 40 45 40 53 40 60 36 66 32 66 28 66 24 60 24 53 24 46 30 41 32 34Z" fill="url(#flameInner)" />
+            </svg>
+            <span id="streakChipCount">0</span>
+          </button>
           <button class="lang-chip" id="topLangButton" type="button" aria-label="Сменить язык / Change language">RU</button>
           <div class="wallet" aria-label="Монеты" data-i18n-aria="wallet.aria">
             <span class="coin" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-coin" /></svg></span>
@@ -400,12 +416,12 @@
     <script src="./rules.js?v=polish1"></script>
     <script src="./session.js?v=polish1"></script>
     <script src="./renderer.js?v=polish3"></script>
-    <script src="./screens.js?v=polish7"></script>
+    <script src="./screens.js?v=polish8"></script>
     <script src="./tutorial.js?v=polish2"></script>
     <script src="./actors.js?v=polish1"></script>
     <script src="./input.js?v=polish1"></script>
     <script src="./ads.js?v=polish1"></script>
     <script src="./audio.js?v=polish3"></script>
-    <script src="./game.js?v=polish7"></script>
+    <script src="./game.js?v=polish8"></script>
   </body>
 </html>

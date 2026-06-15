@@ -299,6 +299,34 @@ h2 {
   color: var(--text);
 }
 
+/* Чип серии в топбаре — виден на всех экранах, только когда серия ≥ 1. */
+.streak-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 40px;
+  padding: 0 11px 0 7px;
+  border: 1px solid rgba(255, 159, 47, 0.32);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 159, 47, 0.16), rgba(255, 159, 47, 0.04)),
+    var(--surface-sunken);
+  color: var(--warning);
+  font-weight: 850;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  transition: border-color 0.16s ease, transform 0.16s ease;
+}
+
+.streak-chip[hidden] { display: none; }
+.streak-chip:active { transform: scale(0.94); }
+
+.streak-chip-flame {
+  width: 17px;
+  height: 21px;
+  filter: drop-shadow(0 1px 3px rgba(255, 95, 69, 0.35));
+}
+
 .wallet {
   position: relative;
   display: inline-flex;
@@ -3339,6 +3367,13 @@ body.game-active #gameCanvas {
     font-size: 12.5px;
   }
 
+  .streak-chip {
+    height: 36px;
+    padding: 0 9px 0 6px;
+    font-size: 13px;
+  }
+  .streak-chip-flame { width: 15px; height: 19px; }
+
   #coins {
     font-size: 17px;
   }
@@ -3578,6 +3613,13 @@ body.game-active #gameCanvas {
     height: 34px;
     font-size: 11.5px;
   }
+
+  .streak-chip {
+    height: 34px;
+    padding: 0 8px 0 5px;
+    font-size: 12px;
+  }
+  .streak-chip-flame { width: 14px; height: 18px; }
 
   .hub-hero {
     padding: 15px;

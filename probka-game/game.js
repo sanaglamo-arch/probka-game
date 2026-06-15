@@ -49,6 +49,8 @@
     app: document.getElementById("app"),
     coins: document.getElementById("coins"),
     coinPop: document.getElementById("coinPop"),
+    streakChip: document.getElementById("streakChip"),
+    streakChipCount: document.getElementById("streakChipCount"),
     currentLevelLabel: document.getElementById("currentLevelLabel"),
     hubProgressFill: document.getElementById("hubProgressFill"),
     modeStatusLabel: document.getElementById("modeStatusLabel"),
@@ -2541,6 +2543,13 @@
       playSound("button");
       show("daily");
     });
+    if (els.streakChip) {
+      els.streakChip.addEventListener("click", () => {
+        if (blockTutorialEscape()) return;
+        playSound("button");
+        show("daily");
+      });
+    }
     els.garageButton.addEventListener("click", () => {
       if (blockTutorialEscape()) return;
       playSound("button");

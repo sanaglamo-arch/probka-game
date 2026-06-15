@@ -615,6 +615,11 @@
       const remaining = Number.isFinite(limit) ? Math.max(0, limit - moves) : Infinity;
       const timerRemaining = deps.getTimerRemainingSec();
       if (els.coins) els.coins.textContent = state.coins;
+      if (els.streakChip && els.streakChipCount) {
+        const streakNow = Math.max(0, (state.daily && state.daily.streak && state.daily.streak.current) || 0);
+        els.streakChipCount.textContent = String(streakNow);
+        els.streakChip.hidden = streakNow <= 0;
+      }
       if (els.currentLevelLabel) els.currentLevelLabel.textContent = String(deps.getCurrentModeOrder(getSelectedModeId()) + 1);
 
       if (els.movesLabel && els.limitLabel) {
