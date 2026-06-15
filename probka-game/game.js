@@ -875,8 +875,10 @@
     if (!tutorialState || tutorialState.phase !== "mini") return;
     clearHint();
     setTutorialDomFocus([]);
-    // Сразу в первый реальный уровень с подсказками — без экрана-лекции.
-    startTutorialGuidedLevel();
+    setTutorialPhase("cards");
+    tutorialState.step = 0;
+    show("menu", { fromTutorial: true });
+    updateTutorialStep();
   }
 
   function startTutorialGuidedLevel() {

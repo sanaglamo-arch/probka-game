@@ -31,22 +31,32 @@
       {
         title: t("tutorial.card.0.title"),
         text: t("tutorial.card.0.text"),
-        focusIds: ["levelSelectButton"]
+        focusIds: ["playButton"]
       },
       {
         title: t("tutorial.card.1.title"),
         text: t("tutorial.card.1.text"),
-        focusIds: ["dailyButton", "streakPanel"]
+        focusIds: ["dailyButton"]
       },
       {
         title: t("tutorial.card.2.title"),
         text: t("tutorial.card.2.text"),
-        focusIds: ["garageButton"]
+        focusIds: ["levelSelectButton"]
       },
       {
         title: t("tutorial.card.3.title"),
         text: t("tutorial.card.3.text"),
+        focusIds: ["garageButton"]
+      },
+      {
+        title: t("tutorial.card.4.title"),
+        text: t("tutorial.card.4.text"),
         focusIds: ["missionsButton"]
+      },
+      {
+        title: t("tutorial.card.5.title"),
+        text: t("tutorial.card.5.text"),
+        focusIds: ["statsButton"]
       }
     ];
   }
@@ -166,9 +176,38 @@
       deps.syncTutorialLock();
     }
 
+    function positionCardForFocus(ids) {
+      const els = deps.getEls();
+      const overlay = els.tutorialOverlay;
+      if (!overlay) return;
+      const id = (ids || [])[0];
+      const target = id ? document.getElementById(id) : null;
+      if (!target) {
+        overlay.classList.remove("at-top");
+        overlay.removeAttribute("data-arrow");
+        return;
+      }
+      try {
+        target.scrollIntoView({ block: "center", behavior: "smooth" });
+      } catch (err) {
+        /* старые браузеры */
+      }
+      const place = () => {
+        const rect = target.getBoundingClientRect();
+        const mid = rect.top + rect.height / 2;
+        const lower = mid > window.innerHeight * 0.5;
+        // подсвеченный элемент в нижней половине → карточку вверх (стрелка вниз), иначе наоборот
+        overlay.classList.toggle("at-top", lower);
+        overlay.setAttribute("data-arrow", lower ? "down" : "up");
+      };
+      requestAnimationFrame(place);
+      setTimeout(place, 240);
+    }
+
     function setCard(step) {
       const els = deps.getEls();
       setDomFocus(step.focusIds || []);
+      positionCardForFocus(step.focusIds || []);
       if (els.tutorialStepLabel) els.tutorialStepLabel.textContent = step.label || t("tutorial.step.label");
       if (els.tutorialTitle) els.tutorialTitle.textContent = step.title || "";
       if (els.tutorialText) els.tutorialText.textContent = step.text || "";

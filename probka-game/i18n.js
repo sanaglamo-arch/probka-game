@@ -278,14 +278,18 @@
       "tutorial.mini.2.text": "Тащи красную машину вправо до выезда.",
 
       // Tutorial menu cards
-      "tutorial.card.0.title": "Три режима",
-      "tutorial.card.0.text": "Свободный двор — спокойно подумать. На счет ходов — пройти оптимально. На время — решить быстро.",
-      "tutorial.card.1.title": "Уровень дня и серия",
-      "tutorial.card.1.text": "Каждый день открыт новый сложный пазл. Проходи сегодняшний уровень, чтобы держать серию.",
-      "tutorial.card.2.title": "Гараж",
-      "tutorial.card.2.text": "Монеты открывают скины твоей машины. Они не меняют правила, зато дают долгую цель.",
-      "tutorial.card.3.title": "Миссии",
-      "tutorial.card.3.text": "Ежедневные задачи дают немного монет за привычные действия: пройти уровень, собрать три звезды, сыграть без отмены.",
+      "tutorial.card.0.title": "Продолжить игру",
+      "tutorial.card.0.text": "Жми «Играть» — продолжишь с того уровня, где остановился.",
+      "tutorial.card.1.title": "Уровень дня",
+      "tutorial.card.1.text": "Каждый день новый пазл. Проходи его, чтобы растить серию 🔥",
+      "tutorial.card.2.title": "Уровни",
+      "tutorial.card.2.text": "Три режима и сотни уровней — от лёгких до хитрых.",
+      "tutorial.card.3.title": "Гараж",
+      "tutorial.card.3.text": "Открывай новые машины и дворы за монеты.",
+      "tutorial.card.4.title": "Миссии",
+      "tutorial.card.4.text": "Выполняй ежедневные задания и получай монеты.",
+      "tutorial.card.5.title": "Статистика",
+      "tutorial.card.5.text": "Здесь твой прогресс, рекорды и серии.",
 
       // Tutorial guided
       "tutorial.guided.move.title": "Твой ход",
@@ -688,14 +692,18 @@
       "tutorial.mini.2.text": "Drag the red car right to the exit.",
 
       // Tutorial menu cards
-      "tutorial.card.0.title": "Three modes",
-      "tutorial.card.0.text": "Free yard — take your time. Move count — solve optimally. Timed — think fast.",
-      "tutorial.card.1.title": "Daily level and streak",
-      "tutorial.card.1.text": "A new tough puzzle opens every day. Complete today's level to keep your streak.",
-      "tutorial.card.2.title": "Garage",
-      "tutorial.card.2.text": "Coins unlock skins for your car. They don't change the rules, but give you a long-term goal.",
-      "tutorial.card.3.title": "Missions",
-      "tutorial.card.3.text": "Daily tasks reward you with coins for normal actions: beat a level, get three stars, play without undo.",
+      "tutorial.card.0.title": "Continue",
+      "tutorial.card.0.text": "Hit Play to jump back into the level where you left off.",
+      "tutorial.card.1.title": "Daily level",
+      "tutorial.card.1.text": "A fresh puzzle every day. Clear it to grow your streak 🔥",
+      "tutorial.card.2.title": "Levels",
+      "tutorial.card.2.text": "Three modes and hundreds of levels, from easy to tricky.",
+      "tutorial.card.3.title": "Garage",
+      "tutorial.card.3.text": "Unlock new cars and yards with coins.",
+      "tutorial.card.4.title": "Missions",
+      "tutorial.card.4.text": "Complete daily tasks and earn coins.",
+      "tutorial.card.5.title": "Stats",
+      "tutorial.card.5.text": "Your progress, records and streaks live here.",
 
       // Tutorial guided
       "tutorial.guided.move.title": "Your move",
