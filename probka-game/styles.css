@@ -1774,48 +1774,144 @@ canvas#gameCanvas {
 .daily-overview {
   position: relative;
   z-index: 2;
-  display: flex;
+  display: grid;
   flex: 0 0 auto;
+  gap: 10px;
+}
+
+/* Баннер серии (огонёк) */
+.daily-streak {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid rgba(255, 159, 47, 0.22);
+  border-radius: var(--r-lg);
+  padding: 13px 18px;
+  background:
+    radial-gradient(120% 170% at 12% 0%, rgba(255, 159, 47, 0.15), transparent 56%),
+    var(--card-bg);
+  box-shadow: var(--elev-1);
+}
+
+.daily-streak.active {
+  border-color: rgba(255, 159, 47, 0.4);
+  background:
+    radial-gradient(120% 170% at 12% 0%, rgba(255, 159, 47, 0.26), transparent 58%),
+    var(--card-bg);
+}
+
+.daily-streak .streak-flame {
+  width: 44px;
+  height: 56px;
+  flex: 0 0 auto;
+  overflow: visible;
+  opacity: 0.5;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.32));
+}
+
+.daily-streak.active .streak-flame {
+  opacity: 1;
+  animation: flameBreath 2.8s ease-in-out infinite;
+  filter:
+    drop-shadow(0 0 14px rgba(255, 159, 47, 0.5))
+    drop-shadow(0 0 28px rgba(255, 95, 69, 0.2));
+}
+
+.daily-streak-copy {
+  display: grid;
+  align-content: center;
+}
+
+.daily-streak-copy strong {
+  font-family: var(--font-display);
+  color: var(--text);
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 0.92;
+  font-variant-numeric: tabular-nums;
+}
+
+.daily-streak-eyebrow {
+  margin-top: 3px;
+  color: var(--warning);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.daily-streak-copy small {
+  margin-top: 1px;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 650;
+}
+
+/* Карточка «сегодня» */
+.daily-today {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
   border: 1px solid rgba(255, 200, 87, 0.34);
   border-radius: var(--r-lg);
-  padding: 16px;
+  padding: 13px 14px 13px 16px;
   background:
-    radial-gradient(120% 140% at 0% 0%, rgba(255, 200, 87, 0.16), transparent 52%),
-    radial-gradient(120% 140% at 100% 100%, rgba(133, 184, 255, 0.1), transparent 55%),
+    radial-gradient(130% 150% at 100% 0%, rgba(255, 200, 87, 0.14), transparent 52%),
     var(--card-bg);
   box-shadow:
-    var(--elev-2),
+    var(--elev-1),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.16s ease, transform 0.16s ease;
 }
 
-.daily-overview-copy .label {
-  color: var(--gold);
-}
+.daily-today:hover { border-color: rgba(255, 200, 87, 0.5); }
+.daily-today:active { transform: scale(0.992); }
 
-.daily-overview-copy {
+.daily-today-copy {
   display: grid;
   min-width: 0;
-  gap: 5px;
+  gap: 4px;
 }
 
-.daily-overview-copy strong {
+.daily-today-copy .label {
+  color: var(--gold);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.daily-today-copy strong {
+  overflow: hidden;
   color: var(--text);
-  font-size: 19px;
-  font-weight: 790;
+  font-size: 18px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.daily-overview-copy small {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 560;
-}
-
-.daily-overview .primary-button {
+.daily-today-cta {
+  display: inline-flex;
   flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  border-radius: var(--r-md);
+  padding: 11px 16px;
+  background: linear-gradient(180deg, #ffd877, var(--gold-deep));
+  color: #2a1804;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 900;
+  box-shadow:
+    0 8px 18px rgba(240, 159, 46, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
+
+.daily-today-cta .button-icon { width: 17px; height: 17px; fill: #2a1804; }
 
 .daily-calendar {
   position: relative;

@@ -470,13 +470,39 @@
       const year = Number(today.slice(0, 4));
       const currentMonth = Number(today.slice(5, 7));
       const rewardPreview = deps.getDailyRewardPreview();
+      const streak = state.daily.streak || { current: 0, best: 0 };
+      const streakNow = Math.max(0, streak.current || 0);
+      const streakBest = Math.max(streakNow, streak.best || 0);
       els.dailyOverview.innerHTML = `
-        <div class="daily-overview-copy">
-          <span class="label">${t("daily.overview.today", { date: deps.formatShortDate(today) })}</span>
-          <strong>${todayCompletion ? t("daily.overview.done", { stars: todayCompletion.stars }) : t("daily.overview.open")}</strong>
-          <small>${t("daily.overview.subtitle", { minMoves: todayLevel ? todayLevel.minMoves : "—", coins: rewardPreview })}</small>
+        <div class="daily-streak${streakNow > 0 ? " active" : ""}">
+          <svg class="streak-flame" viewBox="0 0 64 80" aria-hidden="true">
+            <defs>
+              <linearGradient id="flameOuterD" x1="18" y1="4" x2="46" y2="76" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#ffe66d" /><stop offset="0.46" stop-color="#ff9f2f" /><stop offset="1" stop-color="#ff5f45" />
+              </linearGradient>
+              <linearGradient id="flameInnerD" x1="29" y1="26" x2="39" y2="66" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#fff7b0" /><stop offset="1" stop-color="#ffd24f" />
+              </linearGradient>
+            </defs>
+            <path class="flame-outer" d="M34.9 5.8c3.8 10.2 1.2 16.1-2.2 21.5 5.8-2.7 9.3-7.2 10.7-13.5 10.7 10.1 15.2 21.9 12.2 33.2C52.1 60 42.8 72.5 31.5 72.5 18.7 72.5 8.9 62.6 8.9 49.5c0-9.1 4.8-16.1 11.1-22.7 5.8-6.2 10.7-12 14.9-21z" fill="url(#flameOuterD)" />
+            <path class="flame-inner" d="M35.1 36.1c6.7 6 9.2 12 7.4 18.2-1.7 6.1-6.3 10.9-11.9 10.9-6.2 0-11.2-4.9-11.2-11.4 0-4.7 2.6-8 5.9-11.7 2.8-3.1 5.3-6.2 6.7-11 1.7 2 2.5 3.6 3.1 5z" fill="url(#flameInnerD)" />
+          </svg>
+          <span class="daily-streak-copy">
+            <strong>${streakNow}</strong>
+            <span class="daily-streak-eyebrow">${t("streak.label")}</span>
+            <small>${t("streak.record", { n: streakBest })}</small>
+          </span>
         </div>
-        <button class="primary-button" id="dailyTodayStartButton">${todayCompletion ? t("daily.overview.playAgain") : t("daily.overview.start")}</button>
+        <button class="daily-today" id="dailyTodayStartButton" type="button">
+          <span class="daily-today-copy">
+            <span class="label">${t("daily.overview.today", { date: deps.formatShortDate(today) })}</span>
+            <strong>${todayCompletion ? t("daily.overview.done", { stars: todayCompletion.stars }) : t("daily.overview.open")}</strong>
+          </span>
+          <span class="daily-today-cta">
+            <span>${todayCompletion ? t("daily.overview.playAgain") : t("daily.overview.start")}</span>
+            <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-play" /></svg>
+          </span>
+        </button>
       `;
       const todayButton = document.getElementById("dailyTodayStartButton");
       if (todayButton) {
@@ -497,7 +523,7 @@
         const monthNumber = monthIndex + 1;
         section.className = `daily-month${monthNumber === currentMonth ? " current" : ""}`;
         section.dataset.dailyMonth = String(monthNumber);
-        section.innerHTML = `<div class="daily-month-title"><strong>${name}</strong><span>${deps.formatLevelCount(monthDays.length)}</span></div>`;
+        section.innerHTML = `<div class="daily-month-title"><strong>${name}</strong></div>`;
         const grid = document.createElement("div");
         grid.className = "daily-month-grid";
         monthDays.forEach((slot) => grid.appendChild(createDailyDayButton(slot, today, state)));
