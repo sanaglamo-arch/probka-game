@@ -475,6 +475,7 @@
     applyCaptureMode();
     if (view === "game") resizeCanvas();
     updateGameplayMarker();
+    updateMusicPlayback();
     renderDailyWeek();
     syncTutorialLock();
   }
@@ -2235,17 +2236,23 @@
     }, 1900);
   }
 
+  // Музыка звучит только во время самого геймплея (view === "game").
+  function updateMusicPlayback() {
+    if (!audio) return;
+    if (currentView === "game" && state.settings.music && !state.settings.muted) {
+      if (audio.startMusic) audio.startMusic();
+    } else if (audio.stopMusic) {
+      audio.stopMusic();
+    }
+  }
+
   function toggleMute() {
     if (blockTutorialEscape()) return;
     state.settings.muted = !state.settings.muted;
     saveProgress();
     updateHud();
-    if (state.settings.muted) {
-      if (audio && audio.stopMusic) audio.stopMusic();
-    } else {
-      playSound("button");
-      if (state.settings.music && audio && audio.startMusic) audio.startMusic();
-    }
+    if (!state.settings.muted) playSound("button");
+    updateMusicPlayback();
   }
 
   function toggleHaptics() {
@@ -2262,12 +2269,7 @@
     saveProgress();
     updateHud();
     playSound("button");
-    if (!audio) return;
-    if (state.settings.music && !state.settings.muted) {
-      if (audio.startMusic) audio.startMusic();
-    } else if (audio.stopMusic) {
-      audio.stopMusic();
-    }
+    updateMusicPlayback();
   }
 
   function toggleLang() {
@@ -2580,12 +2582,11 @@
     if (els.musicToggleButton) els.musicToggleButton.addEventListener("click", toggleMusic);
     if (els.langToggleButton) els.langToggleButton.addEventListener("click", toggleLang);
     if (els.topLangButton) els.topLangButton.addEventListener("click", toggleLang);
-    // Автозапуск фоновой музыки по первому жесту (политика автоплея браузера).
+    // Музыка только в геймплее; первый жест разблокирует автоплей,
+    // а играть она начнёт лишь если текущий экран — игровой.
     document.addEventListener("pointerdown", function startMusicOnGesture() {
       document.removeEventListener("pointerdown", startMusicOnGesture);
-      if (state.settings && state.settings.music && !state.settings.muted && audio && audio.startMusic) {
-        audio.startMusic();
-      }
+      updateMusicPlayback();
     }, { once: true });
     els.backButton.addEventListener("click", () => {
       if (isAnimating) return;
