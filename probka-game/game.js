@@ -2201,6 +2201,19 @@
     if (changed) saveProgress();
   }
 
+  // Приветственная серия: при входе серия всегда минимум 1 (с датой «сегодня»),
+  // чтобы огонёк сразу был виден и игроку было что беречь.
+  function ensureWelcomeStreak() {
+    if (!state.daily) return false;
+    if (!state.daily.streak) state.daily.streak = { current: 0, best: 0, lastDateKey: "" };
+    const s = state.daily.streak;
+    if (Number(s.current) >= 1) return false;
+    s.current = 1;
+    s.best = Math.max(1, Number(s.best) || 0);
+    s.lastDateKey = getDailyDateKey();
+    return true;
+  }
+
   function createMissionRecord() {
     return economy.createMissionRecord ? economy.createMissionRecord() : { progress: 0, claimed: false };
   }
@@ -2353,6 +2366,7 @@
       // Платформа не критична — продолжаем на локальном прогрессе.
     }
     syncDailyMissions();
+    ensureWelcomeStreak();
     saveProgress({ touch: false });
     applyAssetShowcaseState();
     const launchScreen = getLaunchScreenFromUrl();
