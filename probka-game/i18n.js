@@ -31,7 +31,7 @@
 
       // Daily card on hub
       "dailyCard.label": "Уровень дня",
-      "dailyCard.subtitle": "Один сложный пазл на сегодня",
+      "dailyCard.subtitle": "Один сложный пазл",
       "dailyCard.badge": "сложно",
       "dailyCard.statusDone": "Пройден · ${stars}",
       "dailyCard.statusOpen": "До ${coins} монет",
@@ -94,7 +94,7 @@
       // Daily overview
       "daily.overview.today": "Сегодня · ${date}",
       "daily.overview.done": "Пройдено на ${stars}★",
-      "daily.overview.open": "Сложный двор дня",
+      "daily.overview.open": "Двор дня",
       "daily.overview.subtitle": "${minMoves} оптимальных ходов · награда до ${coins} монет",
       "daily.overview.playAgain": "Играть еще",
       "daily.overview.start": "Начать",
@@ -143,7 +143,7 @@
       // Level button tooltip
       "level.tooltip.done": "${title}: ${stars} зв., лучший результат ${moves} ходов",
       "level.tooltip.open": "${title}: ${minMoves} ходов, сложность ${diff} из 10",
-      "level.tooltip.locked": "Закрыто",
+      "level.tooltip.locked": "Закрыт",
 
       // Garage panel
       "garage.eyebrow": "Косметика",
@@ -158,7 +158,7 @@
       "garage.equip.btn.equipped": "Надето",
       "garage.equip.btn.equip": "Надеть",
       "garage.equip.btn.buy": "Купить",
-      "garage.equip.btn.locked": "Не хватает",
+      "garage.equip.btn.locked": "Не хватает монет",
       "garage.preview.aria": "Предпросмотр: ${name}",
 
       // Garage rarity
@@ -182,9 +182,9 @@
       // Missions panel
       "missions.eyebrow": "Награды",
       "missions.title": "Миссии",
-      "missions.today": "Цели на сегодня · обновляются каждый день",
+      "missions.today": "Цели дня · каждый день новые",
       "missions.done": "${n}/${total} выполнено",
-      "missions.reward": "Награды за задачи",
+      "missions.reward": "Награды",
       "missions.btn.claimed": "Получено",
       "missions.btn.ready": "Готово",
 
@@ -230,32 +230,32 @@
       "mode.card.order": "${n}/100",
 
       // Win modal
-      "win.eyebrow": "Двор свободен",
+      "win.eyebrow": "Свободно!",
       "win.title": "Уровень пройден",
       "win.packComplete": "Набор пройден!",
-      "win.double": "Удвоить награду",
+      "win.double": "Удвоить",
       "win.next": "Следующий",
-      "win.menu": "В меню",
+      "win.menu": "Меню",
       "win.nextDaily": "Календарь",
 
       // Fail modal
-      "fail.eyebrow.time": "Таймер",
+      "fail.eyebrow.time": "Время вышло",
       "fail.title.time": "Время вышло",
-      "fail.text.time": "Время вышло. Двор начнется заново.",
+      "fail.text.time": "Время вышло — соберём двор заново.",
       "fail.eyebrow.free": "Без лимита",
       "fail.title.free": "Еще попытка",
-      "fail.text.free": "Попробуй еще раз, этот режим не ограничивает ходы.",
-      "fail.eyebrow.moves": "Лимит ходов",
+      "fail.text.free": "Без лимита ходов — пробуй ещё!",
+      "fail.eyebrow.moves": "Ходы кончились",
       "fail.title.moves": "Ходы закончились",
-      "fail.text.moves": "Лимит ${n} ходов исчерпан. Двор начнется заново.",
-      "fail.retry": "Заново",
+      "fail.text.moves": "Лимит ${n} ходов исчерпан. Ещё раз!",
+      "fail.retry": "Ещё раз",
 
       // Archive confirm modal
       "archive.eyebrow": "Архив уровня дня",
       "archive.title": "Открыть архивный уровень?",
       "archive.title.date": "Открыть ${date}?",
       "archive.text": "Посмотри рекламу, чтобы сыграть этот архивный уровень дня.",
-      "archive.watch": "Смотреть рекламу",
+      "archive.watch": "Смотреть",
       "archive.cancel": "Назад",
 
       // Tutorial overlay
@@ -300,7 +300,7 @@
 
       // Toasts
       "toast.adUnavailable": "Реклама недоступна",
-      "toast.noHint": "Сейчас нет полезной подсказки",
+      "toast.noHint": "Нет подходящей подсказки",
       "toast.tutorialBlock": "Сначала закончи обучение",
       "toast.tutorialInGame": "В обучении следуй подсветке",
       "toast.tutorialHighlighted": "Сейчас нужна подсвеченная машина",
@@ -375,11 +375,11 @@
 
       // Mode titles and subtitles (from config/levels)
       "mode.free.title": "Свободный двор",
-      "mode.free.subtitle": "без ограничений",
+      "mode.free.subtitle": "без правил",
       "mode.moves.title": "На счет ходов",
-      "mode.moves.subtitle": "оптимально",
+      "mode.moves.subtitle": "на рекорд",
       "mode.timed.title": "На время",
-      "mode.timed.subtitle": "быстро",
+      "mode.timed.subtitle": "на скорость",
 
       // Skin names (keyed by skin.id)
       "skin.classic_red.name": "Красная классика",
@@ -441,7 +441,7 @@
 
       // Daily card on hub
       "dailyCard.label": "Daily Level",
-      "dailyCard.subtitle": "One tough puzzle for today",
+      "dailyCard.subtitle": "One tough puzzle",
       "dailyCard.badge": "hard",
       "dailyCard.statusDone": "Solved · ${stars}",
       "dailyCard.statusOpen": "Up to ${coins} coins",
@@ -504,7 +504,7 @@
       // Daily overview
       "daily.overview.today": "Today · ${date}",
       "daily.overview.done": "Solved with ${stars}★",
-      "daily.overview.open": "Tough yard of the day",
+      "daily.overview.open": "Today's yard",
       "daily.overview.subtitle": "${minMoves} optimal moves · reward up to ${coins} coins",
       "daily.overview.playAgain": "Play again",
       "daily.overview.start": "Start",
@@ -568,7 +568,7 @@
       "garage.equip.btn.equipped": "Equipped",
       "garage.equip.btn.equip": "Equip",
       "garage.equip.btn.buy": "Buy",
-      "garage.equip.btn.locked": "Not enough",
+      "garage.equip.btn.locked": "Not enough coins",
       "garage.preview.aria": "Preview: ${name}",
 
       // Garage rarity
@@ -592,9 +592,9 @@
       // Missions panel
       "missions.eyebrow": "Rewards",
       "missions.title": "Missions",
-      "missions.today": "Today's goals · refreshes every day",
+      "missions.today": "Today's goals · resets daily",
       "missions.done": "${n}/${total} completed",
-      "missions.reward": "Task rewards",
+      "missions.reward": "Rewards",
       "missions.btn.claimed": "Claimed",
       "missions.btn.ready": "Claim",
 
@@ -640,32 +640,32 @@
       "mode.card.order": "${n}/100",
 
       // Win modal
-      "win.eyebrow": "Yard cleared",
+      "win.eyebrow": "Cleared!",
       "win.title": "Level complete",
       "win.packComplete": "Pack complete!",
-      "win.double": "Double reward",
+      "win.double": "Double",
       "win.next": "Next",
       "win.menu": "Menu",
       "win.nextDaily": "Calendar",
 
       // Fail modal
-      "fail.eyebrow.time": "Timer",
+      "fail.eyebrow.time": "Time's up!",
       "fail.title.time": "Time's up",
-      "fail.text.time": "Time ran out. The yard will restart.",
+      "fail.text.time": "Out of time — let's try again!",
       "fail.eyebrow.free": "No limit",
       "fail.title.free": "One more try",
-      "fail.text.free": "Try again — this mode has no move limit.",
-      "fail.eyebrow.moves": "Move limit",
+      "fail.text.free": "No move limit here — give it another go!",
+      "fail.eyebrow.moves": "Out of moves!",
       "fail.title.moves": "Out of moves",
-      "fail.text.moves": "Limit of ${n} moves reached. The yard will restart.",
-      "fail.retry": "Retry",
+      "fail.text.moves": "Out of ${n} moves — try again!",
+      "fail.retry": "Try again",
 
       // Archive confirm modal
       "archive.eyebrow": "Daily level archive",
       "archive.title": "Open archive level?",
       "archive.title.date": "Open ${date}?",
       "archive.text": "Watch an ad to play this archive daily level.",
-      "archive.watch": "Watch ad",
+      "archive.watch": "Watch",
       "archive.cancel": "Back",
 
       // Tutorial overlay
@@ -710,7 +710,7 @@
 
       // Toasts
       "toast.adUnavailable": "Ad not available",
-      "toast.noHint": "No useful hint right now",
+      "toast.noHint": "No hint available",
       "toast.tutorialBlock": "Finish the tutorial first",
       "toast.tutorialInGame": "Follow the highlight in the tutorial",
       "toast.tutorialHighlighted": "Move the highlighted car",
@@ -785,11 +785,11 @@
 
       // Mode titles and subtitles
       "mode.free.title": "Free Yard",
-      "mode.free.subtitle": "no restrictions",
+      "mode.free.subtitle": "free play",
       "mode.moves.title": "Move Count",
-      "mode.moves.subtitle": "optimally",
+      "mode.moves.subtitle": "best score",
       "mode.timed.title": "Timed",
-      "mode.timed.subtitle": "fast",
+      "mode.timed.subtitle": "beat the clock",
 
       // Skin names
       "skin.classic_red.name": "Classic Red",

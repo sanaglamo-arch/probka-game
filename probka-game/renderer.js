@@ -2427,19 +2427,6 @@
     });
 
     const toScreen = (gridX, gridY) => ({ x: boardPadX + gridX * cellSize, y: boardPadY + gridY * cellSize });
-    const obstacles = [
-      { id: "preview_bin", kind: "bin", x: 0, y: 4 },
-      { id: "preview_gate", kind: "gate", x: 4, y: 0 },
-      { id: "preview_cone", kind: getYardEnvironment(yardTheme) === "winter" ? "snow" : "cone", x: 5, y: 3 }
-    ];
-    obstacles.forEach((obstacle) => {
-      drawObstacle(ctx, obstacle, {
-        cellSize,
-        levelId: level.id,
-        yardTheme,
-        position: toScreen(obstacle.x, obstacle.y)
-      });
-    });
 
     const pad = cellSize * 0.12;
     const drawCar = (vehicle) => {
@@ -2459,12 +2446,30 @@
         cellSize
       });
     };
+    // Чистая, одинаковая для всех дворов композиция: красная цель в центре +
+    // две машины-блокировщика. Без препятствий — тамбнейл читается аккуратно.
     [
-      { id: "side_a", x: 0, y: 1, length: 2, axis: "vertical", color: "#66b6ff" },
-      { id: "target", x: 1, y: 2, length: 2, axis: "horizontal", color: "#ef5364" },
-      { id: "side_b", x: 3, y: 4, length: 2, axis: "horizontal", color: "#f0bd5a" },
-      { id: "side_c", x: 3, y: 1, length: 2, axis: "horizontal", color: "#68d3a3" }
+      { id: "side_a", x: 0, y: 0, length: 2, axis: "vertical", color: "#66b6ff" },
+      { id: "target", x: 2, y: 2, length: 2, axis: "horizontal", color: "#ef5364" },
+      { id: "side_b", x: 3, y: 4, length: 2, axis: "horizontal", color: "#f0bd5a" }
     ].forEach(drawCar);
+
+    // Единый для всех дворов оверлей — верхний блик + мягкая виньетка.
+    // Делает разнородные арты дворов цельной коллекцией.
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    const sheen = ctx.createLinearGradient(0, 0, 0, cssHeight);
+    sheen.addColorStop(0, "rgba(255, 255, 255, 0.1)");
+    sheen.addColorStop(0.2, "rgba(255, 255, 255, 0)");
+    ctx.fillStyle = sheen;
+    ctx.fillRect(0, 0, cssWidth, cssHeight);
+    const vignette = ctx.createRadialGradient(
+      cssWidth / 2, cssHeight * 0.44, cssHeight * 0.18,
+      cssWidth / 2, cssHeight * 0.56, cssHeight * 0.96
+    );
+    vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
+    vignette.addColorStop(1, "rgba(0, 0, 0, 0.36)");
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0, 0, cssWidth, cssHeight);
 
     ctx.restore();
   }
