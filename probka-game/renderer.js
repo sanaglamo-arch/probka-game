@@ -2401,75 +2401,67 @@
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     ctx.clearRect(0, 0, cssWidth, cssHeight);
 
-    const level = { id: `preview_${yardTheme.id || "yard"}`, width: 6, height: 6, exit: { row: 2 }, targetVehicleId: "target" };
-    const fullBoardPreview = usesFullArtBoard(yardTheme, level);
-    const previewSize = Math.min(cssWidth, cssHeight);
-    const frame = fullBoardPreview && yardTheme.gridFrame ? yardTheme.gridFrame : null;
-    const boardPadX = frame ? Math.max(0, Math.round(previewSize * frame.left / 1024)) : 9;
-    const boardPadY = frame ? Math.max(0, Math.round(previewSize * frame.top / 1024)) : boardPadX;
-    const cellSize = frame
-      ? Math.floor(Math.min(
-        previewSize * ((frame.right - frame.left) / 1024) / 6,
-        previewSize * ((frame.bottom - frame.top) / 1024) / 6
-      ))
-      : Math.floor(Math.min((cssWidth - boardPadX * 2) / 6, (cssHeight - boardPadX * 2) / 6));
-    const boardPixelSize = frame ? previewSize : cellSize * 6 + boardPadX * 2;
-    const offsetX = Math.max(0, (cssWidth - boardPixelSize) / 2);
-    const offsetY = fullBoardPreview ? Math.max(0, (cssHeight - boardPixelSize) / 2) : 0;
-    ctx.translate(offsetX, offsetY);
-    drawYard(ctx, {
-      level,
-      cellSize,
-      boardPad: boardPadX,
-      width: boardPixelSize,
-      height: fullBoardPreview ? boardPixelSize : cssHeight,
-      yardTheme
-    });
-
-    const toScreen = (gridX, gridY) => ({ x: boardPadX + gridX * cellSize, y: boardPadY + gridY * cellSize });
-
-    const pad = cellSize * 0.12;
-    const drawCar = (vehicle) => {
-      const pos = toScreen(vehicle.x, vehicle.y);
-      const width = (vehicle.axis === "horizontal" ? vehicle.length : 1) * cellSize - pad * 2;
-      const height = (vehicle.axis === "vertical" ? vehicle.length : 1) * cellSize - pad * 2;
-      drawPreviewVehicle(ctx, {
-        x: pos.x + pad,
-        y: pos.y + pad,
-        width,
-        height,
-        length: vehicle.length,
-        axis: vehicle.axis,
-        color: vehicle.color,
-        isTarget: vehicle.id === "target",
-        yardTheme,
-        cellSize
-      });
+    // Абстрактное превью двора: mesh-градиент из палитры двора.
+    // Никакого поля, машин и символов — только цвет/настроение.
+    const w = cssWidth;
+    const h = cssHeight;
+    const pal = yardTheme.palette || {};
+    const toRgba = (hex, a) => {
+      let s = String(hex || "#1a2230").replace("#", "");
+      if (s.length === 3) s = s.split("").map((c) => c + c).join("");
+      const n = parseInt(s, 16);
+      return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
     };
-    // Чистая, одинаковая для всех дворов композиция: красная цель в центре +
-    // две машины-блокировщика. Без препятствий — тамбнейл читается аккуратно.
-    [
-      { id: "side_a", x: 0, y: 0, length: 2, axis: "vertical", color: "#66b6ff" },
-      { id: "target", x: 2, y: 2, length: 2, axis: "horizontal", color: "#ef5364" },
-      { id: "side_b", x: 3, y: 4, length: 2, axis: "horizontal", color: "#f0bd5a" }
-    ].forEach(drawCar);
+    const base = pal.base || "#151b24";
+    const accent = pal.accent || "#78adff";
+    const line = pal.line || "#d9b766";
+    const exit = pal.exit || "#77d7a6";
 
-    // Единый для всех дворов оверлей — верхний блик + мягкая виньетка.
-    // Делает разнородные арты дворов цельной коллекцией.
-    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    const sheen = ctx.createLinearGradient(0, 0, 0, cssHeight);
-    sheen.addColorStop(0, "rgba(255, 255, 255, 0.1)");
-    sheen.addColorStop(0.2, "rgba(255, 255, 255, 0)");
+    // База + лёгкое затемнение книзу для глубины.
+    ctx.fillStyle = toRgba(base, 1);
+    ctx.fillRect(0, 0, w, h);
+    const depth = ctx.createLinearGradient(0, 0, 0, h);
+    depth.addColorStop(0, "rgba(255, 255, 255, 0.04)");
+    depth.addColorStop(0.5, "rgba(0, 0, 0, 0)");
+    depth.addColorStop(1, "rgba(0, 0, 0, 0.22)");
+    ctx.fillStyle = depth;
+    ctx.fillRect(0, 0, w, h);
+
+    // Mesh — мягкие цветные пятна из палитры.
+    const blob = (cx, cy, r, color, alpha) => {
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      g.addColorStop(0, toRgba(color, alpha));
+      g.addColorStop(1, toRgba(color, 0));
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
+    };
+    blob(w * 0.16, h * 0.16, h * 1.05, accent, 0.62);
+    blob(w * 0.9, h * 0.26, h * 0.95, line, 0.5);
+    blob(w * 0.74, h * 1.04, h * 1.02, exit, 0.5);
+    blob(w * 0.32, h * 1.1, h * 0.82, accent, 0.32);
+
+    // Диагональная световая полоса — лёгкая структура.
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    const band = ctx.createLinearGradient(0, 0, w, h);
+    band.addColorStop(0, toRgba(accent, 0));
+    band.addColorStop(0.5, toRgba(line, 0.14));
+    band.addColorStop(1, toRgba(exit, 0));
+    ctx.fillStyle = band;
+    ctx.fillRect(0, 0, w, h);
+    ctx.restore();
+
+    // Единый оверлей коллекции — верхний блик + мягкая виньетка.
+    const sheen = ctx.createLinearGradient(0, 0, 0, h);
+    sheen.addColorStop(0, "rgba(255, 255, 255, 0.14)");
+    sheen.addColorStop(0.24, "rgba(255, 255, 255, 0)");
     ctx.fillStyle = sheen;
-    ctx.fillRect(0, 0, cssWidth, cssHeight);
-    const vignette = ctx.createRadialGradient(
-      cssWidth / 2, cssHeight * 0.44, cssHeight * 0.18,
-      cssWidth / 2, cssHeight * 0.56, cssHeight * 0.96
-    );
+    ctx.fillRect(0, 0, w, h);
+    const vignette = ctx.createRadialGradient(w / 2, h * 0.45, h * 0.18, w / 2, h * 0.55, h * 1.0);
     vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
-    vignette.addColorStop(1, "rgba(0, 0, 0, 0.36)");
+    vignette.addColorStop(1, "rgba(0, 0, 0, 0.32)");
     ctx.fillStyle = vignette;
-    ctx.fillRect(0, 0, cssWidth, cssHeight);
+    ctx.fillRect(0, 0, w, h);
 
     ctx.restore();
   }
