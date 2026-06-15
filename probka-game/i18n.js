@@ -15,6 +15,8 @@
 
       // Hub hero
       "hub.levelPrefix": "Уровень",
+      "hub.continue": "Продолжить",
+      "hub.nav.aria": "Разделы игры",
       "hub.tagline": "Разбери затор за минимум ходов и выведи свою машину из двора.",
       "streak.label": "Серия",
       "streak.best": "Рекорд ${n}",
@@ -412,6 +414,8 @@
 
       // Hub hero
       "hub.levelPrefix": "Level",
+      "hub.continue": "Continue",
+      "hub.nav.aria": "Game sections",
       "hub.tagline": "Clear the jam in minimum moves and drive your car out of the yard.",
       "streak.label": "Streak",
       "streak.best": "Best ${n}",

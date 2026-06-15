@@ -143,7 +143,7 @@
           : t("level.next", { d: item.difficulty || 1 });
       button.innerHTML = unlocked
         ? `<span class="level-number">${item.modeOrder}</span><small>${marker}</small>`
-        : `<span class="level-number">${item.modeOrder}</span><small>${t("level.locked")}</small>`;
+        : `<span class="level-number">${item.modeOrder}</span><span class="level-lock" aria-label="${t("level.locked")}"><svg viewBox="0 0 24 24"><use href="#i-lock" /></svg></span>`;
       button.title = completion
         ? t("level.tooltip.done", { title: translateLevelTitle(item.title), stars: completion.stars, moves: completion.bestMoves })
         : unlocked
@@ -700,6 +700,11 @@
       const modeOrder = deps.getCurrentModeOrder(getSelectedModeId()) + 1;
       if (els.currentLevelLabel) els.currentLevelLabel.textContent = String(modeOrder);
       if (els.modeStatusLabel) els.modeStatusLabel.textContent = t("hud.modeStatus", { modeTitle: tModeTitle(mode.id) || mode.title, n: modeOrder });
+      if (els.hubProgressFill) {
+        const total = deps.getModeLevels(getSelectedModeId()).length || 1;
+        const done = Math.max(0, Math.min(total, modeOrder - 1));
+        els.hubProgressFill.style.width = `${Math.round((done / total) * 100)}%`;
+      }
 
       const dateKey = deps.getDailyDateKey();
       const completion = deps.getValidDailyCompletion(dateKey);

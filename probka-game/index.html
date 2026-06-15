@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <title data-i18n="doc.title">Пробка во дворе</title>
     <link rel="icon" href="./favicon.svg?v=polish1" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=polish14" />
+    <link rel="preload" href="./assets/fonts/inter-700-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./assets/fonts/inter-700-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./assets/fonts/nunito-800-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./assets/fonts/nunito-800-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="./assets/fonts/fonts.css?v=polish1" />
+    <link rel="stylesheet" href="./styles.css?v=polish16" />
   </head>
   <body class="loading">
     <svg class="svg-defs" aria-hidden="true" focusable="false">
@@ -107,46 +112,47 @@
 
       <main class="game-shell">
         <section class="panel menu-panel" id="menuPanel">
-          <div class="hub-hero">
-            <div class="hub-hero-copy">
-              <div class="hub-level-line">
-                <span data-i18n="hub.levelPrefix">Уровень</span>
-                <strong id="currentLevelLabel">1</strong>
-              </div>
-              <p class="hub-mode-status" id="modeStatusLabel">На счет ходов · уровень 1</p>
-              <p class="hub-tagline" data-i18n="hub.tagline">Разбери затор за минимум ходов и выведи свою машину из двора.</p>
-            </div>
-            <div class="streak-panel" id="streakPanel" aria-label="Серия" data-i18n-aria="streak.label">
-              <svg class="streak-flame" viewBox="0 0 64 80" aria-hidden="true">
-                <defs>
-                  <linearGradient id="flameOuter" x1="18" y1="4" x2="46" y2="76" gradientUnits="userSpaceOnUse">
-                    <stop offset="0" stop-color="#ffe66d" />
-                    <stop offset="0.46" stop-color="#ff9f2f" />
-                    <stop offset="1" stop-color="#ff5f45" />
-                  </linearGradient>
-                  <linearGradient id="flameInner" x1="29" y1="26" x2="39" y2="66" gradientUnits="userSpaceOnUse">
-                    <stop offset="0" stop-color="#fff7b0" />
-                    <stop offset="1" stop-color="#ffd24f" />
-                  </linearGradient>
-                </defs>
-                <path class="flame-outer" d="M34.9 5.8c3.8 10.2 1.2 16.1-2.2 21.5 5.8-2.7 9.3-7.2 10.7-13.5 10.7 10.1 15.2 21.9 12.2 33.2C52.1 60 42.8 72.5 31.5 72.5 18.7 72.5 8.9 62.6 8.9 49.5c0-9.1 4.8-16.1 11.1-22.7 5.8-6.2 10.7-12 14.9-21z" fill="url(#flameOuter)" />
-                <path class="flame-inner" d="M35.1 36.1c6.7 6 9.2 12 7.4 18.2-1.7 6.1-6.3 10.9-11.9 10.9-6.2 0-11.2-4.9-11.2-11.4 0-4.7 2.6-8 5.9-11.7 2.8-3.1 5.3-6.2 6.7-11 1.7 2 2.5 3.6 3.1 5z" fill="url(#flameInner)" />
-              </svg>
-              <div class="streak-copy">
-                <span data-i18n="streak.label">Серия</span>
-                <strong id="streakCount">0</strong>
-                <small id="streakBest">Рекорд 0</small>
-              </div>
-            </div>
-            <button class="primary-button play-cta" id="playButton">
+          <!-- Герой: продолжить игру -->
+          <button class="hub-hero" id="playButton" type="button">
+            <span class="hub-hero-aura" aria-hidden="true"></span>
+            <span class="hub-hero-top">
+              <span class="hub-eyebrow" data-i18n="hub.continue">Продолжить</span>
+              <span class="hub-streak" id="streakPanel" aria-label="Серия" data-i18n-aria="streak.label">
+                <svg class="streak-flame" viewBox="0 0 64 80" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="flameOuter" x1="18" y1="4" x2="46" y2="76" gradientUnits="userSpaceOnUse">
+                      <stop offset="0" stop-color="#ffe66d" />
+                      <stop offset="0.46" stop-color="#ff9f2f" />
+                      <stop offset="1" stop-color="#ff5f45" />
+                    </linearGradient>
+                    <linearGradient id="flameInner" x1="29" y1="26" x2="39" y2="66" gradientUnits="userSpaceOnUse">
+                      <stop offset="0" stop-color="#fff7b0" />
+                      <stop offset="1" stop-color="#ffd24f" />
+                    </linearGradient>
+                  </defs>
+                  <path class="flame-outer" d="M34.9 5.8c3.8 10.2 1.2 16.1-2.2 21.5 5.8-2.7 9.3-7.2 10.7-13.5 10.7 10.1 15.2 21.9 12.2 33.2C52.1 60 42.8 72.5 31.5 72.5 18.7 72.5 8.9 62.6 8.9 49.5c0-9.1 4.8-16.1 11.1-22.7 5.8-6.2 10.7-12 14.9-21z" fill="url(#flameOuter)" />
+                  <path class="flame-inner" d="M35.1 36.1c6.7 6 9.2 12 7.4 18.2-1.7 6.1-6.3 10.9-11.9 10.9-6.2 0-11.2-4.9-11.2-11.4 0-4.7 2.6-8 5.9-11.7 2.8-3.1 5.3-6.2 6.7-11 1.7 2 2.5 3.6 3.1 5z" fill="url(#flameInner)" />
+                </svg>
+                <span class="hub-streak-copy">
+                  <strong id="streakCount">0</strong>
+                  <small id="streakBest">Рекорд 0</small>
+                </span>
+              </span>
+            </span>
+            <span class="hub-level">
+              <span class="hub-level-word" data-i18n="hub.levelPrefix">Уровень</span>
+              <strong class="hub-level-num" id="currentLevelLabel">1</strong>
+            </span>
+            <span class="hub-mode-status" id="modeStatusLabel">На счет ходов · уровень 1</span>
+            <span class="hub-progress" aria-hidden="true"><span class="hub-progress-fill" id="hubProgressFill"></span></span>
+            <span class="hub-play-cue">
               <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-play" /></svg>
               <span data-i18n="play.button">Играть</span>
-            </button>
-          </div>
+            </span>
+          </button>
 
-          <div class="daily-week" id="dailyWeek" aria-label="Неделя ежедневных уровней" data-i18n-aria="dailyWeek.aria"></div>
-
-          <button class="daily-challenge-card daily-status-card" id="dailyButton" type="button">
+          <!-- Уровень дня -->
+          <button class="daily-card" id="dailyButton" type="button">
             <span class="daily-card-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><use href="#i-calendar" /></svg>
             </span>
@@ -157,25 +163,31 @@
             </span>
             <span class="daily-card-badge" aria-hidden="true" data-i18n="dailyCard.badge">сложно</span>
           </button>
+          <div class="daily-week" id="dailyWeek" aria-label="Неделя ежедневных уровней" data-i18n-aria="dailyWeek.aria"></div>
 
-          <div class="hub-nav">
+          <!-- Навигация -->
+          <nav class="hub-nav" aria-label="Разделы" data-i18n-aria="hub.nav.aria">
             <button class="nav-tile" id="levelSelectButton">
               <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-grid" /></svg></span>
               <span class="nav-copy"><strong data-i18n="nav.levels.title">Уровни</strong><small data-i18n="nav.levels.sub">3 режима · 300 уровней</small></span>
+              <svg class="nav-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
             <button class="nav-tile" id="garageButton">
               <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-car" /></svg></span>
               <span class="nav-copy"><strong data-i18n="nav.garage.title">Гараж</strong><small data-i18n="nav.garage.sub">Машины и дворы</small></span>
+              <svg class="nav-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
             <button class="nav-tile" id="missionsButton">
               <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-star" /></svg></span>
               <span class="nav-copy"><strong data-i18n="nav.missions.title">Миссии</strong><small id="missionStatusLabel">0/3 выполнено</small></span>
+              <svg class="nav-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
             <button class="nav-tile" id="statsButton">
               <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-trophy" /></svg></span>
               <span class="nav-copy"><strong data-i18n="nav.stats.title">Статистика</strong><small data-i18n="nav.stats.sub">Прогресс и рекорды</small></span>
+              <svg class="nav-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
-          </div>
+          </nav>
 
           <details class="settings-strip">
             <summary data-i18n="settings.summary">Настройки</summary>
@@ -364,19 +376,19 @@
     <script src="./daily.js?v=polish1"></script>
     <script src="./config.js?v=polish1"></script>
     <script src="./texts.js?v=polish2"></script>
-    <script src="./i18n.js?v=polish3"></script>
+    <script src="./i18n.js?v=polish4"></script>
     <script src="./yandex-sdk.js?v=polish1"></script>
     <script src="./progress.js?v=polish1"></script>
     <script src="./economy.js?v=polish1"></script>
     <script src="./rules.js?v=polish1"></script>
     <script src="./session.js?v=polish1"></script>
     <script src="./renderer.js?v=polish1"></script>
-    <script src="./screens.js?v=polish2"></script>
+    <script src="./screens.js?v=polish3"></script>
     <script src="./tutorial.js?v=polish1"></script>
     <script src="./actors.js?v=polish1"></script>
     <script src="./input.js?v=polish1"></script>
     <script src="./ads.js?v=polish1"></script>
     <script src="./audio.js?v=polish1"></script>
-    <script src="./game.js?v=polish2"></script>
+    <script src="./game.js?v=polish3"></script>
   </body>
 </html>

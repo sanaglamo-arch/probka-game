@@ -43,10 +43,15 @@
     0 24px 60px rgba(2, 4, 9, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
+  /* типографика */
+  --font-body: Inter, "SF Pro Display", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  --font-display: Nunito, Inter, "SF Pro Display", system-ui, sans-serif;
+
   /* геометрия */
   --r-lg: 20px;
   --r-md: 14px;
   --r-sm: 10px;
+  --r-xl: 26px;
 
   /* поверхность карточек одним рецептом */
   --card-bg:
@@ -80,11 +85,22 @@ body {
     linear-gradient(180deg, #0a0d15 0%, var(--bg) 46%, var(--bg-deep) 100%);
   background-attachment: fixed;
   color: var(--text);
-  font-family: Inter, "SF Pro Display", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.35;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* Дисплейный шрифт (Nunito, округлый) — для брендовых и крупных акцентов.
+   Тело интерфейса — Inter. */
+.font-display,
+h1,
+.hub-headline,
+.panel-head h2,
+.screen-title strong {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
 }
 
 .svg-defs {
@@ -446,36 +462,42 @@ h2 {
   gap: 12px;
 }
 
+/* ===================== ГЛАВНОЕ МЕНЮ ===================== */
+
+/* Герой «Продолжить» — крупная карточка-CTA */
 .hub-hero {
   position: relative;
   display: grid;
+  justify-items: start;
+  gap: 11px;
+  width: 100%;
   min-width: 0;
-  grid-template-columns: minmax(0, 1fr) 128px;
-  gap: 16px;
   overflow: hidden;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r-lg);
-  padding: 20px;
+  border: 1px solid rgba(255, 200, 87, 0.22);
+  border-radius: var(--r-xl);
+  padding: 17px 18px 16px;
   background:
-    radial-gradient(130% 110% at 100% 0%, rgba(96, 134, 204, 0.18), transparent 52%),
-    radial-gradient(80% 70% at 0% 100%, rgba(240, 159, 46, 0.07), transparent 55%),
+    radial-gradient(135% 120% at 100% 0%, rgba(133, 184, 255, 0.16), transparent 54%),
+    radial-gradient(95% 85% at 0% 100%, rgba(240, 159, 46, 0.1), transparent 56%),
     var(--card-bg);
   box-shadow: var(--elev-2);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.16s ease, border-color 0.16s ease;
 }
 
-/* Мягкое «дышащее» сияние героя — живой премиум-акцент. */
-.hub-hero::before {
-  content: "";
+.hub-hero:hover { border-color: rgba(255, 200, 87, 0.4); }
+.hub-hero:active { transform: scale(0.992); }
+
+/* Мягкое «дышащее» сияние — живой премиум-акцент. */
+.hub-hero-aura {
   position: absolute;
   inset: 0;
-  background: radial-gradient(58% 80% at 82% 6%, rgba(133, 184, 255, 0.14), transparent 60%);
-  opacity: 0.6;
   pointer-events: none;
+  background: radial-gradient(60% 80% at 84% 0%, rgba(133, 184, 255, 0.18), transparent 60%);
+  opacity: 0.6;
   animation: heroGlow 6.5s ease-in-out infinite alternate;
-}
-
-.hub-hero > * {
-  position: relative;
 }
 
 @keyframes heroGlow {
@@ -483,43 +505,118 @@ h2 {
   to { opacity: 0.85; }
 }
 
-.hub-hero-copy {
-  display: grid;
-  align-content: start;
-  gap: 9px;
+.hub-hero > *:not(.hub-hero-aura) {
+  position: relative;
+  z-index: 1;
 }
 
-.hub-level-line {
+.hub-hero-top {
   display: flex;
-  min-height: 54px;
-  align-items: baseline;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
   gap: 10px;
 }
 
-.hub-level-line span {
-  color: var(--text-soft);
-  font-size: 24px;
-  font-weight: 750;
-  line-height: 1;
+.hub-eyebrow {
+  color: var(--gold);
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
-.hub-level-line strong {
+/* Бейдж серии */
+.hub-streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(255, 200, 87, 0.18);
+  border-radius: 999px;
+  padding: 4px 12px 4px 7px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent),
+    rgba(12, 15, 24, 0.7);
+}
+
+.hub-streak.active {
+  border-color: rgba(255, 159, 47, 0.42);
+  background:
+    linear-gradient(180deg, rgba(255, 170, 61, 0.1), transparent),
+    rgba(15, 17, 26, 0.74);
+}
+
+.streak-flame {
+  width: 22px;
+  height: 27px;
+  overflow: visible;
+  opacity: 0.5;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+}
+
+.hub-streak.active .streak-flame {
+  opacity: 1;
+  animation: flameBreath 2.8s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(255, 159, 47, 0.5));
+}
+
+.flame-outer { transform-origin: 32px 70px; }
+.flame-inner { transform-origin: 31px 65px; opacity: 0.92; }
+
+.hub-streak-copy {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.hub-streak-copy strong {
   color: var(--text);
-  font-size: 54px;
+  font-size: 16px;
   font-weight: 850;
   line-height: 1;
   font-variant-numeric: tabular-nums;
-  text-shadow: 0 0 30px rgba(133, 184, 255, 0.4);
+}
+
+.hub-streak-copy small {
+  color: var(--warning);
+  font-size: 10.5px;
+  font-weight: 720;
+}
+
+/* Большой номер уровня */
+.hub-level {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 1px;
+}
+
+.hub-level-word {
+  font-family: var(--font-display);
+  color: var(--text-soft);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.hub-level-num {
+  font-family: var(--font-display);
+  color: var(--text);
+  font-size: 58px;
+  font-weight: 900;
+  line-height: 0.86;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 36px rgba(133, 184, 255, 0.45);
 }
 
 .hub-mode-status {
   display: inline-flex;
-  width: fit-content;
   max-width: 100%;
   margin: 0;
   border: 1px solid rgba(133, 184, 255, 0.24);
   border-radius: 999px;
-  padding: 5px 11px;
+  padding: 5px 12px;
   background: var(--blue-soft);
   color: var(--blue-2);
   font-size: 12.5px;
@@ -529,99 +626,59 @@ h2 {
   white-space: nowrap;
 }
 
-.hub-tagline {
-  max-width: 30ch;
-  margin: 0;
-  color: var(--muted);
-  font-size: 13.5px;
-  line-height: 1.5;
+/* Прогресс по текущему режиму */
+.hub-progress {
+  display: block;
+  width: 100%;
+  height: 7px;
+  margin-top: 1px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(10, 13, 21, 0.85);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
-.streak-panel {
-  display: grid;
-  min-height: 134px;
-  align-content: center;
-  justify-items: center;
-  gap: 6px;
-  align-self: stretch;
-  border: 1px solid rgba(255, 200, 87, 0.16);
+.hub-progress-fill {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold));
+  box-shadow: 0 0 12px rgba(255, 200, 87, 0.5);
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Кнопка «Играть» внутри героя */
+.hub-play-cue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  margin-top: 5px;
   border-radius: var(--r-md);
-  background:
-    radial-gradient(circle at 50% 26%, rgba(255, 167, 56, 0.13), transparent 60%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent),
-    rgba(13, 16, 25, 0.7);
-}
-
-.streak-panel.active {
-  border-color: rgba(255, 159, 47, 0.38);
-  background:
-    radial-gradient(circle at 50% 28%, rgba(255, 170, 61, 0.26), transparent 62%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent),
-    rgba(15, 17, 26, 0.74);
-}
-
-.streak-flame {
-  width: 52px;
-  height: 64px;
-  overflow: visible;
-  filter:
-    drop-shadow(0 0 14px rgba(255, 124, 50, 0.16))
-    drop-shadow(0 10px 18px rgba(0, 0, 0, 0.28));
-  opacity: 0.6;
-}
-
-.streak-panel.active .streak-flame {
-  opacity: 1;
-  animation: flameBreath 2.8s ease-in-out infinite;
-  filter:
-    drop-shadow(0 0 16px rgba(255, 159, 47, 0.45))
-    drop-shadow(0 0 30px rgba(255, 95, 69, 0.18))
-    drop-shadow(0 12px 20px rgba(0, 0, 0, 0.3));
-}
-
-.flame-outer {
-  transform-origin: 32px 70px;
-}
-
-.flame-inner {
-  transform-origin: 31px 65px;
-  opacity: 0.92;
-}
-
-.streak-copy {
-  display: grid;
-  justify-items: center;
-  gap: 2px;
-  text-align: center;
-}
-
-.streak-copy span {
-  color: var(--muted);
-  font-size: 11.5px;
-  font-weight: 650;
-}
-
-.streak-copy strong {
-  color: var(--text);
-  font-size: 28px;
-  font-weight: 850;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.streak-copy small {
-  color: var(--warning);
-  font-size: 11px;
-  font-weight: 680;
-}
-
-.play-cta {
-  grid-column: 1 / -1;
-  min-height: 60px;
-  border-radius: var(--r-md);
+  background: linear-gradient(180deg, #ffd877, var(--gold-deep));
+  color: #2a1804;
+  font-family: var(--font-display);
   font-size: 20px;
-  font-weight: 820;
+  font-weight: 900;
   letter-spacing: 0.01em;
+  box-shadow:
+    0 12px 26px rgba(240, 159, 46, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.hub-play-cue .button-icon {
+  width: 22px;
+  height: 22px;
+  fill: #2a1804;
+}
+
+.hub-hero:active .hub-play-cue {
+  box-shadow:
+    0 6px 14px rgba(240, 159, 46, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 /* ---------- неделя ежедневок ---------- */
@@ -705,74 +762,85 @@ h2 {
 
 /* ---------- карточка «уровень дня» ---------- */
 
-.daily-challenge-card {
+.daily-card {
   position: relative;
   display: flex;
-  min-height: 86px;
+  min-height: 84px;
   min-width: 0;
   align-items: center;
-  justify-content: space-between;
   gap: 14px;
-  border: 1px solid rgba(255, 200, 87, 0.28);
+  border: 1px solid rgba(255, 200, 87, 0.3);
   border-radius: var(--r-lg);
-  padding: 15px 16px;
+  padding: 14px 15px;
   background:
-    radial-gradient(120% 150% at 100% 0%, rgba(255, 200, 87, 0.12), transparent 54%),
+    radial-gradient(130% 160% at 0% 0%, rgba(255, 200, 87, 0.14), transparent 52%),
     var(--card-bg);
   box-shadow:
     var(--elev-1),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
   color: var(--text);
   text-align: left;
-}
-
-.daily-status-card {
   cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease, transform 0.16s ease;
 }
 
-.daily-status-card:hover {
-  border-color: rgba(133, 184, 255, 0.34);
-  background: var(--card-bg-hover);
+.daily-card:hover {
+  border-color: rgba(255, 200, 87, 0.5);
+  background:
+    radial-gradient(130% 160% at 0% 0%, rgba(255, 200, 87, 0.2), transparent 52%),
+    var(--card-bg-hover);
 }
+
+.daily-card:active { transform: scale(0.992); }
 
 .daily-card-icon {
   display: grid;
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
   flex: 0 0 auto;
   place-items: center;
-  border: 1px solid rgba(255, 200, 87, 0.3);
+  border: 1px solid rgba(255, 200, 87, 0.34);
   border-radius: var(--r-md);
   background:
-    linear-gradient(180deg, rgba(255, 200, 87, 0.16), rgba(255, 200, 87, 0.04)),
+    linear-gradient(180deg, rgba(255, 200, 87, 0.22), rgba(255, 200, 87, 0.05)),
     rgba(11, 14, 22, 0.85);
   color: var(--gold);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 6px 16px rgba(240, 159, 46, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .daily-card-icon svg {
-  width: 24px;
-  height: 24px;
+  width: 25px;
+  height: 25px;
 }
 
 .daily-card-copy {
   display: grid;
   min-width: 0;
   flex: 1;
-  gap: 4px;
+  gap: 3px;
 }
 
-.daily-challenge-card strong {
+.daily-card-copy .label {
+  color: var(--gold);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.daily-card strong {
   overflow: hidden;
   color: var(--text);
   font-size: 18px;
-  font-weight: 780;
-  line-height: 1.15;
+  font-weight: 800;
+  line-height: 1.12;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.daily-challenge-card small {
+.daily-card small {
   display: -webkit-box;
   overflow: hidden;
   color: var(--muted);
@@ -814,7 +882,7 @@ h2 {
 .nav-tile {
   position: relative;
   display: grid;
-  grid-template-columns: 46px minmax(0, 1fr) 20px;
+  grid-template-columns: 48px minmax(0, 1fr) 18px;
   min-height: 70px;
   align-items: center;
   gap: 13px;
@@ -828,36 +896,39 @@ h2 {
   transition: border-color 0.16s ease, background 0.16s ease, transform 0.16s ease;
 }
 
-.nav-tile::after {
-  content: "›";
-  justify-self: end;
-  color: var(--faint);
-  font-size: 24px;
-  line-height: 1;
-}
-
 .nav-tile:hover {
   border-color: rgba(133, 184, 255, 0.32);
   background: var(--card-bg-hover);
 }
 
+.nav-tile:hover .nav-chevron { color: var(--blue-2); transform: translateX(2px); }
+.nav-tile:active { transform: scale(0.992); }
+
+.nav-chevron {
+  width: 18px;
+  height: 18px;
+  justify-self: end;
+  color: var(--faint);
+  transition: color 0.16s ease, transform 0.16s ease;
+}
+
 .nav-icon {
   display: grid;
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
   place-items: center;
   border: 1px solid rgba(133, 184, 255, 0.2);
   border-radius: var(--r-md);
   background:
-    linear-gradient(180deg, rgba(133, 184, 255, 0.13), rgba(133, 184, 255, 0.035)),
+    linear-gradient(180deg, rgba(133, 184, 255, 0.14), rgba(133, 184, 255, 0.04)),
     rgba(11, 14, 22, 0.85);
   color: var(--blue-2);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .nav-icon svg {
-  width: 23px;
-  height: 23px;
+  width: 24px;
+  height: 24px;
   fill: currentColor;
 }
 
@@ -876,7 +947,7 @@ h2 {
 .nav-tile strong {
   color: var(--text);
   font-size: 16px;
-  font-weight: 760;
+  font-weight: 770;
 }
 
 .nav-tile small {
@@ -884,6 +955,23 @@ h2 {
   color: var(--muted);
   font-size: 12px;
   font-weight: 560;
+}
+
+/* Разные акцентные цвета иконок разделов — больше «жизни» */
+#garageButton .nav-icon {
+  border-color: rgba(111, 217, 168, 0.22);
+  background: linear-gradient(180deg, rgba(111, 217, 168, 0.14), rgba(111, 217, 168, 0.04)), rgba(11, 14, 22, 0.85);
+  color: var(--success);
+}
+#missionsButton .nav-icon {
+  border-color: rgba(255, 200, 87, 0.24);
+  background: linear-gradient(180deg, rgba(255, 200, 87, 0.14), rgba(255, 200, 87, 0.04)), rgba(11, 14, 22, 0.85);
+  color: var(--gold);
+}
+#statsButton .nav-icon {
+  border-color: rgba(189, 160, 255, 0.26);
+  background: linear-gradient(180deg, rgba(189, 160, 255, 0.16), rgba(189, 160, 255, 0.04)), rgba(11, 14, 22, 0.85);
+  color: #c4acff;
 }
 
 /* ---------- настройки ---------- */
@@ -1328,6 +1416,24 @@ body:has(#missionsPanel:not([hidden])) .app {
   background: rgba(226, 234, 255, 0.025);
   color: var(--faint);
   cursor: not-allowed;
+}
+
+.level-button.locked .level-number {
+  font-size: 14px;
+  font-weight: 760;
+  opacity: 0.4;
+}
+
+.level-lock {
+  display: grid;
+  place-items: center;
+  margin-top: 1px;
+  color: var(--muted);
+}
+
+.level-lock svg {
+  width: 17px;
+  height: 17px;
 }
 
 .level-button.locked small {
@@ -3020,57 +3126,34 @@ body.game-active #gameCanvas {
   }
 
   .hub-hero {
-    grid-template-columns: minmax(0, 1fr) 112px;
-    gap: 12px;
     padding: 16px;
   }
 
-  .hub-level-line {
-    min-height: 48px;
-  }
-
-  .hub-level-line span {
+  .hub-level-word {
     font-size: 20px;
   }
 
-  .hub-level-line strong {
-    font-size: 46px;
+  .hub-level-num {
+    font-size: 52px;
   }
 
-  .hub-tagline {
-    font-size: 12.5px;
-  }
-
-  .streak-panel {
-    min-height: 120px;
-  }
-
-  .streak-flame {
-    width: 46px;
-    height: 57px;
-  }
-
-  .streak-copy strong {
-    font-size: 25px;
-  }
-
-  .play-cta {
-    min-height: 56px;
+  .hub-play-cue {
+    min-height: 52px;
     font-size: 18px;
   }
 
-  .daily-challenge-card {
+  .daily-card {
     min-height: 80px;
-    gap: 10px;
+    gap: 11px;
     padding: 13px 14px;
   }
 
   .daily-card-icon {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
   }
 
-  .daily-challenge-card strong {
+  .daily-card strong {
     font-size: 16.5px;
   }
 
@@ -3279,46 +3362,20 @@ body.game-active #gameCanvas {
   }
 
   .hub-hero {
-    grid-template-columns: 1fr;
-    gap: 12px;
+    padding: 15px;
+    gap: 10px;
   }
 
-  .hub-level-line {
-    min-height: 44px;
-  }
-
-  .hub-level-line span {
+  .hub-level-word {
     font-size: 19px;
   }
 
-  .hub-level-line strong {
-    font-size: 42px;
+  .hub-level-num {
+    font-size: 48px;
   }
 
-  .hub-tagline {
-    max-width: none;
-  }
-
-  .streak-panel {
-    grid-template-columns: 56px minmax(0, 1fr);
-    min-height: 84px;
-    align-items: center;
-    justify-items: start;
-    padding: 10px 12px;
-  }
-
-  .streak-flame {
-    width: 40px;
-    height: 50px;
-  }
-
-  .streak-copy {
-    justify-items: start;
-    text-align: left;
-  }
-
-  .play-cta {
-    min-height: 54px;
+  .hub-play-cue {
+    min-height: 50px;
     font-size: 17px;
   }
 
@@ -3482,30 +3539,17 @@ body.capture-mobile .hub-hero {
   padding: 14px;
 }
 
-body.capture-mobile .hub-level-line span {
+body.capture-mobile .hub-level-word {
   font-size: 21px;
 }
 
-body.capture-mobile .hub-level-line strong {
-  font-size: 44px;
+body.capture-mobile .hub-level-num {
+  font-size: 54px;
 }
 
-body.capture-mobile .streak-panel {
-  min-height: 118px;
-}
-
-body.capture-mobile .streak-flame {
-  width: 46px;
-  height: 57px;
-}
-
-body.capture-mobile .streak-copy strong {
-  font-size: 25px;
-}
-
-body.capture-mobile .daily-challenge-card {
-  min-height: 78px;
-  gap: 10px;
+body.capture-mobile .daily-card {
+  min-height: 80px;
+  gap: 11px;
   padding: 13px;
 }
 
@@ -3514,7 +3558,7 @@ body.capture-mobile .daily-card-badge {
   min-height: 32px;
 }
 
-body.capture-mobile .daily-challenge-card strong {
+body.capture-mobile .daily-card strong {
   font-size: 16.5px;
 }
 

@@ -50,6 +50,7 @@
     coins: document.getElementById("coins"),
     coinPop: document.getElementById("coinPop"),
     currentLevelLabel: document.getElementById("currentLevelLabel"),
+    hubProgressFill: document.getElementById("hubProgressFill"),
     modeStatusLabel: document.getElementById("modeStatusLabel"),
     dailyStatusLabel: document.getElementById("dailyStatusLabel"),
     streakPanel: document.getElementById("streakPanel"),
