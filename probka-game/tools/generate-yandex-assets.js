@@ -30,9 +30,10 @@ const pages = [
 
 // Скриншоты — полнокадровый портретный геймплей без промо-обёртки:
 // 100% игрового UI, русский язык, без внешних элементов (требования 5.1.1 / 5.1.1.2 / 8.2.3).
-// CSS-размер телефона + высокий DPR дают чёткое изображение 1290x2640.
-const SHOT_CSS_WIDTH = 430;
-const SHOT_CSS_HEIGHT = 880;
+// Требование площадки: портрет строго 9:16, длинная сторона 1280–2560 px.
+// CSS 450x800 (=9:16) × DPR 3 = 1350x2400 — точная пропорция и чёткость.
+const SHOT_CSS_WIDTH = 450;
+const SHOT_CSS_HEIGHT = 800;
 const SHOT_SCALE = 3;
 const shotUrl = (params) => `${baseUrl}/probka-game/index.html?showcase=1&skin=classic_red&${params}`;
 const screenshots = [
