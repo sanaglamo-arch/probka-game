@@ -2385,6 +2385,7 @@
     drawVehicleThemeOverlay(ctx, { x, y, width, height, axis, cellSize, yardTheme });
   }
 
+  const yardPreviewCache = {};
   function renderYardPreview(canvas, yardTheme) {
     const ctx = canvas && canvas.getContext ? canvas.getContext("2d") : null;
     if (!ctx) return;
@@ -2397,73 +2398,52 @@
       canvas.width = pixelWidth;
       canvas.height = pixelHeight;
     }
-    ctx.save();
-    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    ctx.clearRect(0, 0, cssWidth, cssHeight);
-
-    // Абстрактное превью двора: mesh-градиент из палитры двора.
-    // Никакого поля, машин и символов — только цвет/настроение.
     const w = cssWidth;
     const h = cssHeight;
     const pal = yardTheme.palette || {};
-    const toRgba = (hex, a) => {
-      let s = String(hex || "#1a2230").replace("#", "");
-      if (s.length === 3) s = s.split("").map((c) => c + c).join("");
-      const n = parseInt(s, 16);
-      return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
-    };
     const base = pal.base || "#151b24";
-    const accent = pal.accent || "#78adff";
-    const line = pal.line || "#d9b766";
-    const exit = pal.exit || "#77d7a6";
+    const id = yardTheme.id || "yard";
 
-    // База + лёгкое затемнение книзу для глубины.
-    ctx.fillStyle = toRgba(base, 1);
-    ctx.fillRect(0, 0, w, h);
-    const depth = ctx.createLinearGradient(0, 0, 0, h);
-    depth.addColorStop(0, "rgba(255, 255, 255, 0.04)");
-    depth.addColorStop(0.5, "rgba(0, 0, 0, 0)");
-    depth.addColorStop(1, "rgba(0, 0, 0, 0.22)");
-    ctx.fillStyle = depth;
-    ctx.fillRect(0, 0, w, h);
-
-    // Mesh — мягкие цветные пятна из палитры.
-    const blob = (cx, cy, r, color, alpha) => {
-      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-      g.addColorStop(0, toRgba(color, alpha));
-      g.addColorStop(1, toRgba(color, 0));
-      ctx.fillStyle = g;
+    const overlay = () => {
+      // Лёгкий блик сверху + затемнение снизу — цельность коллекции.
+      const top = ctx.createLinearGradient(0, 0, 0, h);
+      top.addColorStop(0, "rgba(255, 255, 255, 0.08)");
+      top.addColorStop(0.4, "rgba(0, 0, 0, 0)");
+      top.addColorStop(1, "rgba(0, 0, 0, 0.28)");
+      ctx.fillStyle = top;
       ctx.fillRect(0, 0, w, h);
     };
-    blob(w * 0.16, h * 0.16, h * 1.05, accent, 0.62);
-    blob(w * 0.9, h * 0.26, h * 0.95, line, 0.5);
-    blob(w * 0.74, h * 1.04, h * 1.02, exit, 0.5);
-    blob(w * 0.32, h * 1.1, h * 0.82, accent, 0.32);
 
-    // Диагональная световая полоса — лёгкая структура.
-    ctx.save();
-    ctx.globalCompositeOperation = "screen";
-    const band = ctx.createLinearGradient(0, 0, w, h);
-    band.addColorStop(0, toRgba(accent, 0));
-    band.addColorStop(0.5, toRgba(line, 0.14));
-    band.addColorStop(1, toRgba(exit, 0));
-    ctx.fillStyle = band;
-    ctx.fillRect(0, 0, w, h);
-    ctx.restore();
+    const paint = (image) => {
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+      // cover-fit настоящей картинки двора
+      const ir = image.width / image.height;
+      const cr = w / h;
+      let dw;
+      let dh;
+      if (ir > cr) { dh = h; dw = h * ir; } else { dw = w; dh = w / ir; }
+      ctx.drawImage(image, (w - dw) / 2, (h - dh) / 2, dw, dh);
+      overlay();
+    };
 
-    // Единый оверлей коллекции — верхний блик + мягкая виньетка.
-    const sheen = ctx.createLinearGradient(0, 0, 0, h);
-    sheen.addColorStop(0, "rgba(255, 255, 255, 0.14)");
-    sheen.addColorStop(0.24, "rgba(255, 255, 255, 0)");
-    ctx.fillStyle = sheen;
+    let img = yardPreviewCache[id];
+    if (img && img.complete && img.naturalWidth) {
+      paint(img);
+      return;
+    }
+    // Пока картинка грузится — базовый цвет двора (не пусто).
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = base;
     ctx.fillRect(0, 0, w, h);
-    const vignette = ctx.createRadialGradient(w / 2, h * 0.45, h * 0.18, w / 2, h * 0.55, h * 1.0);
-    vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
-    vignette.addColorStop(1, "rgba(0, 0, 0, 0.32)");
-    ctx.fillStyle = vignette;
-    ctx.fillRect(0, 0, w, h);
-
-    ctx.restore();
+    if (!img) {
+      img = new Image();
+      yardPreviewCache[id] = img;
+      img.onload = () => { try { paint(img); } catch (err) { /* canvas мог исчезнуть */ } };
+      img.onerror = () => { yardPreviewCache[id] = null; };
+      img.src = `./assets/yards/${id}/preview.jpg`;
+    }
   }
 
   function isCanvasNonBlank(canvas) {

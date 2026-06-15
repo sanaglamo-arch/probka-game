@@ -140,6 +140,7 @@
     const base = `./assets/yards/${id}`;
     return {
       board: withVersion(`${base}/board.png`, version),
+      preview: withVersion(`${base}/preview.jpg`, version),
       traffic: {
         car2Horizontal: withVersion(`${base}/traffic/car-2-h.png`, version),
         car2Vertical: withVersion(`${base}/traffic/car-2-v.png`, version),
