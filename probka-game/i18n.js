@@ -90,6 +90,8 @@
       // Daily panel
       "daily.eyebrow": "365 вызовов",
       "daily.title": "Уровень дня",
+      "daily.weekdays": "Пн Вт Ср Чт Пт Сб Вс",
+      "daily.month.progress": "${done}/${total}",
 
       // Daily overview
       "daily.overview.today": "Сегодня · ${date}",
@@ -504,6 +506,8 @@
       // Daily panel
       "daily.eyebrow": "365 challenges",
       "daily.title": "Daily Level",
+      "daily.weekdays": "Mo Tu We Th Fr Sa Su",
+      "daily.month.progress": "${done}/${total}",
 
       // Daily overview
       "daily.overview.today": "Today · ${date}",

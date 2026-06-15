@@ -518,15 +518,37 @@
       const monthNames = [1,2,3,4,5,6,7,8,9,10,11,12].map((m) => t("month." + m));
       const calendar = dailyApi.getDailyCalendar ? dailyApi.getDailyCalendar(year) : [];
       els.dailyCalendarGrid.innerHTML = "";
+      const weekdays = t("daily.weekdays").split(" ");
       monthNames.forEach((name, monthIndex) => {
-        const monthDays = calendar.filter((slot) => slot.month === monthIndex + 1);
-        const section = document.createElement("section");
         const monthNumber = monthIndex + 1;
+        const monthDays = calendar.filter((slot) => slot.month === monthNumber);
+        if (!monthDays.length) return;
+        const doneCount = monthDays.filter((slot) => deps.getValidDailyCompletion(slot.dateKey)).length;
+        const section = document.createElement("section");
         section.className = `daily-month${monthNumber === currentMonth ? " current" : ""}`;
         section.dataset.dailyMonth = String(monthNumber);
-        section.innerHTML = `<div class="daily-month-title"><strong>${name}</strong></div>`;
+        section.innerHTML = `
+          <div class="daily-month-title">
+            <strong>${name}</strong>
+            <span class="daily-month-progress${doneCount ? " has" : ""}">${t("daily.month.progress", { done: doneCount, total: monthDays.length })}</span>
+          </div>
+          <div class="daily-weekrow" aria-hidden="true">${weekdays.map((w) => `<span>${w}</span>`).join("")}</div>
+        `;
         const grid = document.createElement("div");
         grid.className = "daily-month-grid";
+        // выравнивание по дням недели (понедельник — первый)
+        let lead = 0;
+        try {
+          lead = (new Date(`${monthDays[0].dateKey}T00:00:00`).getDay() + 6) % 7;
+        } catch (err) {
+          lead = 0;
+        }
+        for (let i = 0; i < lead; i += 1) {
+          const empty = document.createElement("span");
+          empty.className = "daily-cal-empty";
+          empty.setAttribute("aria-hidden", "true");
+          grid.appendChild(empty);
+        }
         monthDays.forEach((slot) => grid.appendChild(createDailyDayButton(slot, today, state)));
         section.appendChild(grid);
         els.dailyCalendarGrid.appendChild(section);
