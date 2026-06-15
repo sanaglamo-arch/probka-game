@@ -36,9 +36,9 @@
 
   window.PROBKA_TEXTS = {
     missions: [
-      { id: "daily_complete", title: "Уровень дня", text: "Заверши ежедневный вызов", reward: 8, target: 1 },
-      { id: "three_stars", title: "Три звезды", text: "Пройди уровень идеально", reward: 10, target: 1 },
-      { id: "no_undo", title: "Без отмены", text: "Пройди любой уровень без отката", reward: 8, target: 1 }
+      { id: "daily_complete", title: "Уровень дня", text: "Заверши ежедневный вызов", reward: 10, target: 1 },
+      { id: "three_stars", title: "Три звезды", text: "Пройди уровень идеально", reward: 15, target: 1 },
+      { id: "no_undo", title: "Без отмены", text: "Пройди любой уровень без отката", reward: 10, target: 1 }
     ],
     modes: {
       daily: { id: "daily", title: "Уровень дня", rule: "free", icon: "◆" },
