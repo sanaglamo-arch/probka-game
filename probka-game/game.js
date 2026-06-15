@@ -84,6 +84,9 @@
     statsPanel: document.getElementById("statsPanel"),
     statsBody: document.getElementById("statsBody"),
     statsBackButton: document.getElementById("statsBackButton"),
+    settingsButton: document.getElementById("settingsButton"),
+    settingsPanel: document.getElementById("settingsPanel"),
+    settingsBackButton: document.getElementById("settingsBackButton"),
     levelSelectButton: document.getElementById("levelSelectButton"),
     resetButton: document.getElementById("resetButton"),
     tutorialReplayButton: document.getElementById("tutorialReplayButton"),
@@ -2366,7 +2369,7 @@
     if (!screen) return "";
     const modeId = urlParams.get("mode");
     if (modeId && getModeLevels(modeId).length) selectedModeId = modeId;
-    if (["menu", "modes", "daily", "levels", "garage", "missions"].includes(screen)) return screen;
+    if (["menu", "modes", "daily", "levels", "garage", "missions", "stats", "settings"].includes(screen)) return screen;
     return "";
   }
 
@@ -2622,6 +2625,20 @@
     });
     if (els.statsBackButton) {
       els.statsBackButton.addEventListener("click", () => {
+        if (blockTutorialEscape()) return;
+        playSound("button");
+        show("menu");
+      });
+    }
+    if (els.settingsButton) {
+      els.settingsButton.addEventListener("click", () => {
+        if (blockTutorialEscape()) return;
+        playSound("button");
+        show("settings");
+      });
+    }
+    if (els.settingsBackButton) {
+      els.settingsBackButton.addEventListener("click", () => {
         if (blockTutorialEscape()) return;
         playSound("button");
         show("menu");

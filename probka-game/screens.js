@@ -7,7 +7,8 @@
     levels: "levelsPanel",
     garage: "garagePanel",
     missions: "missionsPanel",
-    stats: "statsPanel"
+    stats: "statsPanel",
+    settings: "settingsPanel"
   };
 
   function setVisibleView(els, view) {
@@ -634,27 +635,23 @@
         els.muteButton.setAttribute("aria-label", muted ? t("mute.on") : t("mute.off"));
         els.muteButton.setAttribute("aria-pressed", String(muted));
       }
-      if (els.soundToggleButton) {
-        const on = !state.settings.muted;
-        els.soundToggleButton.textContent = on ? t("settings.sound.on") : t("settings.sound.off");
-        els.soundToggleButton.setAttribute("aria-pressed", String(on));
-      }
-      if (els.hapticsToggleButton) {
-        const on = state.settings.haptics !== false;
-        els.hapticsToggleButton.textContent = on ? t("settings.haptics.on") : t("settings.haptics.off");
-        els.hapticsToggleButton.setAttribute("aria-pressed", String(on));
-      }
-      if (els.musicToggleButton) {
-        const on = Boolean(state.settings.music);
-        els.musicToggleButton.textContent = on ? t("settings.music.on") : t("settings.music.off");
-        els.musicToggleButton.setAttribute("aria-pressed", String(on));
-      }
+      const setToggleRow = (btn, on) => {
+        if (!btn) return;
+        const stateSpan = btn.querySelector(".settings-state");
+        if (stateSpan) stateSpan.textContent = on ? t("settings.state.on") : t("settings.state.off");
+        else btn.textContent = on ? t("settings.state.on") : t("settings.state.off");
+        btn.setAttribute("aria-pressed", String(on));
+        btn.classList.toggle("is-on", on);
+      };
+      setToggleRow(els.soundToggleButton, !state.settings.muted);
+      setToggleRow(els.hapticsToggleButton, state.settings.haptics !== false);
+      setToggleRow(els.musicToggleButton, Boolean(state.settings.music));
       if (els.topLangButton) {
         els.topLangButton.textContent = (window.PROBKA_LANG || "ru") === "ru" ? "RU" : "EN";
       }
       if (els.langToggleButton) {
-        const lang = window.PROBKA_LANG || "ru";
-        els.langToggleButton.textContent = lang === "ru" ? t("settings.lang.ru") : t("settings.lang.en");
+        const stateSpan = els.langToggleButton.querySelector(".settings-state");
+        if (stateSpan) stateSpan.textContent = t("settings.lang.value");
       }
       if (level && els.levelTitle) {
         const mode = deps.getLevelMode();
