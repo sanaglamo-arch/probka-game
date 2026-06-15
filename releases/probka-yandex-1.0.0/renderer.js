@@ -131,7 +131,6 @@
     images: {},
     callbacks: []
   };
-
   function loadSkinSprites(source, versionOrReady, onReady) {
     if (Array.isArray(source)) {
       loadIndividualSkinSprites(source, typeof versionOrReady === "string" ? versionOrReady : "", typeof versionOrReady === "function" ? versionOrReady : onReady);
@@ -670,7 +669,7 @@
     ctx.beginPath();
     ctx.rect(options.x, options.y, options.width, options.height);
     ctx.clip();
-    drawImageContain(ctx, image, options.x, options.y, options.width, options.height);
+    ctx.drawImage(image, options.x, options.y, options.width, options.height);
     ctx.restore();
     return true;
   }
@@ -1171,8 +1170,6 @@
       ctx.arc(x + width * 0.58, y + height * 0.65, height * 0.035, 0, Math.PI * 2);
       ctx.fill();
     } else if (skin.pattern === "neon") {
-      ctx.shadowColor = accent;
-      ctx.shadowBlur = 12;
       ctx.beginPath();
       ctx.moveTo(x + width * 0.12, y + height * 0.7);
       ctx.lineTo(x + width * 0.88, y + height * 0.7);
@@ -1230,8 +1227,6 @@
       ctx.stroke();
     } else if (skin.pattern === "cyber") {
       ctx.strokeStyle = accent;
-      ctx.shadowColor = accent;
-      ctx.shadowBlur = 10;
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(x + width * 0.16, y + height * 0.62);
@@ -1294,7 +1289,8 @@
     const pos = options.position;
     const palette = getYardPalette(options);
     const obstacleKind = obstacle.kind || "bin";
-    const pad = cellSize * 0.22;
+    const themedSprite = getYardObstacleSprite(options.yardTheme || {}, obstacleKind);
+    const pad = themedSprite ? cellSize * 0.02 : cellSize * 0.22;
     const x = pos.x + pad;
     const y = pos.y + pad;
     const size = cellSize - pad * 2;
@@ -1316,7 +1312,6 @@
     ctx.shadowBlur = 7;
     ctx.shadowOffsetY = 3;
 
-    const themedSprite = getYardObstacleSprite(options.yardTheme || {}, obstacleKind);
     if (themedSprite) {
       drawImageContain(ctx, themedSprite, x, y, size, size);
       ctx.restore();
@@ -1604,8 +1599,7 @@
     }
     ctx.restore();
     const exitLaneY = level.exit.row * cellSize;
-    const usesCurbExit = true;
-    ctx.fillStyle = usesCurbExit ? colorWithAlpha(palette.exitGlow, 0.045) : palette.exitLane;
+    ctx.fillStyle = colorWithAlpha(palette.exitGlow, 0.045);
     ctx.fillRect(cellSize * 0.08, exitLaneY + cellSize * 0.24, boardWidth - cellSize * 0.08, cellSize * 0.52);
 
     const lineWidth = Math.max(1, Math.min(2, cellSize * 0.04));
@@ -1780,6 +1774,7 @@
     const cellSize = options.cellSize;
     const width = vehicle.axis === "horizontal" ? vehicle.length * cellSize : cellSize;
     const height = vehicle.axis === "vertical" ? vehicle.length * cellSize : cellSize;
+    const fullBoardPreview = usesFullArtBoard(options.yardTheme, options.level || {});
     const pad = fullBoardPreview ? cellSize * 0.02 : cellSize * 0.1;
     return {
       x: pos.x + pad,
@@ -1861,8 +1856,8 @@
     drawTutorialGhost(ctx, vehicle, targetRect, options, pulse);
     options.drawVehicle(vehicle);
     drawTutorialVehicleRing(ctx, currentRect, options, pulse);
-    drawTutorialBadge(ctx, hint.sourceLabel || "Тащи эту", currentRect.x, currentRect.y - options.cellSize * 0.2, "source", options);
-    drawTutorialBadge(ctx, hint.targetLabel || "Сюда", targetRect.x + targetRect.width * 0.5, targetRect.y + targetRect.height + options.cellSize * 0.12, "target", options);
+    // Текстовые бейджи на поле убраны — направляют кольцо вокруг машины,
+    // пунктирный путь и призрак-цель; инструкция есть на карточке.
   }
 
   function drawTutorialPath(ctx, fromRect, toRect, options, pulse) {
@@ -2063,33 +2058,19 @@
     const roadY = y + (cellSize - roadHeight) / 2;
     const outWidth = Math.max(20, Math.min(boardPad * 0.78, cellSize * 0.62));
     const curbHeight = Math.max(5, cellSize * 0.14);
-    const markerWidth = Math.max(10, cellSize * 0.18);
-    const markerX = x - markerWidth * 1.16;
-    const markerY = roadY + cellSize * 0.05;
-    const markerHeight = roadHeight - cellSize * 0.1;
     const curbColor = env === "forest_parking" ? "#c4bba0" : env === "winter_premium" ? "#dcecf4" : palette.curb;
     const curbShadow = env === "forest_parking" ? "rgba(34, 31, 20, 0.42)" : "rgba(0, 0, 0, 0.28)";
     const roadColor = env === "winter_premium" ? "rgba(42, 57, 70, 0.82)" : env === "forest_parking" ? "rgba(30, 34, 29, 0.9)" : "rgba(14, 18, 24, 0.78)";
-    const hazard = palette.hazard || "#d9aa36";
-    const hazardDark = palette.hazardDark || "#17191c";
 
     if (options.foregroundOnly) {
+      // Поверх машины дорисовываем только торцы бордюров проезда,
+      // чтобы выезд сохранял объем; предупреждающих полос здесь нет.
       ctx.save();
-      ctx.shadowColor = "rgba(0, 0, 0, 0.38)";
-      ctx.shadowBlur = 5;
-      ctx.shadowOffsetY = 2;
-      roundedRect(ctx, markerX, markerY, markerWidth, markerHeight, 3);
-      ctx.clip();
-      ctx.fillStyle = hazardDark;
-      ctx.fillRect(markerX, markerY, markerWidth, markerHeight);
-      ctx.strokeStyle = hazard;
-      ctx.lineWidth = Math.max(3, markerWidth * 0.6);
-      for (let i = -2; i < 5; i += 1) {
-        ctx.beginPath();
-        ctx.moveTo(markerX - markerWidth + i * markerWidth * 0.9, markerY + markerHeight);
-        ctx.lineTo(markerX + i * markerWidth * 0.9, markerY);
-        ctx.stroke();
-      }
+      ctx.fillStyle = curbColor;
+      roundedRect(ctx, x - cellSize * 0.06, roadY - curbHeight * 1.45, cellSize * 0.12, curbHeight, 4);
+      ctx.fill();
+      roundedRect(ctx, x - cellSize * 0.06, roadY + roadHeight + curbHeight * 0.35, cellSize * 0.12, curbHeight, 4);
+      ctx.fill();
       ctx.restore();
       return;
     }
@@ -2140,20 +2121,15 @@
     roundedRect(ctx, x - cellSize * 0.12, roadY + roadHeight * 0.18, outWidth * 0.44, Math.max(1, cellSize * 0.035), 999);
     ctx.fill();
 
-    ctx.save();
-    roundedRect(ctx, markerX, markerY, markerWidth, markerHeight, 3);
-    ctx.clip();
-    ctx.fillStyle = hazardDark;
-    ctx.fillRect(markerX, markerY, markerWidth, markerHeight);
-    ctx.strokeStyle = hazard;
-    ctx.lineWidth = Math.max(3, markerWidth * 0.6);
-    for (let i = -2; i < 5; i += 1) {
-      ctx.beginPath();
-      ctx.moveTo(markerX - markerWidth + i * markerWidth * 0.9, markerY + markerHeight);
-      ctx.lineTo(markerX + i * markerWidth * 0.9, markerY);
-      ctx.stroke();
-    }
-    ctx.restore();
+    // Осевая разметка проезда вместо предупреждающего блока
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.26)";
+    ctx.lineWidth = Math.max(1.5, cellSize * 0.035);
+    ctx.setLineDash([cellSize * 0.14, cellSize * 0.12]);
+    ctx.beginPath();
+    ctx.moveTo(x - cellSize * 0.1, roadY + roadHeight / 2);
+    ctx.lineTo(x + outWidth + cellSize * 0.04, roadY + roadHeight / 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
 
     ctx.strokeStyle = colorWithAlpha(palette.exitGlow, 0.18 + pulse * 0.22);
     ctx.lineWidth = Math.max(1, cellSize * 0.025);
@@ -2189,6 +2165,28 @@
       ctx.beginPath();
       ctx.arc(x + Math.cos(angle) * distance, y + Math.sin(angle) * distance, Math.max(3, cellSize * 0.06), 0, Math.PI * 2);
       ctx.fill();
+    }
+
+    // Конфетти-вспышка: детерминированные разлетающиеся прямоугольники
+    // с гравитацией, вращением и затуханием (без Math.random для повторяемости).
+    const frac = (v) => v - Math.floor(v);
+    const rand = (i, s) => frac(Math.sin((i + 1) * 12.9898 + s * 78.233) * 43758.5453);
+    const confetti = [palette.win, palette.winCoin, "#85b8ff", "#f2828d", "#6fd9a8", "#ffd97e"];
+    const fade = Math.max(0, 1 - progress * 1.05);
+    for (let i = 0; i < 26; i += 1) {
+      const angle = rand(i, 1) * Math.PI * 2;
+      const speed = 0.8 + rand(i, 2) * 1.5;
+      const dist = cellSize * speed * (0.6 + progress * 2.3);
+      const px = x + Math.cos(angle) * dist;
+      const py = y + Math.sin(angle) * dist + cellSize * progress * progress * 1.7;
+      const size = cellSize * (0.05 + rand(i, 3) * 0.045);
+      ctx.save();
+      ctx.globalAlpha = fade;
+      ctx.fillStyle = confetti[i % confetti.length];
+      ctx.translate(px, py);
+      ctx.rotate(angle + progress * (4 + rand(i, 1) * 4));
+      ctx.fillRect(-size / 2, -size / 4, size, size / 2);
+      ctx.restore();
     }
     ctx.restore();
     return false;
@@ -2308,13 +2306,10 @@
       }
       ctx.stroke();
     } else if (env === "neon") {
-      ctx.shadowColor = colorWithAlpha(palette.border, 0.52);
-      ctx.shadowBlur = 9;
       ctx.strokeStyle = colorWithAlpha(palette.border, 0.55);
       ctx.lineWidth = Math.max(1, cellSize * 0.018);
       roundedRect(ctx, x + 2, y + 2, width - 4, height - 4, Math.max(4, cellSize * 0.1));
       ctx.stroke();
-      ctx.shadowBlur = 0;
       ctx.fillStyle = colorWithAlpha(palette.exit, 0.22);
       roundedRect(ctx, x + width * 0.18, y + height * 0.78, width * 0.58, Math.max(2, height * 0.08), 3);
       ctx.fill();
@@ -2322,8 +2317,6 @@
       const lights = [palette.winCoin || "#ffd166", palette.exit || "#70d59c", "#ff7a86"];
       for (let i = 0; i < 3; i += 1) {
         ctx.fillStyle = lights[i % lights.length];
-        ctx.shadowColor = lights[i % lights.length];
-        ctx.shadowBlur = 4;
         ctx.beginPath();
         ctx.arc(x + width * (0.26 + i * 0.22), y + height * 0.16, Math.max(1.6, cellSize * 0.025), 0, Math.PI * 2);
         ctx.fill();
@@ -2339,13 +2332,26 @@
       axis,
       length: options.length || (axis === "horizontal" ? Math.max(2, Math.round(width / cellSize)) : Math.max(2, Math.round(height / cellSize)))
     };
-    ctx.save();
-    ctx.fillStyle = "rgba(0,0,0,0.2)";
-    roundedRect(ctx, x + width * 0.08, y + height * 0.8, width * 0.84, height * 0.18, 5);
-    ctx.fill();
-    ctx.restore();
 
-    if (!isTarget && drawYardTrafficSprite(ctx, { vehicle, x, y, width, height, axis, cellSize, yardTheme, paintColor: color })) return;
+    if (!isTarget) {
+      const bodyPad = cellSize * 0.12;
+      const spritePad = cellSize * 0.02;
+      const spriteX = x - bodyPad + spritePad;
+      const spriteY = y - bodyPad + spritePad;
+      const spriteWidth = width + bodyPad * 2 - spritePad * 2;
+      const spriteHeight = height + bodyPad * 2 - spritePad * 2;
+      if (drawYardTrafficSprite(ctx, {
+        vehicle,
+        x: spriteX,
+        y: spriteY,
+        width: spriteWidth,
+        height: spriteHeight,
+        axis,
+        cellSize,
+        yardTheme,
+        paintColor: color
+      })) return;
+    }
 
     ctx.save();
     const gradient = axis === "horizontal" ? ctx.createLinearGradient(x, y, x, y + height) : ctx.createLinearGradient(x, y, x + width, y);
@@ -2379,6 +2385,7 @@
     drawVehicleThemeOverlay(ctx, { x, y, width, height, axis, cellSize, yardTheme });
   }
 
+  const yardPreviewCache = {};
   function renderYardPreview(canvas, yardTheme) {
     const ctx = canvas && canvas.getContext ? canvas.getContext("2d") : null;
     if (!ctx) return;
@@ -2391,70 +2398,52 @@
       canvas.width = pixelWidth;
       canvas.height = pixelHeight;
     }
-    ctx.save();
-    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    ctx.clearRect(0, 0, cssWidth, cssHeight);
+    const w = cssWidth;
+    const h = cssHeight;
+    const pal = yardTheme.palette || {};
+    const base = pal.base || "#151b24";
+    const id = yardTheme.id || "yard";
 
-    const level = { id: `preview_${yardTheme.id || "yard"}`, width: 6, height: 6, exit: { row: 2 }, targetVehicleId: "target" };
-    const fullBoardPreview = usesFullArtBoard(yardTheme, level);
-    const previewSize = Math.min(cssWidth, cssHeight);
-    const frame = fullBoardPreview && yardTheme.gridFrame ? yardTheme.gridFrame : null;
-    const boardPad = frame ? Math.max(7, Math.round(previewSize * frame.left / 1024)) : 9;
-    const cellSize = Math.floor(Math.min((cssWidth - boardPad * 2) / 6, (cssHeight - boardPad * 2) / 6));
-    const boardPixelSize = cellSize * 6 + boardPad * 2;
-    const offsetX = Math.max(0, (cssWidth - boardPixelSize) / 2);
-    const offsetY = fullBoardPreview ? Math.max(0, (cssHeight - boardPixelSize) / 2) : 0;
-    ctx.translate(offsetX, offsetY);
-    drawYard(ctx, {
-      level,
-      cellSize,
-      boardPad,
-      width: boardPixelSize,
-      height: fullBoardPreview ? boardPixelSize : cssHeight,
-      yardTheme
-    });
-
-    const toScreen = (gridX, gridY) => ({ x: boardPad + gridX * cellSize, y: boardPad + gridY * cellSize });
-    const obstacles = [
-      { id: "preview_bin", kind: "bin", x: 0, y: 4 },
-      { id: "preview_gate", kind: "gate", x: 4, y: 0 },
-      { id: "preview_cone", kind: getYardEnvironment(yardTheme) === "winter" ? "snow" : "cone", x: 5, y: 3 }
-    ];
-    obstacles.forEach((obstacle) => {
-      drawObstacle(ctx, obstacle, {
-        cellSize,
-        levelId: level.id,
-        yardTheme,
-        position: toScreen(obstacle.x, obstacle.y)
-      });
-    });
-
-    const pad = cellSize * 0.1;
-    const drawCar = (vehicle) => {
-      const pos = toScreen(vehicle.x, vehicle.y);
-      const width = (vehicle.axis === "horizontal" ? vehicle.length : 1) * cellSize - pad * 2;
-      const height = (vehicle.axis === "vertical" ? vehicle.length : 1) * cellSize - pad * 2;
-      drawPreviewVehicle(ctx, {
-        x: pos.x + pad,
-        y: pos.y + pad,
-        width,
-        height,
-        length: vehicle.length,
-        axis: vehicle.axis,
-        color: vehicle.color,
-        isTarget: vehicle.id === "target",
-        yardTheme,
-        cellSize
-      });
+    const overlay = () => {
+      // Лёгкий блик сверху + затемнение снизу — цельность коллекции.
+      const top = ctx.createLinearGradient(0, 0, 0, h);
+      top.addColorStop(0, "rgba(255, 255, 255, 0.08)");
+      top.addColorStop(0.4, "rgba(0, 0, 0, 0)");
+      top.addColorStop(1, "rgba(0, 0, 0, 0.28)");
+      ctx.fillStyle = top;
+      ctx.fillRect(0, 0, w, h);
     };
-    [
-      { id: "side_a", x: 0, y: 1, length: 2, axis: "vertical", color: "#66b6ff" },
-      { id: "target", x: 1, y: 2, length: 2, axis: "horizontal", color: "#ef5364" },
-      { id: "side_b", x: 3, y: 4, length: 2, axis: "horizontal", color: "#f0bd5a" },
-      { id: "side_c", x: 3, y: 1, length: 2, axis: "horizontal", color: "#68d3a3" }
-    ].forEach(drawCar);
 
-    ctx.restore();
+    const paint = (image) => {
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+      // cover-fit настоящей картинки двора
+      const ir = image.width / image.height;
+      const cr = w / h;
+      let dw;
+      let dh;
+      if (ir > cr) { dh = h; dw = h * ir; } else { dw = w; dh = w / ir; }
+      ctx.drawImage(image, (w - dw) / 2, (h - dh) / 2, dw, dh);
+      overlay();
+    };
+
+    let img = yardPreviewCache[id];
+    if (img && img.complete && img.naturalWidth) {
+      paint(img);
+      return;
+    }
+    // Пока картинка грузится — базовый цвет двора (не пусто).
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = base;
+    ctx.fillRect(0, 0, w, h);
+    if (!img) {
+      img = new Image();
+      yardPreviewCache[id] = img;
+      img.onload = () => { try { paint(img); } catch (err) { /* canvas мог исчезнуть */ } };
+      img.onerror = () => { yardPreviewCache[id] = null; };
+      img.src = `./assets/yards/${id}/preview.jpg`;
+    }
   }
 
   function isCanvasNonBlank(canvas) {

@@ -1,7 +1,8 @@
 (function () {
   const root = typeof window !== "undefined" ? window : globalThis;
 
-  const GRID_FRAME = { left: 120, top: 120, right: 904, bottom: 904 };
+  const GRID_FRAME = { left: 125, top: 125, right: 845, bottom: 845 };
+  const WIDE_VISUAL_EXIT_FRAME = { x: 845, y: 305, right: 1024, bottom: 708 };
 
   const ID_MIGRATIONS = {
     old_district: "old_block_yard",
@@ -18,7 +19,7 @@
       environment: "quiet_city",
       description: "Чистый асфальт, аккуратный бордюр и спокойная разметка.",
       palette: { accent: "#78adff", line: "#d9b766", exit: "#77d7a6", base: "#151b24" },
-      assetVersion: "quiet-v2",
+      assetVersion: "quiet-v6-art1",
       gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
@@ -30,8 +31,8 @@
       environment: "night_city",
       description: "Темный асфальт, теплые фонари и мягкие блики на машинах.",
       palette: { accent: "#ffb86b", line: "#c88b45", exit: "#57c995", base: "#090c14" },
-      assetVersion: "night-v2",
-      gridFrame: { left: 132, top: 174, right: 824, bottom: 866 }
+      assetVersion: "night-v6-art1",
+      gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
       id: "winter_yard",
@@ -42,8 +43,8 @@
       environment: "winter_premium",
       description: "Снег по краям, следы шин, ледяной бордюр и зимние машины.",
       palette: { accent: "#8fd4ff", line: "#e7edf5", exit: "#65cba1", base: "#d5e8f4" },
-      assetVersion: "winter-v5",
-      gridFrame: { left: 145, top: 145, right: 840, bottom: 840 }
+      assetVersion: "winter-v9-art1",
+      gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
       id: "forest_yard",
@@ -54,8 +55,8 @@
       environment: "forest_parking",
       description: "Каменная плитка, мох, листья, лесной бордюр и природный выезд.",
       palette: { accent: "#8aa265", line: "#d0b34c", exit: "#d0b34c", base: "#11190f" },
-      assetVersion: "forest-v5",
-      gridFrame: { left: 165, top: 165, right: 825, bottom: 825 }
+      assetVersion: "forest-v9-art1",
+      gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
       id: "rainy_yard",
@@ -66,8 +67,8 @@
       environment: "rainy_yard",
       description: "Мокрый асфальт, лужи, отражения разметки и блеск на кузове.",
       palette: { accent: "#7dbbff", line: "#9dc9d3", exit: "#6ee5b2", base: "#0a1218" },
-      assetVersion: "rainy-v2",
-      gridFrame: { left: 132, top: 132, right: 817, bottom: 817 }
+      assetVersion: "rainy-v6-art1",
+      gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
       id: "underground_parking",
@@ -78,8 +79,8 @@
       environment: "underground_parking",
       description: "Бетон, колонны, строгая разметка и холодный свет ламп.",
       palette: { accent: "#b9c6d8", line: "#e1be55", exit: "#58c98f", base: "#191c22" },
-      assetVersion: "underground-v2",
-      gridFrame: { left: 155, top: 155, right: 816, bottom: 816 }
+      assetVersion: "underground-v6-art1",
+      gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
       id: "business_center",
@@ -90,8 +91,8 @@
       environment: "business_center",
       description: "Чистая парковка, ровные линии, стеклянный холодный свет.",
       palette: { accent: "#78adff", line: "#b8c6d8", exit: "#5fd0a0", base: "#101824" },
-      assetVersion: "business-v2",
-      gridFrame: { left: 160, top: 160, right: 832, bottom: 832 }
+      assetVersion: "business-v7-art1",
+      gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
       id: "old_block_yard",
@@ -102,8 +103,8 @@
       environment: "old_block",
       description: "Потертый асфальт, трещины, ржавые детали и выцветшая разметка.",
       palette: { accent: "#7fac72", line: "#b7a05a", exit: "#64bd86", base: "#1e211a" },
-      assetVersion: "oldblock-v2",
-      gridFrame: { left: 150, top: 150, right: 820, bottom: 820 }
+      assetVersion: "oldblock-v6-art1",
+      gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
       id: "neon_yard",
@@ -114,8 +115,8 @@
       environment: "neon_yard",
       description: "Темная база, cyan/purple линии и сдержанные неоновые отражения.",
       palette: { accent: "#b889ff", line: "#5ff2ff", exit: "#66f2b6", base: "#090a18" },
-      assetVersion: "neon-v2",
-      gridFrame: { left: 150, top: 150, right: 835, bottom: 835 }
+      assetVersion: "neon-v6-art1",
+      gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
       id: "holiday_yard",
@@ -126,8 +127,8 @@
       environment: "holiday_yard",
       description: "Теплый свет, гирлянды по краям и праздничные детали без шума.",
       palette: { accent: "#ff7a86", line: "#ffd166", exit: "#70d59c", base: "#251615" },
-      assetVersion: "holiday-v1",
-      gridFrame: { left: 140, top: 140, right: 829, bottom: 829 }
+      assetVersion: "holiday-v5-art1",
+      gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     }
   ];
 
@@ -139,6 +140,7 @@
     const base = `./assets/yards/${id}`;
     return {
       board: withVersion(`${base}/board.png`, version),
+      preview: withVersion(`${base}/preview.jpg`, version),
       traffic: {
         car2Horizontal: withVersion(`${base}/traffic/car-2-h.png`, version),
         car2Vertical: withVersion(`${base}/traffic/car-2-v.png`, version),
@@ -197,6 +199,7 @@
     board: { width: 1024, height: 1024 },
     gridFrame: GRID_FRAME,
     exitFrame: makeExitFrame(GRID_FRAME),
+    wideVisualExitFrame: WIDE_VISUAL_EXIT_FRAME,
     vehicles: {
       car2Horizontal: { width: 768, height: 384 },
       car2Vertical: { width: 384, height: 768 },

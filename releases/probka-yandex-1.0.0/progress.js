@@ -6,7 +6,17 @@
     const storageKey = options.storageKey;
     const progressVersion = options.progressVersion || 2;
     const isAssetShowcase = options.isAssetShowcase;
+    const unlockAllYards = options.unlockAllYards;
+    const yards = options.yards || [];
     const yandex = options.yandex;
+
+    function defaultOwnedYards() {
+      const owned = { quiet_yard: true };
+      if (unlockAllYards) yards.forEach((yard) => {
+        owned[yard.id] = true;
+      });
+      return owned;
+    }
 
     function defaultProgress() {
       return {
@@ -19,11 +29,11 @@
         hints: 3,
         completed: {},
         unlocked: Object.fromEntries(modes.map((mode) => [getModeLevels(mode.id)[0]?.id, true]).filter(([id]) => id)),
-        ad: { levelsSinceInterstitial: 0, completedLevels: 0 },
+        ad: { levelsSinceInterstitial: 0, completedLevels: 0, lastInterstitialAt: 0 },
         garage: {
           ownedSkins: { classic_red: true },
           equippedSkinId: "classic_red",
-          ownedYards: { quiet_yard: true },
+          ownedYards: defaultOwnedYards(),
           equippedYardId: "quiet_yard"
         },
         daily: {
@@ -34,7 +44,7 @@
         },
         missions: { dateKey: "", records: {} },
         tutorial: { completedVersion: 0 },
-        settings: { muted: false }
+        settings: { muted: false, haptics: true, lang: null, music: false }
       };
     }
 
@@ -48,6 +58,9 @@
       Object.entries(yardMigrations).forEach(([oldId, newId]) => {
         if (ownedYards[oldId]) ownedYards[newId] = true;
         delete ownedYards[oldId];
+      });
+      if (unlockAllYards) yards.forEach((yard) => {
+        ownedYards[yard.id] = true;
       });
       const equippedYardId = yardMigrations[rawGarage.equippedYardId] || rawGarage.equippedYardId || defaults.garage.equippedYardId;
       return {

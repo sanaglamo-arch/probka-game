@@ -1,6 +1,9 @@
 (function () {
   function createController(deps) {
     let isOpen = false;
+    const t = (typeof window !== "undefined" && window.PROBKA_TEXTS && window.PROBKA_TEXTS.t)
+      ? window.PROBKA_TEXTS.t.bind(window.PROBKA_TEXTS)
+      : ((k) => k);
 
     function getIsOpen() {
       return isOpen;
@@ -18,7 +21,7 @@
         return true;
       }
       deps.playSound("bump");
-      deps.showToast("Реклама недоступна");
+      deps.showToast(t("toast.adUnavailable"));
       if (options.onUnavailable) options.onUnavailable(result);
       return false;
     }
