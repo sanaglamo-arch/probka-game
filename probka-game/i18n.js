@@ -272,10 +272,10 @@
       "tutorial.mini.0.button": "Поехали",
       "tutorial.mini.1.label": "Шаг 1 из 2",
       "tutorial.mini.1.title": "Освободи путь",
-      "tutorial.mini.1.text": "Тащи зелёную машину вниз. Машины едут только вдоль корпуса.",
+      "tutorial.mini.1.text": "Сдвинь машину вниз — за подсветкой на поле. Машины едут только вдоль корпуса.",
       "tutorial.mini.2.label": "Шаг 2 из 2",
       "tutorial.mini.2.title": "Газуй!",
-      "tutorial.mini.2.text": "Тащи красную машину вправо до выезда.",
+      "tutorial.mini.2.text": "Теперь выкати красную машину вправо к выезду.",
 
       // Tutorial menu cards
       "tutorial.card.0.title": "Продолжить игру",
@@ -686,10 +686,10 @@
       "tutorial.mini.0.button": "Let's go",
       "tutorial.mini.1.label": "Step 1 of 2",
       "tutorial.mini.1.title": "Clear the path",
-      "tutorial.mini.1.text": "Drag the green car down. Cars only move along their body.",
+      "tutorial.mini.1.text": "Slide the highlighted car down. Cars only move along their body.",
       "tutorial.mini.2.label": "Step 2 of 2",
       "tutorial.mini.2.title": "Drive!",
-      "tutorial.mini.2.text": "Drag the red car right to the exit.",
+      "tutorial.mini.2.text": "Now roll the red car right to the exit.",
 
       // Tutorial menu cards
       "tutorial.card.0.title": "Continue",

@@ -1856,8 +1856,8 @@
     drawTutorialGhost(ctx, vehicle, targetRect, options, pulse);
     options.drawVehicle(vehicle);
     drawTutorialVehicleRing(ctx, currentRect, options, pulse);
-    drawTutorialBadge(ctx, hint.sourceLabel || "Тащи эту", currentRect.x, currentRect.y - options.cellSize * 0.2, "source", options);
-    drawTutorialBadge(ctx, hint.targetLabel || "Сюда", targetRect.x + targetRect.width * 0.5, targetRect.y + targetRect.height + options.cellSize * 0.12, "target", options);
+    // Текстовые бейджи на поле убраны — направляют кольцо вокруг машины,
+    // пунктирный путь и призрак-цель; инструкция есть на карточке.
   }
 
   function drawTutorialPath(ctx, fromRect, toRect, options, pulse) {

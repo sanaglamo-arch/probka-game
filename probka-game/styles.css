@@ -2950,7 +2950,9 @@ canvas.skin-preview-sprite::after {
 
 /* ---------- обучение ---------- */
 
-body.tutorial-active .tutorial-overlay::before {
+/* Сильное затемнение — только во время тура по разделам (фаза cards).
+   Во время ходов на поле доска НЕ затемняется. */
+body.tutorial-active[data-tutorial-phase="cards"] .tutorial-overlay::before {
   content: "";
   position: fixed;
   inset: 0;
