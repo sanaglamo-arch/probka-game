@@ -14,7 +14,7 @@
     const self = window.PROBKA_TEXTS;
     if (self && self.formatCoinAmountI18n) return self.formatCoinAmountI18n(value, options);
     const amount = Math.max(0, Math.round(value || 0));
-    const suffix = options.short ? "мон." : plural(amount, ["монета", "монеты", "монет"]);
+    const suffix = options.short ? "жет." : plural(amount, ["жетон", "жетона", "жетонов"]);
     return `${amount} ${suffix}`;
   }
 

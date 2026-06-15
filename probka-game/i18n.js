@@ -11,7 +11,7 @@
       // Topbar / brand
       "brand.eyebrow": "Головоломка",
       "brand.title": "Пробка во дворе",
-      "wallet.aria": "Монеты",
+      "wallet.aria": "Жетоны",
 
       // Hub hero
       "hub.levelPrefix": "Уровень",
@@ -34,7 +34,7 @@
       "dailyCard.subtitle": "Один сложный пазл",
       "dailyCard.badge": "сложно",
       "dailyCard.statusDone": "Пройден · ${stars}",
-      "dailyCard.statusOpen": "До ${coins} монет",
+      "dailyCard.statusOpen": "До ${coins} жетонов",
 
       // Hub nav
       "nav.levels.title": "Уровни",
@@ -95,7 +95,7 @@
       "daily.overview.today": "Сегодня · ${date}",
       "daily.overview.done": "Пройдено на ${stars}★",
       "daily.overview.open": "Двор дня",
-      "daily.overview.subtitle": "${minMoves} оптимальных ходов · награда до ${coins} монет",
+      "daily.overview.subtitle": "${minMoves} оптимальных ходов · награда до ${coins} жетонов",
       "daily.overview.playAgain": "Играть еще",
       "daily.overview.start": "Начать",
 
@@ -158,7 +158,7 @@
       "garage.equip.btn.equipped": "Надето",
       "garage.equip.btn.equip": "Надеть",
       "garage.equip.btn.buy": "Купить",
-      "garage.equip.btn.locked": "Не хватает монет",
+      "garage.equip.btn.locked": "Не хватает жетонов",
       "garage.preview.aria": "Предпросмотр: ${name}",
 
       // Garage rarity
@@ -196,7 +196,7 @@
       "stats.tile.daily": "Дней пройдено",
       "stats.tile.bestStreak": "Лучшая серия",
       "stats.tile.streak": "Текущая серия",
-      "stats.tile.coins": "Монеты",
+      "stats.tile.coins": "Жетоны",
       "stats.section.modes": "Прогресс по режимам",
 
       // HUD
@@ -209,7 +209,7 @@
       "hud.levelTitle.daily": "${title} · ${date}",
       "hud.levelTitle.campaign": "${title}",
       "hud.modeStatus": "${modeTitle} · уровень ${n}",
-      "hud.dailyBtn.aria": "Уровень дня, награда до ${coins} монет",
+      "hud.dailyBtn.aria": "Уровень дня, награда до ${coins} жетонов",
 
       // HUD tools
       "tool.undo.title": "Отмена",
@@ -285,9 +285,9 @@
       "tutorial.card.2.title": "Уровни",
       "tutorial.card.2.text": "Три режима и сотни уровней — от лёгких до хитрых.",
       "tutorial.card.3.title": "Гараж",
-      "tutorial.card.3.text": "Открывай новые машины и дворы за монеты.",
+      "tutorial.card.3.text": "Открывай новые машины и дворы за жетоны.",
       "tutorial.card.4.title": "Миссии",
-      "tutorial.card.4.text": "Выполняй ежедневные задания и получай монеты.",
+      "tutorial.card.4.text": "Выполняй ежедневные задания и получай жетоны.",
       "tutorial.card.5.title": "Статистика",
       "tutorial.card.5.text": "Здесь твой прогресс, рекорды и серии.",
 
@@ -317,14 +317,14 @@
       "toast.dailyNoSkip": "Уровень дня нельзя пропустить",
       "toast.dailyNoDouble": "Уровень дня не удваивается",
       "toast.nothingToDouble": "Нечего удваивать",
-      "toast.notEnoughCoins": "Не хватает монет",
+      "toast.notEnoughCoins": "Не хватает жетонов",
       "toast.searching": "Ищу лучший ход",
       "toast.skinEquipped": "${name}: надето",
       "toast.skinBought": "${name}: куплено",
       "toast.archiveUnlocked": "Архив ${date} открыт",
-      "toast.missionsReward": "Миссии: +${coins} монет",
-      "toast.dailyReward.today": "Уровень дня: +${coins} монет",
-      "toast.dailyReward.archive": "Архив: +${coins} монет",
+      "toast.missionsReward": "Миссии: +${coins} жетонов",
+      "toast.dailyReward.today": "Уровень дня: +${coins} жетонов",
+      "toast.dailyReward.archive": "Архив: +${coins} жетонов",
 
       // Rewarded ad dialog
       "rewarded.hint.title": "Подсказка",
@@ -332,26 +332,26 @@
       "rewarded.skip.title": "Пропуск уровня",
       "rewarded.skip.text": "После короткого ролика следующий двор откроется сразу.",
       "rewarded.double.title": "Удвоить награду",
-      "rewarded.double.text": "После рекламного ролика монеты за уровень удвоятся.",
+      "rewarded.double.text": "После рекламного ролика жетоны за уровень удвоятся.",
       "rewarded.archive.title": "Архив уровня дня",
       "rewarded.archive.text": "После ролика откроется выбранный архивный уровень.",
 
       // Campaign reward labels
-      "reward.coins": "+${n} монет",
-      "reward.coinsTimed": "+${n} монет · ${time}",
-      "reward.alreadyClaimed": "Монеты уже получены",
+      "reward.coins": "+${n} жетонов",
+      "reward.coinsTimed": "+${n} жетонов · ${time}",
+      "reward.alreadyClaimed": "Жетоны уже получены",
       "reward.missionSuffix": "миссии +${n}",
-      "reward.daily.earned": "+${total} монет за сегодня",
+      "reward.daily.earned": "+${total} жетонов за сегодня",
       "reward.daily.streak": "серия +${n}",
       "reward.daily.claimed": "Награда дня уже получена",
-      "reward.archive.earned": "Архив ${date} · +${coins} монет",
+      "reward.archive.earned": "Архив ${date} · +${coins} жетонов",
       "reward.archive.done": "Архив уже закрыт на лучший результат",
 
       // Coin amount formatting
-      "coin.form.1": "монета",
-      "coin.form.2": "монеты",
-      "coin.form.3": "монет",
-      "coin.short": "мон.",
+      "coin.form.1": "жетон",
+      "coin.form.2": "жетона",
+      "coin.form.3": "жетонов",
+      "coin.short": "жет.",
 
       // Move plural forms
       "move.form.1": "ход",
@@ -425,7 +425,7 @@
       // Topbar / brand
       "brand.eyebrow": "Puzzle",
       "brand.title": "Yard Traffic Jam",
-      "wallet.aria": "Coins",
+      "wallet.aria": "Tokens",
 
       // Hub hero
       "hub.levelPrefix": "Level",
@@ -448,7 +448,7 @@
       "dailyCard.subtitle": "One tough puzzle",
       "dailyCard.badge": "hard",
       "dailyCard.statusDone": "Solved · ${stars}",
-      "dailyCard.statusOpen": "Up to ${coins} coins",
+      "dailyCard.statusOpen": "Up to ${coins} tokens",
 
       // Hub nav
       "nav.levels.title": "Levels",
@@ -509,7 +509,7 @@
       "daily.overview.today": "Today · ${date}",
       "daily.overview.done": "Solved with ${stars}★",
       "daily.overview.open": "Today's yard",
-      "daily.overview.subtitle": "${minMoves} optimal moves · reward up to ${coins} coins",
+      "daily.overview.subtitle": "${minMoves} optimal moves · reward up to ${coins} tokens",
       "daily.overview.playAgain": "Play again",
       "daily.overview.start": "Start",
 
@@ -572,7 +572,7 @@
       "garage.equip.btn.equipped": "Equipped",
       "garage.equip.btn.equip": "Equip",
       "garage.equip.btn.buy": "Buy",
-      "garage.equip.btn.locked": "Not enough coins",
+      "garage.equip.btn.locked": "Not enough tokens",
       "garage.preview.aria": "Preview: ${name}",
 
       // Garage rarity
@@ -610,7 +610,7 @@
       "stats.tile.daily": "Daily levels done",
       "stats.tile.bestStreak": "Best streak",
       "stats.tile.streak": "Current streak",
-      "stats.tile.coins": "Coins",
+      "stats.tile.coins": "Tokens",
       "stats.section.modes": "Mode progress",
 
       // HUD
@@ -623,7 +623,7 @@
       "hud.levelTitle.daily": "${title} · ${date}",
       "hud.levelTitle.campaign": "${title}",
       "hud.modeStatus": "${modeTitle} · level ${n}",
-      "hud.dailyBtn.aria": "Daily level, reward up to ${coins} coins",
+      "hud.dailyBtn.aria": "Daily level, reward up to ${coins} tokens",
 
       // HUD tools
       "tool.undo.title": "Undo",
@@ -699,9 +699,9 @@
       "tutorial.card.2.title": "Levels",
       "tutorial.card.2.text": "Three modes and hundreds of levels, from easy to tricky.",
       "tutorial.card.3.title": "Garage",
-      "tutorial.card.3.text": "Unlock new cars and yards with coins.",
+      "tutorial.card.3.text": "Unlock new cars and yards with tokens.",
       "tutorial.card.4.title": "Missions",
-      "tutorial.card.4.text": "Complete daily tasks and earn coins.",
+      "tutorial.card.4.text": "Complete daily tasks and earn tokens.",
       "tutorial.card.5.title": "Stats",
       "tutorial.card.5.text": "Your progress, records and streaks live here.",
 
@@ -731,14 +731,14 @@
       "toast.dailyNoSkip": "Daily level cannot be skipped",
       "toast.dailyNoDouble": "Daily level cannot be doubled",
       "toast.nothingToDouble": "Nothing to double",
-      "toast.notEnoughCoins": "Not enough coins",
+      "toast.notEnoughCoins": "Not enough tokens",
       "toast.searching": "Finding best move",
       "toast.skinEquipped": "${name}: equipped",
       "toast.skinBought": "${name}: purchased",
       "toast.archiveUnlocked": "Archive ${date} unlocked",
-      "toast.missionsReward": "Missions: +${coins} coins",
-      "toast.dailyReward.today": "Daily level: +${coins} coins",
-      "toast.dailyReward.archive": "Archive: +${coins} coins",
+      "toast.missionsReward": "Missions: +${coins} tokens",
+      "toast.dailyReward.today": "Daily level: +${coins} tokens",
+      "toast.dailyReward.archive": "Archive: +${coins} tokens",
 
       // Rewarded ad dialog
       "rewarded.hint.title": "Hint",
@@ -746,26 +746,26 @@
       "rewarded.skip.title": "Skip level",
       "rewarded.skip.text": "After a short ad the next yard will open immediately.",
       "rewarded.double.title": "Double reward",
-      "rewarded.double.text": "After the ad your level coins will be doubled.",
+      "rewarded.double.text": "After the ad your level tokens will be doubled.",
       "rewarded.archive.title": "Daily level archive",
       "rewarded.archive.text": "After the ad the selected archive level will open.",
 
       // Campaign reward labels
-      "reward.coins": "+${n} coins",
-      "reward.coinsTimed": "+${n} coins · ${time}",
-      "reward.alreadyClaimed": "Coins already claimed",
+      "reward.coins": "+${n} tokens",
+      "reward.coinsTimed": "+${n} tokens · ${time}",
+      "reward.alreadyClaimed": "Tokens already claimed",
       "reward.missionSuffix": "missions +${n}",
-      "reward.daily.earned": "+${total} coins for today",
+      "reward.daily.earned": "+${total} tokens for today",
       "reward.daily.streak": "streak +${n}",
       "reward.daily.claimed": "Daily reward already claimed",
-      "reward.archive.earned": "Archive ${date} · +${coins} coins",
+      "reward.archive.earned": "Archive ${date} · +${coins} tokens",
       "reward.archive.done": "Archive already at best result",
 
       // Coin amount formatting
-      "coin.form.1": "coin",
-      "coin.form.2": "coins",
-      "coin.form.3": "coins",
-      "coin.short": "c.",
+      "coin.form.1": "token",
+      "coin.form.2": "tokens",
+      "coin.form.3": "tokens",
+      "coin.short": "tok.",
 
       // Move plural forms
       "move.form.1": "move",
