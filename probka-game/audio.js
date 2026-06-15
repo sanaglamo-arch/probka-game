@@ -76,22 +76,28 @@
       });
     }
 
-    // --- Фоновая музыка: мягкий генеративный эмбиент на пентатонике ---
-    // Пентатоника + тихий sine + медленные ноты практически не дают диссонанса.
+    // --- Фоновая музыка: лёгкий казуальный луп (marimba-плаки по аккордам) ---
+    // Мягкая прогрессия C–G–Am–F (I–V–vi–IV), тёплый бас + арпеджио. Без нарастания.
     let musicOn = false;
     let musicTimer = null;
     let musicBus = null;
-    const PENTA = [220.0, 261.63, 293.66, 329.63, 392.0, 440.0]; // A-minor pentatonic
+    let musicStep = 0;
+    const CHORDS = [
+      { bass: 130.81, notes: [261.63, 329.63, 392.0, 523.25] }, // C:  C E G C
+      { bass: 196.0, notes: [293.66, 392.0, 493.88, 587.33] }, // G:  D G B D
+      { bass: 220.0, notes: [329.63, 440.0, 523.25, 659.25] }, // Am: E A C E
+      { bass: 174.61, notes: [349.23, 440.0, 523.25, 698.46] } // F:  F A C F
+    ];
+    const ARP = [0, 1, 2, 3, 2, 1]; // паттерн по нотам аккорда
 
-    let droneNodes = null;
     function ensureMusicBus(context) {
       if (!musicBus || musicBus.context !== context) {
         const filter = context.createBiquadFilter();
         filter.type = "lowpass";
-        filter.frequency.value = 1300;
+        filter.frequency.value = 2000;
         filter.Q.value = 0.4;
         const gain = context.createGain();
-        gain.gain.value = 0.5;
+        gain.gain.value = 0.42;
         filter.connect(gain);
         gain.connect(context.destination);
         musicBus = filter;
@@ -99,81 +105,49 @@
       return musicBus;
     }
 
-    // Спокойный дрон (тоника A + квинта E) — тёплая подложка без нарастания.
-    function startDrone(context, bus) {
-      if (droneNodes) return;
-      const now = context.currentTime;
-      const g = context.createGain();
-      g.gain.setValueAtTime(0.0001, now);
-      g.gain.exponentialRampToValueAtTime(0.022, now + 3.5);
-      const a = context.createOscillator();
-      a.type = "sine";
-      a.frequency.value = 110.0;
-      const e = context.createOscillator();
-      e.type = "sine";
-      e.frequency.value = 164.81;
-      a.connect(g);
-      e.connect(g);
-      g.connect(bus);
-      a.start(now);
-      e.start(now);
-      droneNodes = { a, e, g };
-    }
-
-    function stopDrone() {
-      if (!droneNodes || !audioCtx) {
-        droneNodes = null;
-        return;
-      }
-      const now = audioCtx.currentTime;
-      const { a, e, g } = droneNodes;
-      try {
-        g.gain.cancelScheduledValues(now);
-        g.gain.setValueAtTime(Math.max(0.0001, g.gain.value), now);
-        g.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
-        a.stop(now + 1.7);
-        e.stop(now + 1.7);
-      } catch (err) {
-        /* узлы уже остановлены */
-      }
-      droneNodes = null;
-    }
-
-    function voice(context, bus, freq, now, dur, peak) {
+    // Короткий мягкий плак (marimba-подобный): быстрая атака, плавный спад.
+    function pluck(context, bus, freq, when, dur, peak, type) {
       const osc = context.createOscillator();
       const g = context.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(freq, now);
-      g.gain.setValueAtTime(0.0001, now);
-      g.gain.exponentialRampToValueAtTime(peak, now + 0.9);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+      osc.type = type || "triangle";
+      osc.frequency.setValueAtTime(freq, when);
+      g.gain.setValueAtTime(0.0001, when);
+      g.gain.exponentialRampToValueAtTime(peak, when + 0.018);
+      g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
       osc.connect(g);
       g.connect(bus);
-      osc.start(now);
-      osc.stop(now + dur + 0.05);
+      osc.start(when);
+      osc.stop(when + dur + 0.05);
     }
 
-    function scheduleNote() {
+    function scheduleBar() {
       if (!musicOn) return;
       const context = ensure();
       if (!context) {
-        musicTimer = setTimeout(scheduleNote, 1500);
+        musicTimer = setTimeout(scheduleBar, 1500);
         return;
       }
       const bus = ensureMusicBus(context);
-      startDrone(context, bus);
       const now = context.currentTime;
-      const freq = PENTA[Math.floor(Math.random() * PENTA.length)] * (Math.random() < 0.25 ? 0.5 : 1);
-      const dur = 2.8 + Math.random() * 2.4;
-      voice(context, bus, freq, now, dur, 0.045);
-      if (Math.random() < 0.4) voice(context, bus, freq * 1.5, now, dur, 0.026); // тихая квинта
-      musicTimer = setTimeout(scheduleNote, 1800 + Math.random() * 2000);
+      const barDur = 1.9;
+      const chord = CHORDS[musicStep % CHORDS.length];
+      // тёплый бас на тонику
+      pluck(context, bus, chord.bass, now, 1.5, 0.05, "sine");
+      pluck(context, bus, chord.bass * 2, now, 1.2, 0.022, "sine");
+      // арпеджио вверх-вниз
+      const step = barDur / ARP.length;
+      ARP.forEach((idx, i) => {
+        pluck(context, bus, chord.notes[idx], now + i * step, 0.55, 0.03);
+      });
+      musicStep++;
+      musicTimer = setTimeout(scheduleBar, barDur * 1000);
     }
 
     function startMusic() {
       if (musicOn || isMuted()) return;
       musicOn = true;
-      scheduleNote();
+      musicStep = 0;
+      scheduleBar();
     }
 
     function stopMusic() {
@@ -182,7 +156,6 @@
         clearTimeout(musicTimer);
         musicTimer = null;
       }
-      stopDrone();
     }
 
     return { play, pause, resume, startMusic, stopMusic, isMusicOn: () => musicOn };

@@ -266,16 +266,16 @@
       "tutorial.guided.label": "Первый уровень",
 
       // Tutorial mini steps
-      "tutorial.mini.0.label": "Шаг 1 из 3",
-      "tutorial.mini.0.title": "Выведи свою машину",
-      "tutorial.mini.0.text": "Цель простая: освободи путь и выведи свою машину через правый край двора.",
-      "tutorial.mini.0.button": "Понял",
-      "tutorial.mini.1.label": "Шаг 2 из 3",
-      "tutorial.mini.1.title": "Сдвинь блокер",
-      "tutorial.mini.1.text": "Перетащи зеленую машину вниз. Машины ездят только вдоль своего направления.",
-      "tutorial.mini.2.label": "Шаг 3 из 3",
-      "tutorial.mini.2.title": "Теперь выезжай",
-      "tutorial.mini.2.text": "Перетащи свою машину вправо до выезда.",
+      "tutorial.mini.0.label": "Как играть",
+      "tutorial.mini.0.title": "Выкати красную машину",
+      "tutorial.mini.0.text": "Освободи дорогу и выведи красную машину к выезду справа.",
+      "tutorial.mini.0.button": "Поехали",
+      "tutorial.mini.1.label": "Шаг 1 из 2",
+      "tutorial.mini.1.title": "Освободи путь",
+      "tutorial.mini.1.text": "Тащи зелёную машину вниз. Машины едут только вдоль корпуса.",
+      "tutorial.mini.2.label": "Шаг 2 из 2",
+      "tutorial.mini.2.title": "Газуй!",
+      "tutorial.mini.2.text": "Тащи красную машину вправо до выезда.",
 
       // Tutorial menu cards
       "tutorial.card.0.title": "Три режима",
@@ -288,10 +288,10 @@
       "tutorial.card.3.text": "Ежедневные задачи дают немного монет за привычные действия: пройти уровень, собрать три звезды, сыграть без отмены.",
 
       // Tutorial guided
-      "tutorial.guided.move.title": "Повтори подсвеченный ход",
-      "tutorial.guided.move.text": "Желтая рамка показывает машину, пунктирная рамка показывает место, куда ее нужно перетащить.",
-      "tutorial.guided.finish.title": "Двор почти свободен",
-      "tutorial.guided.finish.text": "Доведи машину до выезда.",
+      "tutorial.guided.move.title": "Твой ход",
+      "tutorial.guided.move.text": "Следуй за стрелкой-подсказкой.",
+      "tutorial.guided.finish.title": "Последний штрих",
+      "tutorial.guided.finish.text": "Выкати красную машину к выезду!",
 
       // Canvas tutorial hints
       "hint.source.target": "Твоя машина",
@@ -676,16 +676,16 @@
       "tutorial.guided.label": "First level",
 
       // Tutorial mini steps
-      "tutorial.mini.0.label": "Step 1 of 3",
-      "tutorial.mini.0.title": "Drive your car out",
-      "tutorial.mini.0.text": "The goal is simple: clear the way and drive your car out through the right side of the yard.",
-      "tutorial.mini.0.button": "Got it",
-      "tutorial.mini.1.label": "Step 2 of 3",
-      "tutorial.mini.1.title": "Shift the blocker",
-      "tutorial.mini.1.text": "Drag the green car downward. Cars can only move along their own axis.",
-      "tutorial.mini.2.label": "Step 3 of 3",
-      "tutorial.mini.2.title": "Now drive out",
-      "tutorial.mini.2.text": "Drag your car to the right to reach the exit.",
+      "tutorial.mini.0.label": "How to play",
+      "tutorial.mini.0.title": "Get the red car out",
+      "tutorial.mini.0.text": "Clear the path and roll the red car to the exit on the right.",
+      "tutorial.mini.0.button": "Let's go",
+      "tutorial.mini.1.label": "Step 1 of 2",
+      "tutorial.mini.1.title": "Clear the path",
+      "tutorial.mini.1.text": "Drag the green car down. Cars only move along their body.",
+      "tutorial.mini.2.label": "Step 2 of 2",
+      "tutorial.mini.2.title": "Drive!",
+      "tutorial.mini.2.text": "Drag the red car right to the exit.",
 
       // Tutorial menu cards
       "tutorial.card.0.title": "Three modes",
@@ -698,10 +698,10 @@
       "tutorial.card.3.text": "Daily tasks reward you with coins for normal actions: beat a level, get three stars, play without undo.",
 
       // Tutorial guided
-      "tutorial.guided.move.title": "Repeat the highlighted move",
-      "tutorial.guided.move.text": "The yellow outline marks the car; the dashed outline marks where to drag it.",
-      "tutorial.guided.finish.title": "Yard almost clear",
-      "tutorial.guided.finish.text": "Drive the car to the exit.",
+      "tutorial.guided.move.title": "Your move",
+      "tutorial.guided.move.text": "Just follow the arrow hint.",
+      "tutorial.guided.finish.title": "Final touch",
+      "tutorial.guided.finish.text": "Roll the red car to the exit!",
 
       // Canvas tutorial hints
       "hint.source.target": "Your car",

@@ -145,11 +145,12 @@
       button.innerHTML = unlocked
         ? `<span class="level-number">${item.modeOrder}</span><small>${marker}</small>`
         : `<span class="level-number">${item.modeOrder}</span><span class="level-lock" aria-label="${t("level.locked")}"><svg viewBox="0 0 24 24"><use href="#i-lock" /></svg></span>`;
-      button.title = completion
+      // aria-label вместо title: ничего не всплывает при наведении, но доступность сохранена.
+      button.setAttribute("aria-label", completion
         ? t("level.tooltip.done", { title: translateLevelTitle(item.title), stars: completion.stars, moves: completion.bestMoves })
         : unlocked
           ? t("level.tooltip.open", { title: translateLevelTitle(item.title), minMoves: item.minMoves, diff: item.difficulty })
-          : t("level.tooltip.locked");
+          : t("level.tooltip.locked"));
       button.disabled = !unlocked;
       button.addEventListener("click", () => {
         if (deps.blockTutorialEscape()) return;
@@ -584,11 +585,6 @@
             ? t("daily.day.aria.unlocked", { date: deps.formatShortDate(slot.dateKey) })
             : t("daily.day.aria.locked", { date: deps.formatShortDate(slot.dateKey) })
       );
-      button.title = isFuture
-        ? t("daily.day.title.future")
-        : unlocked
-          ? t("daily.day.title.unlocked", { date: deps.formatShortDate(slot.dateKey), minMoves: slot.minMoves })
-          : t("daily.day.title.locked");
       button.addEventListener("click", () => {
         if (deps.blockTutorialEscape()) return;
         deps.playSound("button");
