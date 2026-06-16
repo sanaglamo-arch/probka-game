@@ -5,35 +5,32 @@
 
 ---
 
-ROUND 5 — STOP ADDING, START MASTERING. We've piled on features for four rounds (endgame, viral mechanics, full redesign, audio). Now PROVE the game is actually fun, make the pieces cohere, and make it unforgettable. Act as a demanding senior game-dev lead. Full autonomy — don't ask, just do. RU+EN parity, a working build at every step, re-verify + rebuild at the end. Zero external network requests (all assets local/inline).
+ROUND 6 — AUTO-BUY / MANAGER REWORK + bug hunt. A player found a real economy bug: money silently vanishes because a "manager" auto-buys its generator the instant it's affordable, dumping cash into a low-value low-tier unit (e.g. a GPU Rig at 5.26M that isn't worth buying). The current "manager" conflates two things — a +50% output buff AND a dumb "buy whenever affordable, one step per tick" autobuyer (game.js:~631). Rework it completely. Act as a demanding game-dev lead. Full autonomy — don't ask, just do. RU+EN parity, a working build at every step, verify + rebuild at the end, zero external network requests. Use the `ui-ux-pro-max` skill (invoke or read /root/.claude/skills/ui-ux-pro-max/ files) for the new UI.
 
-USE THE DESIGN SKILL (mandatory): `ui-ux-pro-max` at `/root/.claude/skills/ui-ux-pro-max/`. Invoke it if available; otherwise read `SKILL.md` + its `data/`/`scripts/` and apply its guidance + run its accessibility/contrast/touch-target checks.
+1) DECOUPLE MANAGER FROM AUTO-BUY:
+- "Manager" becomes a PURE permanent output buff for its generator (keep ~+50%, or rebalance). It NEVER spends your cash. A clean, worthwhile one-time purchase.
+- Remove the old "buy whenever affordable each tick" behavior entirely.
 
-LEAD'S FRAMING (be honest with yourself): the game is feature-rich but UNPROVEN — nobody has verified it's actually fun end-to-end, the balance with all the new mechanics is untested in practice, and the look is "good", not "unforgettable". This round is quality, cohesion, and spectacle — NOT new systems. Resist adding mechanics; make the existing ones sing.
+2) NEW SMART "AUTOPILOT" (ROI + reserve + control):
+- A separate auto-buy system. When active, each tick it considers all auto-enabled generators and buys the BEST-VALUE one — lowest cost per +output/sec gained (true ROI), NEVER cheapest-blindly. It must never make a purchase that's worse value than an available alternative.
+- RESERVE control: a player-set reserve (slider / %), e.g. "keep 50% of cash". Autopilot only spends ABOVE the reserve, so manual buys, Breakthrough, and prestige always have cash. This directly fixes the "money disappears" feeling.
+- PER-GENERATOR toggles: player turns Autopilot on/off per generator, so it never wastes on ones they don't want.
+- OPTIONAL MODE "fill to next milestone then pause": buys a generator only up to its next 25/50/100 breakpoint, then stops — pushing the meaningful x2 without endless drain. Selectable.
+- Gate Autopilot behind a sensible unlock (e.g. after the first prestige, or a one-time buy), so early game stays hands-on.
 
-1) DEEP PLAYTEST + BALANCE HARDENING (most important):
-- Simulate/play the FULL arc with every mechanic active (tap+combo, generators, milestone x2, upgrades, tech tree, research prestige, artifacts+synergy, Singularity meta-layer, risk/alignment+incidents, insight flash, breakthrough, world events).
-- Find and FIX: the first-60-seconds hook, any mid-game dead zones or progress walls, whether each prestige layer is reachable and feels rewarding, and whether insight/breakthrough/combo synergize vs. trivialize the economy.
-- Tune to: a gripping first minute, a satisfying first prestige (~30–45 min), a meaningful-but-reachable first Singularity, smooth pacing throughout. Document the full curve in BALANCE.md.
-- Add a lightweight "next goal" nudge so players are never lost (subtle hint at the next unlock / affordable milestone / when to prestige).
+3) UI (use the skill):
+- A clean Automation/Autopilot panel: global on/off, reserve slider with a live "keeps X" readout, per-generator toggles, a mode selector (Best value / Fill-to-milestone), and a status line showing what it's doing now ("Buying Data Center — best ROI"). RU+EN. Readable and premium, not cluttered.
 
-2) SIGNATURE IDENTITY + FIRST IMPRESSION (skill):
-- Push the visual from "good neon" to a cohesive, memorable art direction with a distinct personality. Polish splash/loading, first-run, and ALL empty states.
-- Make the main screen a thumb-stopper — the kind of screenshot that earns a click in a store catalog.
+4) SAVE MIGRATION (critical — no one should log in to a drained balance):
+- Convert existing saves cleanly: keep the +50% manager buff, and default Autopilot to a SAFE state (off, or on with a healthy reserve). Never auto-spend a returning player's bank on load.
 
-3) SPECTACLE PASS on the dopamine peaks (make them WOW, not just present):
-- Insight Flash claim, Breakthrough activation, 25/50/100 milestones, the Prestige Ritual, and the Singularity reset should EACH be a genuine spectacle — layered particles, light, motion, sound stings, screen-wide feedback. These are the moments players replay for.
+5) BUG HUNT / PLAYTEST PASS (the player is finding bugs by playing — find the rest first):
+- Self-playtest the full economy and hunt specifically for: money silently spent in bad ways, negative/NaN balances, purchases that feel like a trap, milestone/multiplier miscounts, offline-earnings mismatches, prestige/Singularity edge cases, and missing/confusing feedback when cash is spent. Fix what you find; list each in the final message.
 
-4) DEPTH WITHOUT BLOAT:
-- Cosmetic skins (earned, no pay-to-win): themes for the lab/backdrop, the TRAIN orb, and/or GPU icons; a small unlock gallery.
-- Expand the satirical news-ticker into a light NARRATIVE ARC with story beats: garage → frontier lab → AGI → Singularity, tied to milestones (RU+EN).
-- Add achievements tied to the NEW systems (tech tree, artifacts, Singularity); a couple may grant small permanent perks.
-
-5) FULL QA SWEEP:
-- `node --check` all JS; zero console errors in headless Chrome.
-- Smoke + edge cases: huge numbers, long offline, prestige mid-incident, artifact-synergy stacking, Singularity reset, music toggle, save/reload, RU↔EN.
-- Skill accessibility pass (contrast/focus/touch) — fix fails.
-- RU/EN parity for ALL strings (incl. nudges, narrative, cosmetics, new achievements).
-- Regenerate ALL screenshots (seeded mid-game), mobile + desktop of EVERY screen — including the new Singularity / tech-tree / artifacts / cosmetics screens and a spectacle moment (insight or prestige ritual).
+VERIFY + REBUILD:
+- `node --check` every JS; zero console errors in headless Chrome.
+- Smoke + targeted tests: Autopilot respects the reserve, buys best-ROI (not cheapest), per-gen toggles work, fill-to-milestone stops correctly, manager buff applies WITHOUT spending, save migration is safe, RU↔EN.
+- RU/EN parity for all new strings.
+- Regenerate affected screenshots (the Automation panel + any changed screens), mobile + desktop.
 - Rebuild dist/singularity-inc.zip (index.html at root, validated) + dist/store-assets-bundle.zip.
-- Commit each phase. Final message: what changed, the tuned final numbers, and your HONEST assessment of whether it's now genuinely fun.
+- Commit each phase. Final message: what changed, the bugs you found + fixed, and the new automation design.
