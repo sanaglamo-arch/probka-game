@@ -13,7 +13,7 @@ SPECIFIC CONFIRMED BUG (fix this exact one): on the WIDE / desktop layout, a GIA
 - Audit EVERY screen (main/Lab first, then all tabs and modals) at MULTIPLE phone sizes (360×640, 360×800, 390×844, 414×896) AND desktop. NOTHING may overlap. NO text overflow, clipping, or spill. NO buttons stacking on top of each other. Proper spacing, wrapping, and stacking everywhere.
 - Specifically the main/Lab screen: the TRAIN orb, Breakthrough button + its timer, the risk/vector bars, the generator list, the buy-mode bar, and the bottom nav must all have their own space and never collide — at every size, including when new elements appear (insight flash, crisis banner, breakthrough active, news ticker).
 - Rebuild the layout with a robust system (fl/grid, min-heights, overflow handling, safe-area insets) so it CAN'T overlap as content changes. Use the skill for spacing/hierarchy.
-- VERIFY visually: screenshot the main screen and each tab at all the sizes above and confirm by eye there are zero overlaps/overflows before moving on. Treat any overlap as a blocking bug.
+- VERIFY layout integrity at all the sizes above (render and check that nothing overlaps or overflows) before moving on. Treat any overlap as a blocking bug.
 
 == P1 — EXPLAIN EVERYTHING (lots was added; nothing should be a mystery) ==
 So many systems were added (tap/combo, generators, milestones, upgrades, managers, Autopilot, Research/tech tree, artifacts, prestige, Singularity, multi-vector Risk, Alignment, crises, News, Trust, Market, Breakthrough, Insight Flash, events...). A player must ALWAYS understand what each thing is.
@@ -37,9 +37,8 @@ So many systems were added (tap/combo, generators, milestones, upgrades, manager
 == P6 — ANDROID WRAPPER PREP (monetization deferred — just wrappable) ==
 - Set up Capacitor wrapping: config, portrait lock, status-bar/safe-area, Android hardware BACK-button handling, offline local save in a WebView. No ads/IAP. Produce or fully document the APK build steps (if Android SDK absent, prepare so the user can build). Keep plain-web + Yandex builds intact (platform abstracted).
 
-VERIFY + REBUILD:
-- `node --check` all JS; headless Chrome at 360×640 / 360×800 / 390×844 / 414×896 with ZERO console errors AND zero visual overlaps (verify by screenshot); a perf check.
+VERIFY:
+- `node --check` all JS; headless Chrome at 360×640 / 360×800 / 390×844 / 414×896 with ZERO console errors and zero layout overlaps/overflows; a perf check.
 - RU/EN parity for ALL strings (incl. every new tooltip/hint).
-- Regenerate ALL screenshots PHONE-FIRST (portrait, real device sizes), keep desktop set — and include close-ups proving the main screen no longer overlaps.
-- Rebuild dist/singularity-inc.zip (index.html at root, validated) + bundle; document/produce the Android build if set up.
-- Commit each phase. Final message: confirmation the overlap bug is gone (with which sizes you verified), the explanation/tooltip coverage, mobile-readiness, perf numbers, and first-3-min verdict.
+- Keep a working, runnable build (dev server). Do NOT regenerate the release screenshot set or rebuild the store zip/bundle — those are final/release-time tasks, not now.
+- Commit each phase. Final message: confirmation the overlap bug (incl. the giant oval) is gone and which sizes you verified, the explanation/tooltip coverage, mobile-readiness, perf numbers, and first-3-min verdict.
