@@ -5,49 +5,30 @@
 
 ---
 
-=== CONTEXT — READ THIS FIRST (you may be a fresh session) ===
-- PROJECT: "Singularity Inc." — a polished idle / incremental ("clicker") web game about building an AI company (tap to train → buy GPU/server generators → prestige "Release a frontier model" → multi-vector Risk/Alignment, News/Trust/Market management layer → Singularity 2nd-prestige → Race-to-AGI narrative + endings).
-- GOAL: a flagship-quality game targeting ANDROID / Google Play first; deep BUT accessible; monetization deferred. Fully localized RU + EN.
-- WORKING DIR: `/root/singularity-inc/`. It IS a git repo, branch `claude/ai-tycoon`, remote `https://github.com/sanaglamo-arch/singularity-inc.git`. Commit your work as you go (push only if asked).
-- STACK: vanilla JS + HTML + CSS, NO build step, NO framework. IIFE modules in `js/` exposing globals. ZERO external network requests at runtime.
-  - `js/config.js` = all tunable numbers. `js/game.js` = engine + state + economy. `js/ui.js` = all UI/rendering. `js/i18n.js` = RU+EN strings. `js/sdk.js`+`js/ads.js` = platform abstraction (graceful fallback). `js/music.js`/`js/audio.js` = procedural WebAudio. `js/fx.js`, `js/icons.js`, `js/format.js`, `js/main.js`. `index.html` + `styles.css` + `fonts.css`. Save key `singularity_inc_save_v1`.
-- READ FIRST: `README.md` and `BALANCE.md` (current design + economy).
-- RUN/TEST: `python3 -m http.server 8099 --bind 127.0.0.1` in the folder → `http://127.0.0.1:8099/index.html`. `__seed.html` writes a mid-game save (load it, then index.html, same browser profile). Fresh "Garage" = clean profile / cleared localStorage.
-- TOOLING (probe + fall back): `node --check` validates JS. `zip` likely MISSING → python3 `zipfile`. PIL/ffmpeg likely MISSING → headless Chrome (`google-chrome --headless=new --no-sandbox --disable-dev-shm-usage --hide-scrollbars --window-size=W,H --force-device-scale-factor=N --screenshot=out.png URL`).
-- DESIGN SKILL: `ui-ux-pro-max` at `/root/.claude/skills/ui-ux-pro-max/`.
-- Verify your own work by RENDERING the game at 360/390/414 + desktop and inspecting — don't trust it blindly.
+ROUND 14 — PHASE 3: PRODUCTION POLISH (make it read as "premium"). The game is now legible, balanced, and bug-light. This round is the last 10% that separates a flagship from a competent idle: game feel, audio, a signature visual identity, and rock-solid 60fps performance on Android. Act as a demanding senior game-dev lead. FEATURE FREEZE — NO new systems; only feel, polish, performance, identity. Full autonomy — don't ask, just do. RU+EN parity, a working build at every step, zero external network requests. Use the `ui-ux-pro-max` skill for visual/identity work. NO store-rebuild/screenshots (release-time). Verify your work by RENDERING at 360/390/414 + desktop and by profiling — don't trust it blindly.
 
-=== TASK ===
+1) PERFORMANCE — lock ~60fps on a mid/low-end Android (priority #1 for the Play target):
+- Profile the tick + render. Fix jank: pool & cap particles; throttle DOM writes (odometer, /sec, long lists — update only what CHANGED, not the whole DOM each frame); eliminate layout thrash (batch DOM reads then writes); tighten the rAF loop; pause ALL offscreen / inactive-tab work; lazy-render heavy panels (market sparklines, long lists, endings).
+- Fast initial load; NO memory growth over a long session (verify listeners / timers / particle arrays don't leak). Measure and report frame times BEFORE vs AFTER.
 
-ROUND 13 — PHASE 2: FUN & BALANCE (deep playtest + full economy hardening). We've stabilized the layout (Phase 0) and made the deep game legible (Phase 1: progressive unlocks, ≤5-tab nav, explain-everything, buy clarity, prestige rework). Now PROVE it is actually FUN end-to-end and balance the WHOLE economy with every system active. This round decides flagship vs. "competent idle". Act as a demanding senior game-dev lead. FEATURE FREEZE — do NOT add new systems; this is playtest, tuning, balance, and feel only. Full autonomy — don't ask, just do. RU+EN parity, a working build at every step, zero external requests. NO store-rebuild/screenshots (release-time).
+2) GAME FEEL / JUICE MASTERING — every interaction must feel good:
+- Tune animation timing & easing across the whole UI so it feels snappy and intentional (nothing laggy or floaty).
+- The dopamine PEAKS must each be genuinely satisfying and consistent: the TRAIN tap (squash/stretch + ripple + particle + number pop), generator buy, milestone ×2, Insight Flash claim, Breakthrough activation, the Prestige Ritual, the Singularity reset, and endings. Layered feedback (motion + particle + sound + haptic), well-timed, never janky.
+- Mobile haptics fire at the right moments and feel good (not buzzy spam).
 
-1) MULTI-PERSONA PLAYTEST (actually simulate the full arc; write findings + fix):
-- Play as THREE personas:
-  • Casual Tapper — active, taps a lot, short sessions.
-  • Idle Checker — logs in briefly, leans on offline earnings + autopilot.
-  • Optimizer — min-maxes, chases prestige efficiency.
-- For each, judge: is the first 60 SECONDS gripping? the first 10 minutes? Where is there dead time, boredom, confusion, or a wall? FIX what you find. The first session MUST hook.
+3) AUDIO MASTERING — make sound a feature, not an afterthought:
+- Balance the SFX mix (levels, no clipping/harshness); polish the ambient music (clean loop, pleasant, non-intrusive); duck/layer sensibly; pause when the tab is hidden; respect the toggles. Add subtle distinct SFX where peaks lack them. All procedural / local (no external files).
 
-2) PACING / THE COMPULSION LOOP:
-- Map and tune the time-to-each-beat: first generator (seconds), first upgrade, first milestone ×2, first manager/autopilot, FIRST PRESTIGE (~30–45 min), first World/risk unlock, first Singularity. No dead zones, no walls, ALWAYS a visible next goal. Use the economy sim to confirm the curve is smooth.
+4) SIGNATURE VISUAL IDENTITY (use the skill) — from "good neon" to memorable:
+- Push the look to a cohesive, distinctive art direction with personality (not generic dark-neon). Polish the splash/loading screen, the first-impression main screen, and ALL empty states. Enforce consistent iconography, typography, spacing, and color across EVERY screen.
+- The main/Lab screen should be genuinely thumb-stopping; refine the TRAIN orb to be the crown jewel.
+- App icon: a crisp, premium, Android adaptive-ready icon (keep a square non-alpha icon for other platforms).
 
-3) FULL ECONOMY BALANCE AUDIT — with EVERYTHING active (generators, milestones, upgrades, managers, autopilot, RP per-RP multiplier + research tree, scaling startCash %, risk/alignment/crises, news/trust/market, breakthrough, insight, tap-combo, singularity, artifacts). Hunt and FIX:
-- EXPLOITS: market money-printing / risk-free arbitrage; alignment trivialization; breakthrough+insight+combo stacking into runaway; autopilot abuse; any infinite/instant path.
-- WALLS: any point progress stalls too long.
-- RP economy: confirm prestige is clearly worth it and each run accelerates correctly; the per-RP multiplier + research tree + startCash% don't double-count into runaway.
-- OFFLINE earnings: rewarding but not trivializing active play.
-Document the full tuned curve + final numbers in BALANCE.md.
-
-4) PRESTIGE LOOP VALIDATION (verify the R11 rework feels good in play):
-- First prestige = a taught, genuinely rewarding moment; the next run is visibly faster; subsequent prestiges accelerate. Time-to-2nd-prestige and time-to-first-Singularity reasonable. The projection wording is honest.
-
-5) MANAGEMENT LAYER (World) — make it earn its place:
-- Verify risk/alignment/crises/news/trust/market actually ADD meaningful decisions and fun — not chores or ignorable filler. Crisis cadence tense-not-nagging. Market a fun OPTIONAL bonus. Trust meaningful. Simplify or cut anything that's just noise.
-
-6) NEVER-LOST:
-- The next-goal nudge + unlock pacing must mean the player ALWAYS knows the next thing to do and feels momentum. Verify across the whole arc.
+5) MICRO-POLISH SWEEP:
+- Micro-interactions on every interactive element (buttons, tabs, toggles, buy, claim). Smooth tab/screen transitions. Loading/skeleton states where content pops in. A final consistency pass — kill every rough edge you can find.
 
 VERIFY:
-- `node --check` all JS; zero console errors; a fresh save still shows ONLY Stage-1 Garage; run the economy sim across the full arc; confirm no exploit / no wall and the pacing targets above; RU↔EN parity.
-- Render key screens at 360/390/414 — confirm NO regressions in layout/clarity from R10–R12.
-- Keep a working dev build. Commit each part. FINAL MESSAGE: your HONEST verdict — is it fun for hours? the tuned pacing numbers (time-to-each-beat), the exploits you closed, and the single biggest thing still holding it back from "flagship".
+- `node --check` all JS; zero game console errors at 360/390/414 + desktop; a fresh save still shows ONLY Stage-1 Garage (no regressions from R10–R13).
+- Performance: confirm smooth ~60fps and report measured frame times; no memory growth over a long run.
+- RU↔EN parity for any new copy (splash etc.). Render key screens at the sizes above and confirm no layout/clarity regressions.
+- Keep a working dev build. Commit each part. FINAL MESSAGE: what you polished (feel, audio, identity, perf), the before/after frame-time numbers, and your honest take on whether it now reads as "premium / flagship".
