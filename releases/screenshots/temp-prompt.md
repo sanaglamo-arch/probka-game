@@ -5,34 +5,40 @@
 
 ---
 
-ROUND 2 — turn the game from "good" into a sticky Yandex idle game. You have full autonomy — don't ask, just do. Keep a working build at every step, keep RU+EN parity, and re-verify + rebuild assets at the end. All features must degrade gracefully when the Yandex SDK is absent (local dev) and make ZERO external requests beyond the Yandex SDK itself.
+ROUND 3 — FULL VISUAL OVERHAUL + viral clicker mechanics. Act as a demanding senior game-dev lead with a very high bar: the current look is NOT good enough to ship. You have full autonomy — don't ask, just do. Keep RU+EN parity, keep a working build at every step, re-verify + rebuild at the end. Zero external network requests (all assets local/inline).
 
-1) YANDEX LEADERBOARDS (native social retention)
-- Use the Yandex SDK leaderboards API to submit a score (lifetime Research Points; optionally also peak compute/sec). Add a "Leaderboard" view/tab that fetches and shows top players + the player's rank.
-- Graceful fallback when no SDK / not logged in: show a friendly "available on Yandex Games" placeholder, no errors. RU+EN.
+USE THE DESIGN SKILL (mandatory):
+A `ui-ux-pro-max` skill is installed at `/root/.claude/skills/ui-ux-pro-max/`. If it shows up as an invokable Skill, use it (Skill tool). If it does NOT (it was just installed and may need a session restart), then READ its files directly — `/root/.claude/skills/ui-ux-pro-max/SKILL.md` plus everything in its `data/` and `scripts/` folders — and apply its guidance: pick a cohesive palette + font pairing + style, and run its accessibility/contrast/touch-target/spacing checks on your result. Target a premium dark theme with glassmorphism + neon, fitting an AI/singularity vibe.
 
-2) YANDEX CLOUD SAVE (cross-device progress)
-- Use the Yandex Player data API (setData/getData) to sync the save when logged in; keep localStorage as the offline fallback. On load, merge/choose the newer save (by lastSeen). Debounce cloud writes (don't spam). No data loss, no crash when SDK absent.
+HARSH CRITIQUE OF THE CURRENT UI (fix ALL of this — be honest, it's mediocre right now):
+- Flat and GENERIC — it reads like a dark admin dashboard, not a premium game. One flat navy bg, a single blue accent, plain rounded cards, zero depth/lighting/texture, no visual identity.
+- The TRAIN button — the literal heart of a clicker — is a dull flat circle. Unacceptable. It must be the single most satisfying, tactile, alive element on the screen.
+- Big numbers are static text with no weight, roll, or impact. In an idle game the numbers ARE the dopamine — they must feel good.
+- Desktop screens (Alignment etc.) are half-empty. No atmosphere for an "AI singularity" theme.
+- Generic/emoji icons, inconsistent. Flat progress bars. No coherent motion language.
 
-3) DAILY REWARD / LOGIN STREAK (return loop)
-- Escalating daily bonus (cash and/or RP and/or a timed x2 boost), with a visible streak counter that resets if a day is missed. Persist via cloud+local. Offer a rewarded-ad "double today's reward". RU+EN copy. Show a small "welcome back / day N" modal once per day.
+A) FULL VISUAL REDESIGN (the headline — make it genuinely premium and "tasty"):
+- Cohesive identity via the skill: layered dark backgrounds with depth, soft glows, glassmorphism panels, 1–2 signature neon accents, subtle grain/gradient — NOT flat #111.
+- Hero TRAIN button: big, glossy, reactive — squash-and-stretch on press, radial glow pulse, ripple + particle burst on tap, charge/heat shimmer. Tapping must feel physical and addictive.
+- Numbers: odometer-style rolling counters for balance & /sec; floating number pop-ups on tap/income (rise + scale + fade); weighty formatting with subtle glow on big values.
+- Generator cards: real depth (glass + inner shadow), crisp consistent inline-SVG icons (NOT emoji), milestone color-shift + icon glow at 25/50/100, smooth hover/press states.
+- Progress/risk bars: rounded, gradient-filled, glow that intensifies toward 100%.
+- Motion language everywhere: tab transitions, card reveals, modal spring-in, milestone flashes, screen shake on big events.
+- Atmosphere: an evolving ambient backdrop (subtle animated gradient/particles/grid) that intensifies as you scale toward AGI; fill empty desktop space with ambient art / secondary panels (mini-stats, tips).
+- Premium typography: strong display + number font pairing (local/bundled, no external fetch), clear hierarchy, generous spacing. Run the skill's contrast + touch-target checks and fix every fail.
 
-4) SECOND PRESTIGE LAYER — "The Singularity" (end-game goal + narrative climax)
-- A deeper reset that unlocks late (e.g. after N total RP or first AGI-tier generator). Resets generators AND Research Points in exchange for a permanent meta-currency ("Singularity Cores" or similar) that grants strong global modifiers and unlocks a small meta-upgrade tree. Give it a short narrative beat when triggered. Keep the math sane (no runaway); document in BALANCE.md + the economy sim.
+B) BORROW VIRAL CLICKER MECHANICS (add these — researched from the top idlers):
+1. INSIGHT FLASH (Cookie Clicker "golden cookie"): a glowing object randomly drifts across the screen every ~30–90s; tap it in time for a burst — random buff: "Frenzy" (x7 output 30s), instant cash, or "Click Frenzy" (x100 tap value 15s). Sparkle + chime + particles. This is the signature active-play hook.
+2. MILESTONE MULTIPLIERS (AdVenture Capitalist): every 25/50/100/200 owned of a generator → permanent x2 to THAT generator, with a visible breakpoint indicator + celebratory flash. Drives bulk buying.
+3. BREAKTHROUGH ABILITY (active, chainable): a button on cooldown that fires a temporary mega-boost (e.g. x10 output 20s); chaining two within a window grants a bonus. Adds active-play skill.
+4. TAP COMBO / OVERCLOCK HEAT: rapid tapping builds a temporary multiplier that decays — rewards active bursts and makes the TRAIN button feel alive.
+Wire all into the existing economy/config; keep balance sane (document in BALANCE.md + the economy sim); RU+EN for all new copy.
 
-5) AMBIENT BACKGROUND MUSIC (procedural, optional)
-- A subtle generative ambient pad/arp via WebAudio (no external files), OFF by default, with its own toggle in Settings (separate from SFX). Calm, non-intrusive, loops cleanly. Pause when tab hidden.
-
-6) AI-SATIRE NEWS TICKER (cheap flavor, high charm)
-- A small headline ticker/banner that fires milestone-tied satirical headlines as you scale (e.g. "Your model passed the bar exam", "Regulators are asking questions", "Series F closed at an absurd valuation"). RU+EN, ~12–16 headlines, non-spammy.
-
-7) SMALL FIX
-- Desktop Alignment (and any other single-card screen) still looks empty — vertically center the card or add a complementary panel (e.g. a mini risk history / tips) so wide screens aren't half-empty.
-
-VERIFY + REBUILD (at the end)
-- `node --check` every JS; load in headless Chrome with zero console errors.
-- Smoke test: tap, buy, prestige, the new Singularity reset, daily reward, save/reload (incl. cloud path mocked), RU↔EN, incident, leaderboard fallback.
-- Confirm RU/EN parity for ALL new strings (leaderboard, daily, singularity, news headlines, music toggle).
-- Regenerate ALL screenshots (seeded mid-game save), mobile + desktop of every screen, plus new ones: leaderboard, daily-reward modal, the Singularity screen.
-- Rebuild dist/singularity-inc.zip (index.html at root, validated) and dist/store-assets-bundle.zip.
-- Commit each phase. Final message: what changed + the new final numbers.
+VERIFY + REBUILD (at the end):
+- `node --check` every JS; zero console errors in headless Chrome.
+- Smoke test incl. the new mechanics (insight flash spawn/claim, milestone x2, breakthrough, tap combo) + save/reload + RU↔EN.
+- Skill accessibility pass (contrast, focus states, touch targets) — fix fails.
+- RU/EN parity for all new strings.
+- Regenerate ALL screenshots (seeded mid-game), mobile + desktop of every screen, showing the NEW look + an Insight Flash moment.
+- Rebuild dist/singularity-inc.zip (index.html at root, validated) + dist/store-assets-bundle.zip.
+- Commit each phase. Final message: what changed, before/after notes, and the new final numbers.
