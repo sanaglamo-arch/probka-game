@@ -13,6 +13,7 @@ SPECIFIC CONFIRMED BUG (independently reproduced at 1280px — fix this exact on
 - Audit EVERY screen (main/Lab first, then all tabs and modals) at MULTIPLE phone sizes (360×640, 360×800, 390×844, 414×896) AND desktop. NOTHING may overlap. NO text overflow, clipping, or spill. NO buttons stacking on top of each other. Proper spacing, wrapping, and stacking everywhere.
 - Specifically the main/Lab screen: the TRAIN orb, Breakthrough button + its timer, the risk/vector bars, the generator list, the buy-mode bar, and the bottom nav must all have their own space and never collide — at every size, including when new elements appear (insight flash, crisis banner, breakthrough active, news ticker).
 - Rebuild the layout with a robust system (flex/grid, min-heights, overflow handling, safe-area insets) so it CAN'T overlap as content changes. Use the skill for spacing/hierarchy.
+- ANOTHER CONFIRMED OVERLAP (found in QA at 390px, fix it): the buy-mode bar (x1 / x10 / x100 / Max) floats OVER the generator list and COVERS the generator row beneath it (e.g. the "Server" card is partially hidden behind the buttons). The buy bar must NOT cover any generator card — either dock it cleanly (with bottom padding on the list so nothing ever sits under it) or restructure so it never overlaps content.
 - VERIFY layout integrity at all the sizes above (render and check that nothing overlaps or overflows) before moving on. Treat any overlap as a blocking bug.
 
 == P1 — EXPLAIN EVERYTHING (lots was added; nothing should be a mystery) ==
@@ -22,6 +23,7 @@ So many systems were added (tap/combo, generators, milestones, upgrades, manager
 - Keep it lightweight and consistent — not walls of text; just enough that nothing is a mystery.
 
 == P2 — MOBILE UX HARDENING (Play is the target) ==
+- BOTTOM NAV IS OVERLOADED (found in QA): there are 9 tabs in the bottom bar (Lab, Upgrades, Research, Singularity, Alignment, World, Stats, Awards, Settings) — on a 360–390px phone the labels are truncated/cramped and targets are too small. Fix it: reduce to a sane number of primary tabs for mobile (group related ones, e.g. fold Stats/Awards/Settings into a "More"/profile, or merge where it makes sense), so labels are full and every target is ≥48px. Keep all destinations reachable.
 - Portrait-first, locked orientation. One-handed thumb reach for primary actions. Touch targets ≥48px. No hover/desktop-only patterns. Legible fonts. Bottom-nav in the thumb zone. Notch/safe-area correct.
 - HAPTICS (Vibration API where available) on tap/buy/milestone/crisis/insight, with a settings toggle.
 
