@@ -5,42 +5,17 @@
 
 ---
 
-ROUND 10 — LAYOUT INTEGRITY + EXPLAIN EVERYTHING + mobile flagship polish. Decision is set: flagship targets ANDROID / Google Play, focus is POLISH-TO-A-GEM (not new systems), the game stays DEEP BUT ACCESSIBLE, monetization deferred. Act as a demanding senior game-dev lead. Full autonomy — don't ask, just do. RU+EN parity, a working build at every step, verify at the end (no store-rebuild/screenshots during dev), zero external network requests. Use the `ui-ux-pro-max` skill for all UI/feel work + its accessibility/contrast/touch-target checks.
+R10 FIX — two layout bugs you marked "done" but are STILL broken. I independently verified the live build (seeded mid-game save) at 390×844 and 360/414 — both reproduce. Fix ONLY these two, then re-verify by rendering at those sizes yourself. Full autonomy, RU+EN, no store-rebuild/screenshots (release-time), zero external requests. Use the `ui-ux-pro-max` skill for layout.
 
-== P0 — CRITICAL LAYOUT BUG (do this FIRST, be ruthless) ==
-A real player reports the MAIN SCREEN is broken: buttons overlap each other and text overflows/spills out of its containers, because too much UI was crammed in over the last rounds. This is unacceptable for a flagship.
-SPECIFIC CONFIRMED BUG (independently reproduced at 1280px — fix this exact one): on the WIDE / desktop layout, the "next-goal" nudge ("Growth is slowing — release a model…" / "Доступен апгрейд: …") renders as a GIANT empty oval / stadium (pill) shape filling the CENTER column between the TRAIN orb and the generator list — almost entirely empty except one tiny line of text. It looks broken and pointless. IMPORTANT: this is WIDE-LAYOUT-ONLY — on mobile (≤414px) the SAME nudge already renders correctly as a small banner chip. So the fix is simple and targeted: make the wide layout match the mobile treatment — the nudge must be a small, properly-sized chip/banner, and the wide-screen center column must NOT contain that giant empty oval container (remove/restyle it; if it was a "fill empty desktop space" element, it failed — kill it or replace with something purposeful and correctly sized). Then do the full STRICT layout-integrity pass:
-- Audit EVERY screen (main/Lab first, then all tabs and modals) at MULTIPLE phone sizes (360×640, 360×800, 390×844, 414×896) AND desktop. NOTHING may overlap. NO text overflow, clipping, or spill. NO buttons stacking on top of each other. Proper spacing, wrapping, and stacking everywhere.
-- Specifically the main/Lab screen: the TRAIN orb, Breakthrough button + its timer, the risk/vector bars, the generator list, the buy-mode bar, and the bottom nav must all have their own space and never collide — at every size, including when new elements appear (insight flash, crisis banner, breakthrough active, news ticker).
-- Rebuild the layout with a robust system (flex/grid, min-heights, overflow handling, safe-area insets) so it CAN'T overlap as content changes. Use the skill for spacing/hierarchy.
-- ANOTHER CONFIRMED OVERLAP (found in QA at 390px, fix it): the buy-mode bar (x1 / x10 / x100 / Max) floats OVER the generator list and COVERS the generator row beneath it (e.g. the "Server" card is partially hidden behind the buttons). The buy bar must NOT cover any generator card — either dock it cleanly (with bottom padding on the list so nothing ever sits under it) or restructure so it never overlaps content.
-- VERIFY layout integrity at all the sizes above (render and check that nothing overlaps or overflows) before moving on. Treat any overlap as a blocking bug.
+BUG 1 — BUY-MODE BAR OVERLAPS A GENERATOR CARD (still broken):
+On the main/Lab screen, the floating buy-mode bar (x1 / x10 / x100 / Max) sits ON TOP of the generator list and COVERS the card directly beneath it — the "Server" generator row is clearly visible peeking out from behind the buttons (its name, /sec, and value are half-hidden). This is a real overlap.
+- Fix: the buy-mode bar must NEVER cover a generator card. Either (a) add bottom padding / scroll-margin to the generator list equal to the bar's height so no row can ever sit under it, or (b) make the bar part of the normal flow / a solid docked footer with the list scrolling above it (not under it). Verify at 360/390/414 that the last generator row is fully visible and tappable, never behind the bar.
 
-== P1 — EXPLAIN EVERYTHING (lots was added; nothing should be a mystery) ==
-So many systems were added (tap/combo, generators, milestones, upgrades, managers, Autopilot, Research/tech tree, artifacts, prestige, Singularity, multi-vector Risk, Alignment, crises, News, Trust, Market, Breakthrough, Insight Flash, events...). A player must ALWAYS understand what each thing is.
-- Give every system/stat/button at least a MINIMAL explanation: a one-line label/subtitle, and an info "ⓘ" affordance (tap/long-press → a short tooltip/popover) on anything non-obvious (each Risk vector, Trust, Alignment, Autopilot reserve, artifacts, Cores, market assets, Breakthrough, Insight, etc.).
-- First-time-reveal hints when a new system unlocks (one line, skippable, shown once). RU+EN for ALL of it.
-- Keep it lightweight and consistent — not walls of text; just enough that nothing is a mystery.
+BUG 2 — BOTTOM NAV HAS 9 TABS, CRAMPED & TRUNCATED ON MOBILE (still broken):
+The bottom navigation shows 9 items (Lab, Upgrades, Research, Singularity, Alignment, World, Stats, Awards, Settings). At 360–390px the labels are truncated ("Upgrad.", "Resear.", "Singul.", "Alignm.", "Settin.") and the targets are too small/cramped for a flagship mobile game.
+- Fix: reduce to a sane set of primary bottom tabs for mobile (aim ~5). Group the rest behind a "More" tab / overflow sheet or merge logically (e.g. keep Lab, Upgrades, Research, World, More — and put Singularity/Alignment/Stats/Awards/Settings inside "More" or where they fit). Every visible tab must show its FULL label and have a ≥48px touch target. Keep ALL destinations reachable. RU+EN.
 
-== P2 — MOBILE UX HARDENING (Play is the target) ==
-- BOTTOM NAV IS OVERLOADED (found in QA): there are 9 tabs in the bottom bar (Lab, Upgrades, Research, Singularity, Alignment, World, Stats, Awards, Settings) — on a 360–390px phone the labels are truncated/cramped and targets are too small. Fix it: reduce to a sane number of primary tabs for mobile (group related ones, e.g. fold Stats/Awards/Settings into a "More"/profile, or merge where it makes sense), so labels are full and every target is ≥48px. Keep all destinations reachable.
-- Portrait-first, locked orientation. One-handed thumb reach for primary actions. Touch targets ≥48px. No hover/desktop-only patterns. Legible fonts. Bottom-nav in the thumb zone. Notch/safe-area correct.
-- HAPTICS (Vibration API where available) on tap/buy/milestone/crisis/insight, with a settings toggle.
-
-== P3 — PERFORMANCE (~60fps on mid/low-end Android) ==
-- Fix jank: cap/pool particles, throttle DOM writes (odometer, /sec, lists), avoid layout thrash, tighten rAF tick/render, pause offscreen work, lazy-render heavy panels (market sparklines, long lists). Measure frame time; no memory growth over long sessions.
-
-== P4 — FIRST 3 MINUTES + DEEP-BUT-ACCESSIBLE ==
-- Make the opening instantly satisfying and clear; first tap great, first buy fast, first "wow" early; onboarding frictionless + skippable. Play the first ~30 min as a casual mobile player — anything overwhelming/unclear/tedious, smooth it. Deep systems must feel optional/rewarding, never mandatory homework early.
-
-== P5 — GAME FEEL / PRODUCTION VALUES ==
-- Polish animation timing/easing, sound mix + ambient-music balance, transitions, spectacle moments. Enforce consistent iconography/spacing/typography across every screen (skill). Kill rough edges.
-
-== P6 — ANDROID WRAPPER PREP (monetization deferred — just wrappable) ==
-- Set up Capacitor wrapping: config, portrait lock, status-bar/safe-area, Android hardware BACK-button handling, offline local save in a WebView. No ads/IAP. Produce or fully document the APK build steps (if Android SDK absent, prepare so the user can build). Keep plain-web + Yandex builds intact (platform abstracted).
-
-VERIFY:
-- `node --check` all JS; headless Chrome at 360×640 / 360×800 / 390×844 / 414×896 with ZERO console errors and zero layout overlaps/overflows; a perf check.
-- RU/EN parity for ALL strings (incl. every new tooltip/hint).
-- Keep a working, runnable build (dev server). Do NOT regenerate the release screenshot set or rebuild the store zip/bundle — those are final/release-time tasks, not now.
-- Commit each phase. Final message: confirmation the overlap bug (incl. the giant oval) is gone and which sizes you verified, the explanation/tooltip coverage, mobile-readiness, perf numbers, and first-3-min verdict.
+VERIFY (do this and report):
+- `node --check` all JS; zero console errors at 360×640 / 390×844 / 414×896.
+- Render the main screen at those sizes and confirm by inspection: the buy bar covers NOTHING, the last generator row is fully visible, and every bottom-nav label is full + targets ≥48px.
+- Keep a working dev build. Commit. Final message: confirm BOTH bugs are fixed and which sizes you verified.
