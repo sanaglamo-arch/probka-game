@@ -5,36 +5,33 @@
 
 ---
 
-ROUND 8 — TUNE & HARDEN the new management-sim layer. R7 added a lot at once (multi-vector risk, branching crises, news feed, Trust, Market) and shipped it UNTUNED. Now make it actually FUN and balanced — not just present. Act as a demanding senior game-dev lead. Full autonomy — don't ask, just do. RU+EN parity, a working build at every step, verify + rebuild at the end, zero external network requests. Use the `ui-ux-pro-max` skill for UI polish + its accessibility/contrast/touch checks.
+ROUND 9 — THE RACE TO AGI: a narrative campaign + rival labs + multiple endings. This is the round that gives the game a SOUL and a reason to replay — it ties every existing system (generators, prestige, Singularity, multi-vector risk, Trust, crises, news, market) into a journey with stakes, competition, and branching climaxes. Act as a demanding senior game-dev lead. Full autonomy — don't ask, just do. RU+EN parity, a working build at every step, verify + rebuild at the end, zero external network requests. Use the `ui-ux-pro-max` skill for all new UI + its accessibility/contrast/touch checks.
 
-LEAD'S FRAMING: a big systems round just landed without tuning. RESIST adding more systems this round. This is balance, feel, anti-exploit, variety, and a real playtest of the new layer.
+LEAD MANDATE — STORY THROUGH SYSTEMS, GATE THE REVEAL: do NOT bolt on a separate "story mode". The narrative rides on the systems you already have (news feed, crises, milestones, prestige). Keep early game simple; reveal acts, rivals, and stakes progressively. The journey should feel emergent, not on-rails.
 
-1) CRISIS TUNING (frequency + severity):
-- Tune crisis cadence by game stage: tense but NOT nagging/spammy. Gentle early game, more pressure later.
-- Ignored/mishandled escalation must carry a real consequence, and proactive Alignment investment must VISIBLY pay off (fewer/smaller crises). Re-confirm the spam-tap exploit is truly gone.
-- Make each crisis decision feel weighty — clear tradeoffs, a beat of spectacle, satisfying resolution feedback.
+1) NARRATIVE CAMPAIGN / ACTS:
+- Structure the whole progression into named ACTS, each with a one-screen intro beat, a clear goal, and a reveal/twist: e.g. Garage → Startup → Frontier Lab → The Race → Singularity. Use existing milestones/prestige as act boundaries. Each intro is a short, satirical, atmospheric beat (RU+EN) — not a wall of text.
+- A subtle "act progress / next chapter" indicator so the player always feels forward motion toward AGI.
 
-2) FIRST-SINGULARITY PACING:
-- Tune the full curve with EVERYTHING active (autopilot, market income, trust gates, crises) so the first Singularity is reachable and satisfying — not a slog, not trivial. Pick a good time-to-first-Singularity and document the curve in BALANCE.md.
+2) RIVAL LABS — "Race to AGI":
+- 2–4 named rival AI labs (with personalities/flavor) that progress toward AGI on their OWN timeline, shown in a clear standings panel (their progress vs. yours). They react to world events and to the race heating up.
+- Light interaction via existing systems: out-compete them (raw progress), slow them (open-source a model = Trust+ but capability−; via news/decisions), poach talent, or race recklessly (speed+ but risk+). Make rivals feel ALIVE and create genuine tension ("Helion Labs is 12% from AGI — move!").
 
-3) MARKET BALANCE + ANTI-EXPLOIT:
-- Ensure the Market is a fun BONUS, not a mandatory grind or a money printer. No risk-free buy-low/sell-high infinite loop; reasonable volatility, sane caps, spread/fees if needed. It should add flavor + light strategy, never trivialize the economy.
+3) STORY VIA NEWS + KEY DECISIONS:
+- Drive the storyline through the existing news/crisis feed plus a handful of pivotal STORY decisions at act boundaries that branch the path (and set up the ending). Keep choices meaningful (tied to Risk vectors / Trust / speed).
 
-4) TRUST ECONOMY:
-- Make Trust matter: earnable AND loseable, with gates that feel meaningful (content/contracts that genuinely want high Trust). Not trivial to max, not impossible.
+4) MULTIPLE ENDINGS / CLIMAX (the payoff + replayability):
+- The AGI/Singularity climax resolves into one of several distinct ENDINGS based on alignment vectors, Trust, crisis handling, race outcome, and speed — e.g. "Aligned Singularity" (win, safely), "Reckless Foom" (win, darkly), "Nationalized / Shut Down" (scaled too fast, lost control), "Beaten to AGI" (a rival got there first). Each ending = a short cinematic + a permanent badge + a small meta-perk, encouraging replay to chase the others.
+- An ENDINGS / collection screen showing which you've unlocked, nudging "try a different strategy next run". Tie cleanly into the existing Singularity reset (each run can pursue a different ending).
 
-5) CONTENT VARIETY (supports tuning, not bloat):
-- Expand news headlines, crisis types, and decision cards so the feed doesn't repeat quickly. RU+EN for all.
+5) DESIGN (skill): act-intro screens, the rivals standings panel, the endings/collection screen, and the climax cinematics must look premium and cohesive — atmospheric, readable, motion. RU+EN.
 
-6) FEEL / UI POLISH (skill): the "World" tab is dense — improve readability and hierarchy (news vs. crisis vs. market), add micro-interactions on market buy/sell and crisis choices, make the Trust HUD clear. Run accessibility/contrast/touch checks and fix fails.
-
-7) FULL PLAYTEST:
-- Play the whole arc with all systems on. Find where it's confusing, annoying, exploitable, repetitive, or boring — and fix it. Give an HONEST verdict on whether the management layer is genuinely fun and well-integrated.
+6) BALANCE + GATING: rivals' pace, act lengths, and ending thresholds tuned so the journey is satisfying (a reachable first ending, meaningful variety between endings), and none of it breaks the economy or the R8 management-sim tuning. Document in BALANCE.md. Gate the reveal of rivals/endings behind progress.
 
 VERIFY + REBUILD:
 - `node --check` every JS; zero console errors in headless Chrome.
-- Smoke + targeted: crisis cadence/escalation, alignment payoff, market not exploitable, trust gates, news variety, gating order, autopilot + all prior systems intact, save/reload, RU↔EN.
-- RU/EN parity for all new strings.
-- Regenerate ALL screenshots (seeded mid-game), mobile + desktop, including a FOCUSED Market screen and a tuned crisis moment.
+- Smoke + targeted: acts advance + intros fire, rival standings progress + react, story decisions branch, each ending is reachable and triggers correctly, endings collection persists, a new run can pursue a different ending, all prior systems (autopilot, market, crises, trust) intact, save/reload, RU↔EN.
+- RU/EN parity for ALL new strings (acts, rivals, story beats, endings — lots).
+- Regenerate ALL screenshots (seeded mid-game), mobile + desktop, including a new ACT INTRO, the RIVALS standings, and an ENDING/climax screen.
 - Rebuild dist/singularity-inc.zip (index.html at root, validated) + dist/store-assets-bundle.zip.
-- Commit each phase. Final message: the tuning numbers (crisis cadence, time-to-first-Singularity), exploits closed, and your honest fun assessment.
+- Commit each phase. Final message: the act/ending structure, how rivals + endings tie to existing systems, the balance numbers, and an honest take on whether the game now has a satisfying journey + replay hook.
