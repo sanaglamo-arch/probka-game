@@ -5,39 +5,35 @@
 
 ---
 
-ROUND 4 — DEPTH, ENDGAME, and the moments that make idlers addictive, plus a critical design-polish pass. Act as a demanding senior game-dev lead. Full autonomy — don't ask, just do. Keep RU+EN parity, a working build at every step, re-verify + rebuild at the end. Zero external network requests (all assets local/inline).
+ROUND 5 — STOP ADDING, START MASTERING. We've piled on features for four rounds (endgame, viral mechanics, full redesign, audio). Now PROVE the game is actually fun, make the pieces cohere, and make it unforgettable. Act as a demanding senior game-dev lead. Full autonomy — don't ask, just do. RU+EN parity, a working build at every step, re-verify + rebuild at the end. Zero external network requests (all assets local/inline).
 
-USE THE DESIGN SKILL (mandatory): a `ui-ux-pro-max` skill is at `/root/.claude/skills/ui-ux-pro-max/`. Invoke it if available; otherwise READ `/root/.claude/skills/ui-ux-pro-max/SKILL.md` + its `data/`/`scripts/` and apply its palette/typography/style guidance and run its accessibility/contrast/touch-target checks on the result.
+USE THE DESIGN SKILL (mandatory): `ui-ux-pro-max` at `/root/.claude/skills/ui-ux-pro-max/`. Invoke it if available; otherwise read `SKILL.md` + its `data/`/`scripts/` and apply its guidance + run its accessibility/contrast/touch-target checks.
 
-LEAD'S VERDICT ON ROUND 3 (be honest): the visual overhaul is a real step up — the glowing TRAIN orb, neon cards, Insight Flash all land. But it's "good, not exceptional", and the GAME still lacks long-term depth and climactic moments. Idlers live or die on (a) an endgame that keeps players for weeks and (b) dopamine spikes at key moments. Both are thin right now. Fix that.
+LEAD'S FRAMING (be honest with yourself): the game is feature-rich but UNPROVEN — nobody has verified it's actually fun end-to-end, the balance with all the new mechanics is untested in practice, and the look is "good", not "unforgettable". This round is quality, cohesion, and spectacle — NOT new systems. Resist adding mechanics; make the existing ones sing.
 
-1) ENDGAME / META-PROGRESSION (biggest gap — kills "nothing to chase after an hour"):
-- SECOND PRESTIGE LAYER "The Singularity": unlocks late (after N total Research Points or the first AGI-tier generator). Resets generators AND Research Points for a permanent meta-currency ("Singularity Cores") that buys a small meta-upgrade tree with strong global modifiers. Short narrative beat on trigger.
-- RESEARCH / TECH TREE (Egg Inc / Realm Grinder): a tree of unlockable techs gated by progress, each multiplying a category (tap, a generator class, offline, risk). Long-term strategic planning.
-- PRESTIGE ARTIFACTS + SYNERGIES: on prestige, grant a few build-crafting artifacts (e.g. "+5% all mult", "risk gain −20%", a gamble one); equipping tagged pairs grants synergy bonuses. Makes each run unique.
-Keep all math sane; document in BALANCE.md + the economy sim.
+1) DEEP PLAYTEST + BALANCE HARDENING (most important):
+- Simulate/play the FULL arc with every mechanic active (tap+combo, generators, milestone x2, upgrades, tech tree, research prestige, artifacts+synergy, Singularity meta-layer, risk/alignment+incidents, insight flash, breakthrough, world events).
+- Find and FIX: the first-60-seconds hook, any mid-game dead zones or progress walls, whether each prestige layer is reachable and feels rewarding, and whether insight/breakthrough/combo synergize vs. trivialize the economy.
+- Tune to: a gripping first minute, a satisfying first prestige (~30–45 min), a meaningful-but-reachable first Singularity, smooth pacing throughout. Document the full curve in BALANCE.md.
+- Add a lightweight "next goal" nudge so players are never lost (subtle hint at the next unlock / affordable milestone / when to prestige).
 
-2) CLIMACTIC MOMENTS (dopamine — currently flat):
-- PRESTIGE RITUAL: turn "Release a frontier model" from a button-tap into a MOMENT — a short cinematic (model-release graphics, light sweep, number cascade, confetti/particles, audio sting) + a quick allocation choice if feasible.
-- MILESTONE CELEBRATIONS: 25/50/100 breakpoints get a real flash + popup + sound, not just a color shift.
-- EVOLVING BACKDROP toward AGI: the ambient backdrop visibly escalates across milestones/prestiges (quiet startup → server farm → data center → orbital → AGI glow), giving a sense of scale.
+2) SIGNATURE IDENTITY + FIRST IMPRESSION (skill):
+- Push the visual from "good neon" to a cohesive, memorable art direction with a distinct personality. Polish splash/loading, first-run, and ALL empty states.
+- Make the main screen a thumb-stopper — the kind of screenshot that earns a click in a store catalog.
 
-3) CRITICAL DESIGN-POLISH PASS (good → exceptional, use the skill):
-- Generator cards read a bit flat/dark/samey — add depth, hierarchy, per-tier identity; make /sec and milestone progress pop.
-- Tighten the TRAIN orb (crisp premium icon, charge/heat shimmer, even more satisfying press).
-- Consistent inline-SVG iconography across ALL screens (kill any remaining emoji/inconsistency).
-- Micro-interactions on every interactive element (buy, tab, toggle, claim). Run the skill's contrast/touch-target/focus checks and fix every fail.
+3) SPECTACLE PASS on the dopamine peaks (make them WOW, not just present):
+- Insight Flash claim, Breakthrough activation, 25/50/100 milestones, the Prestige Ritual, and the Singularity reset should EACH be a genuine spectacle — layered particles, light, motion, sound stings, screen-wide feedback. These are the moments players replay for.
 
-4) AUDIO (last missing juice):
-- Subtle procedural ambient music (WebAudio, no external files), OFF by default, own toggle; richer SFX for tap/buy/milestone/prestige/insight. Pause when tab hidden.
+4) DEPTH WITHOUT BLOAT:
+- Cosmetic skins (earned, no pay-to-win): themes for the lab/backdrop, the TRAIN orb, and/or GPU icons; a small unlock gallery.
+- Expand the satirical news-ticker into a light NARRATIVE ARC with story beats: garage → frontier lab → AGI → Singularity, tied to milestones (RU+EN).
+- Add achievements tied to the NEW systems (tech tree, artifacts, Singularity); a couple may grant small permanent perks.
 
-5) BALANCE AUDIT:
-- Run the economy sim with ALL current mechanics (insight flash, milestone x2, breakthrough, tap combo, new endgame). No runaway / no dead walls; tune to a satisfying first prestige (~30–45 min) and a reachable-but-meaningful Singularity. Document final numbers.
-
-VERIFY + REBUILD:
-- `node --check` every JS; zero console errors in headless Chrome.
-- Smoke test incl. second prestige, tech tree, artifacts, prestige ritual, music toggle, insight/milestone/breakthrough/combo, save/reload, RU↔EN.
-- RU/EN parity for ALL new strings.
-- Regenerate ALL screenshots (seeded mid-game), mobile + desktop of every screen, including new Singularity / tech-tree / artifacts screens + a prestige-ritual moment.
+5) FULL QA SWEEP:
+- `node --check` all JS; zero console errors in headless Chrome.
+- Smoke + edge cases: huge numbers, long offline, prestige mid-incident, artifact-synergy stacking, Singularity reset, music toggle, save/reload, RU↔EN.
+- Skill accessibility pass (contrast/focus/touch) — fix fails.
+- RU/EN parity for ALL strings (incl. nudges, narrative, cosmetics, new achievements).
+- Regenerate ALL screenshots (seeded mid-game), mobile + desktop of EVERY screen — including the new Singularity / tech-tree / artifacts / cosmetics screens and a spectacle moment (insight or prestige ritual).
 - Rebuild dist/singularity-inc.zip (index.html at root, validated) + dist/store-assets-bundle.zip.
-- Commit each phase. Final message: what changed + before/after notes + the new final numbers.
+- Commit each phase. Final message: what changed, the tuned final numbers, and your HONEST assessment of whether it's now genuinely fun.
