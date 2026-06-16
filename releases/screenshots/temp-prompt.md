@@ -5,33 +5,40 @@
 
 ---
 
-ROUND 9 — THE RACE TO AGI: a narrative campaign + rival labs + multiple endings. This is the round that gives the game a SOUL and a reason to replay — it ties every existing system (generators, prestige, Singularity, multi-vector risk, Trust, crises, news, market) into a journey with stakes, competition, and branching climaxes. Act as a demanding senior game-dev lead. Full autonomy — don't ask, just do. RU+EN parity, a working build at every step, verify + rebuild at the end, zero external network requests. Use the `ui-ux-pro-max` skill for all new UI + its accessibility/contrast/touch checks.
+ROUND 10 — LAYOUT INTEGRITY + EXPLAIN EVERYTHING + mobile flagship polish. Decision is set: flagship targets ANDROID / Google Play, focus is POLISH-TO-A-GEM (not new systems), the game stays DEEP BUT ACCESSIBLE, monetization deferred. Act as a demanding senior game-dev lead. Full autonomy — don't ask, just do. RU+EN parity, working build at every step, verify + rebuild at the end, zero external network requests. Use the `ui-ux-pro-max` skill for all UI/feel work + its accessibility/contrast/touch-target checks.
 
-LEAD MANDATE — STORY THROUGH SYSTEMS, GATE THE REVEAL: do NOT bolt on a separate "story mode". The narrative rides on the systems you already have (news feed, crises, milestones, prestige). Keep early game simple; reveal acts, rivals, and stakes progressively. The journey should feel emergent, not on-rails.
+== P0 — CRITICAL LAYOUT BUG (do this FIRST, be ruthless) ==
+A real player reports the MAIN SCREEN is broken: buttons overlap each other and text overflows/spills out of its containers, because too much UI was crammed in over the last rounds. This is unacceptable for a flagship. Do a STRICT layout-integrity pass:
+- Audit EVERY screen (main/Lab first, then all tabs and modals) at MULTIPLE phone sizes (360×640, 360×800, 390×844, 414×896) AND desktop. NOTHING may overlap. NO text overflow, clipping, or spill. NO buttons stacking on top of each other. Proper spacing, wrapping, and stacking everywhere.
+- Specifically the main/Lab screen: the TRAIN orb, Breakthrough button + its timer, the risk/vector bars, the generator list, the buy-mode bar, and the bottom nav must all have their own space and never collide — at every size, including when new elements appear (insight flash, crisis banner, breakthrough active, news ticker).
+- Rebuild the layout with a robust system (fl/grid, min-heights, overflow handling, safe-area insets) so it CAN'T overlap as content changes. Use the skill for spacing/hierarchy.
+- VERIFY visually: screenshot the main screen and each tab at all the sizes above and confirm by eye there are zero overlaps/overflows before moving on. Treat any overlap as a blocking bug.
 
-1) NARRATIVE CAMPAIGN / ACTS:
-- Structure the whole progression into named ACTS, each with a one-screen intro beat, a clear goal, and a reveal/twist: e.g. Garage → Startup → Frontier Lab → The Race → Singularity. Use existing milestones/prestige as act boundaries. Each intro is a short, satirical, atmospheric beat (RU+EN) — not a wall of text.
-- A subtle "act progress / next chapter" indicator so the player always feels forward motion toward AGI.
+== P1 — EXPLAIN EVERYTHING (lots was added; nothing should be a mystery) ==
+So many systems were added (tap/combo, generators, milestones, upgrades, managers, Autopilot, Research/tech tree, artifacts, prestige, Singularity, multi-vector Risk, Alignment, crises, News, Trust, Market, Breakthrough, Insight Flash, events...). A player must ALWAYS understand what each thing is.
+- Give every system/stat/button at least a MINIMAL explanation: a one-line label/subtitle, and an info "ⓘ" affordance (tap/long-press → a short tooltip/popover) on anything non-obvious (each Risk vector, Trust, Alignment, Autopilot reserve, artifacts, Cores, market assets, Breakthrough, Insight, etc.).
+- First-time-reveal hints when a new system unlocks (one line, skippable, shown once). RU+EN for ALL of it.
+- Keep it lightweight and consistent — not walls of text; just enough that nothing is a mystery.
 
-2) RIVAL LABS — "Race to AGI":
-- 2–4 named rival AI labs (with personalities/flavor) that progress toward AGI on their OWN timeline, shown in a clear standings panel (their progress vs. yours). They react to world events and to the race heating up.
-- Light interaction via existing systems: out-compete them (raw progress), slow them (open-source a model = Trust+ but capability−; via news/decisions), poach talent, or race recklessly (speed+ but risk+). Make rivals feel ALIVE and create genuine tension ("Helion Labs is 12% from AGI — move!").
+== P2 — MOBILE UX HARDENING (Play is the target) ==
+- Portrait-first, locked orientation. One-handed thumb reach for primary actions. Touch targets ≥48px. No hover/desktop-only patterns. Legible fonts. Bottom-nav in the thumb zone. Notch/safe-area correct.
+- HAPTICS (Vibration API where available) on tap/buy/milestone/crisis/insight, with a settings toggle.
 
-3) STORY VIA NEWS + KEY DECISIONS:
-- Drive the storyline through the existing news/crisis feed plus a handful of pivotal STORY decisions at act boundaries that branch the path (and set up the ending). Keep choices meaningful (tied to Risk vectors / Trust / speed).
+== P3 — PERFORMANCE (~60fps on mid/low-end Android) ==
+- Fix jank: cap/pool particles, throttle DOM writes (odometer, /sec, lists), avoid layout thrash, tighten rAF tick/render, pause offscreen work, lazy-render heavy panels (market sparklines, long lists). Measure frame time; no memory growth over long sessions.
 
-4) MULTIPLE ENDINGS / CLIMAX (the payoff + replayability):
-- The AGI/Singularity climax resolves into one of several distinct ENDINGS based on alignment vectors, Trust, crisis handling, race outcome, and speed — e.g. "Aligned Singularity" (win, safely), "Reckless Foom" (win, darkly), "Nationalized / Shut Down" (scaled too fast, lost control), "Beaten to AGI" (a rival got there first). Each ending = a short cinematic + a permanent badge + a small meta-perk, encouraging replay to chase the others.
-- An ENDINGS / collection screen showing which you've unlocked, nudging "try a different strategy next run". Tie cleanly into the existing Singularity reset (each run can pursue a different ending).
+== P4 — FIRST 3 MINUTES + DEEP-BUT-ACCESSIBLE ==
+- Make the opening instantly satisfying and clear; first tap great, first buy fast, first "wow" early; onboarding frictionless + skippable. Play the first ~30 min as a casual mobile player — anything overwhelming/unclear/tedious, smooth it. Deep systems must feel optional/rewarding, never mandatory homework early.
 
-5) DESIGN (skill): act-intro screens, the rivals standings panel, the endings/collection screen, and the climax cinematics must look premium and cohesive — atmospheric, readable, motion. RU+EN.
+== P5 — GAME FEEL / PRODUCTION VALUES ==
+- Polish animation timing/easing, sound mix + ambient-music balance, transitions, spectacle moments. Enforce consistent iconography/spacing/typography across every screen (skill). Kill rough edges.
 
-6) BALANCE + GATING: rivals' pace, act lengths, and ending thresholds tuned so the journey is satisfying (a reachable first ending, meaningful variety between endings), and none of it breaks the economy or the R8 management-sim tuning. Document in BALANCE.md. Gate the reveal of rivals/endings behind progress.
+== P6 — ANDROID WRAPPER PREP (monetization deferred — just wrappable) ==
+- Set up Capacitor wrapping: config, portrait lock, status-bar/safe-area, Android hardware BACK-button handling, offline local save in a WebView. No ads/IAP. Produce or fully document the APK build steps (if Android SDK absent, prepare so the user can build). Keep plain-web + Yandex builds intact (platform abstracted).
 
 VERIFY + REBUILD:
-- `node --check` every JS; zero console errors in headless Chrome.
-- Smoke + targeted: acts advance + intros fire, rival standings progress + react, story decisions branch, each ending is reachable and triggers correctly, endings collection persists, a new run can pursue a different ending, all prior systems (autopilot, market, crises, trust) intact, save/reload, RU↔EN.
-- RU/EN parity for ALL new strings (acts, rivals, story beats, endings — lots).
-- Regenerate ALL screenshots (seeded mid-game), mobile + desktop, including a new ACT INTRO, the RIVALS standings, and an ENDING/climax screen.
-- Rebuild dist/singularity-inc.zip (index.html at root, validated) + dist/store-assets-bundle.zip.
-- Commit each phase. Final message: the act/ending structure, how rivals + endings tie to existing systems, the balance numbers, and an honest take on whether the game now has a satisfying journey + replay hook.
+- `node --check` all JS; headless Chrome at 360×640 / 360×800 / 390×844 / 414×896 with ZERO console errors AND zero visual overlaps (verify by screenshot); a perf check.
+- RU/EN parity for ALL strings (incl. every new tooltip/hint).
+- Regenerate ALL screenshots PHONE-FIRST (portrait, real device sizes), keep desktop set — and include close-ups proving the main screen no longer overlaps.
+- Rebuild dist/singularity-inc.zip (index.html at root, validated) + bundle; document/produce the Android build if set up.
+- Commit each phase. Final message: confirmation the overlap bug is gone (with which sizes you verified), the explanation/tooltip coverage, mobile-readiness, perf numbers, and first-3-min verdict.
