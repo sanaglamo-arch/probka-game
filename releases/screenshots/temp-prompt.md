@@ -26,6 +26,11 @@ You committed "standings verified green", but it is STILL BROKEN. I re-rendered 
 Note: `standings()` in game.js DOES have a `.sort(b.share - a.share)`, yet the DISPLAYED order/ranks don't match. So the bug is between the sorted array and what's shown — most likely `updateStandings()` in ui.js: the DOM-reorder `appendChild` is gated on `sig !== _standSig` (id-order caching) so rows may never actually re-order, while rank labels get set per-row → labels and visual rows desync. OR rival-share init makes the array unsorted.
 Fix: make the DISPLAYED rank AND row order ALWAYS match the descending market-share, in EVERY state (mid/late/finale). VERIFY by actually RENDERING `__view.html?tab=world&stage=mid` and `&stage=finale` and reading the result — do NOT trust that a `.sort` exists in code. The repro state has rival defaults Helion 11 / Cerebra 13 / OmniNet 9 with You 12, so the correct display is: #1 Cerebra 13%, #2 You 12%, #3 Helion 11%, #4 OmniNet 9%.
 
+UPDATE: your commit "fix(bug3): standings always reorder DOM to sorted share" did NOT fix it — I re-rendered the CURRENT build and `__view.html?tab=world&stage=mid` STILL shows #1 Helion 11% above #2 Cerebra 13% and #3 You 12%. So the DOM-reorder was not the (only) cause. STRONG HYPOTHESIS: `standings()` sorts with `b.share - a.share`, but in this state the rival shares (`state.rivalShare[id]`) are non-numeric / undefined → `b.share - a.share` is NaN → `Array.sort` leaves them in insertion order (rivals-array order with You spliced in = exactly what's shown). FIX ROBUSTLY: coerce every share to a finite Number (default 0) BEFORE sorting, in `standings()` — harmless if already numeric, fixes it if NaN. Also ensure `ensureRivalShare()` always yields numbers. Then RE-RENDER `__view.html?tab=world&stage=mid` AND `&stage=finale` yourself and confirm rank matches share before claiming done.
+
+== BUG 5 (MINOR, RU) — "You" not localized in standings ==
+In the market-share standings the player row shows "You" in English even in RU. Localize it (e.g. "Вы"). (RU otherwise reads clean — no overflow.)
+
 == BUG 4 (MINOR) — ALIGNMENT ARROW DIRECTION ==
 On the Alignment risk vectors, each rising rate shows a "▼" down-arrow (e.g. "▼ +0.14/s") — confusing. Use a rising/up indicator (or drop the arrow) so it reads as "risk going up".
 
