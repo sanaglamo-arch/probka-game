@@ -21,9 +21,10 @@ Fix:
 - Queue/cap toasts: show at most ~2–3 at once; the rest queue and appear in sequence; never cover the whole screen.
 - On save-LOAD, do NOT re-fire already-earned achievement/milestone toasts — only genuinely NEW unlocks should toast. (Re-check this fires correctly once valuation is fixed, since UNICORN/DECACORN are valuation-gated.)
 
-== BUG 3 (MEDIUM) — MARKET-SHARE STANDINGS SORT WRONG ==
-Repro: at a mid state the World/Race standings showed **#1 Helion 11%, #2 Cerebra 13%, #3 You 12%, #4 OmniNet 9%** — ranks do NOT match the shown %. (Late game sorted correctly.) A player must never see "#1" with less share than "#2/#3".
-Fix: sort the standings strictly by the SAME market-share value that's displayed, in EVERY state; rank label always matches shown %.
+== BUG 3 (MEDIUM) — MARKET-SHARE STANDINGS SORT STILL WRONG (your "fix" did NOT work) ==
+You committed "standings verified green", but it is STILL BROKEN. I re-rendered the CURRENT build via `__view.html?tab=world&stage=mid` and the standings STILL show **#1 Helion 11%, #2 Cerebra 13%, #3 You 12%, #4 OmniNet 9%** — rank #1 has LESS share than #2 and #3. (At stage=late it looks right; at stage=mid and stage=finale the rivals are mis-ranked.)
+Note: `standings()` in game.js DOES have a `.sort(b.share - a.share)`, yet the DISPLAYED order/ranks don't match. So the bug is between the sorted array and what's shown — most likely `updateStandings()` in ui.js: the DOM-reorder `appendChild` is gated on `sig !== _standSig` (id-order caching) so rows may never actually re-order, while rank labels get set per-row → labels and visual rows desync. OR rival-share init makes the array unsorted.
+Fix: make the DISPLAYED rank AND row order ALWAYS match the descending market-share, in EVERY state (mid/late/finale). VERIFY by actually RENDERING `__view.html?tab=world&stage=mid` and `&stage=finale` and reading the result — do NOT trust that a `.sort` exists in code. The repro state has rival defaults Helion 11 / Cerebra 13 / OmniNet 9 with You 12, so the correct display is: #1 Cerebra 13%, #2 You 12%, #3 Helion 11%, #4 OmniNet 9%.
 
 == BUG 4 (MINOR) — ALIGNMENT ARROW DIRECTION ==
 On the Alignment risk vectors, each rising rate shows a "▼" down-arrow (e.g. "▼ +0.14/s") — confusing. Use a rising/up indicator (or drop the arrow) so it reads as "risk going up".
