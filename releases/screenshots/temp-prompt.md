@@ -4,43 +4,14 @@
 
 ---
 
-BUGFIX ROUND — a full playtest (fresh → mid → late → finale, every tab, via __view.html) turned up real bugs. Fix ALL of them properly, then re-verify by rendering. Full autonomy — don't ask, don't stop. RU+EN parity, working build at every step, safe save migration, zero external runtime requests, commit each fix with a clear message, update BALANCE.md where economy changes.
+BUGFIX ROUND — STATUS + next. Independent verification results:
+- ✅ BUG1 (valuation/funding) — FIXED & verified: valuation is now sane ($40.66M at $1.79M cash) and CONSISTENT Lab HUD == Stats; funding pays a sensible boost (+$622.5K, not billions). Good.
+- ✅ BUG2 (toast flood) — FIXED: capped, screen no longer buried; finale readable.
+- ✅ BUG3 (standings) — actually CORRECT. I inspected the runtime directly (engine + real DOM, replicating the exact mid state): `GAME.standings()` returns `[helion:17, cerebra:13, you:12, omninet:9]` and the DOM shows `#1 Helion 17%, #2 Cerebra 13%, #3 You 12%, #4 OmniNet 9%` — properly sorted, rank matches share. The earlier "#1 Helion 11%" screenshot was a TIMING ARTIFACT of the __view.html harness (rival shares evolve over ticks; a frame caught a transient), NOT a real bug. Nothing more to do here.
+- ✅ BUG4 (alignment arrow) & BUG5 (RU "You" → localized player row) — done.
 
-== BUG 1 (CRITICAL) — VALUATION & FUNDING ARE BROKEN ==
-Repro: at a mid state (cash $1.42M) the Lab HUD shows **VALUATION $164 TRILLION**, while the STATS tab shows **Valuation 40.66M** for the SAME state — inconsistent AND wildly inflated. Funding buttons pay out insane lumps: **"Raise Series B · +$294.6B"** (mid), **"Raise IPO · +$22T"** (late). A player who releases a model and takes a round is handed "free" billions from nowhere.
-Root cause: `valuation() = max(moneyRate*SECONDS_YEAR*VAL_REV_MULT, cash+compute*2)` — annualising the per-second rate (×~31.5M) then ×VAL_REV_MULT explodes it; it's also time-sensitive (grows as moneyRate climbs) so different screens show different numbers; `takeFunding()` grants `valuation*cashFrac` → trillions.
-Fix:
-- **Valuation:** re-derive so it's a believable company number IN THE SAME UNIVERSE as your cash/revenue (e.g. a sane revenue multiple WITHOUT the ×SECONDS_YEAR explosion, and/or based on cumulative earnings + market share). It must be STABLE and CONSISTENT on every screen (Lab HUD == Stats == anywhere). Grows impressively but plausibly — never $164T at $1.4M cash.
-- **Funding payouts:** a meaningful BOOST, never a game-skip. Re-tune so each round pays roughly "a few minutes of current income" (or a hand-tuned curve vs. current cash/cps), NOT valuation×frac. Seed = small head-start; later rounds bigger but still minutes-of-income, never hours/days. Simulate taking every round at its earliest gen — it must NOT trivialise the next stage.
-- **Clarity:** when a round unlocks, explain WHERE the money comes from — "Releasing model vN unlocked your Seed round: investors put in $X for equity." One line on the button/panel + ⓘ tooltip, RU+EN.
-- **Money-scenario sweep:** check EVERY money source (model release/market-share income, funding, daily/boost, offline, windfalls, news/event cash) — nothing may hand a sum wildly out of scale; no money-printer. Re-confirm the month-long arc still holds; document new numbers in BALANCE.md.
-
-== BUG 2 (HIGH) — ACHIEVEMENT/MILESTONE TOAST FLOOD ==
-Repro: loading a mid/late/finale state makes 8–13 toasts (achievements + UNICORN/DECACORN milestones) stack and BURY the entire screen — at the finale the ending screen is completely hidden behind toasts.
-Fix:
-- Queue/cap toasts: show at most ~2–3 at once; the rest queue and appear in sequence; never cover the whole screen.
-- On save-LOAD, do NOT re-fire already-earned achievement/milestone toasts — only genuinely NEW unlocks should toast. (Re-check this fires correctly once valuation is fixed, since UNICORN/DECACORN are valuation-gated.)
-
-== BUG 3 (MEDIUM) — MARKET-SHARE STANDINGS SORT STILL WRONG (your "fix" did NOT work) ==
-You committed "standings verified green", but it is STILL BROKEN. I re-rendered the CURRENT build via `__view.html?tab=world&stage=mid` and the standings STILL show **#1 Helion 11%, #2 Cerebra 13%, #3 You 12%, #4 OmniNet 9%** — rank #1 has LESS share than #2 and #3. (At stage=late it looks right; at stage=mid and stage=finale the rivals are mis-ranked.)
-Note: `standings()` in game.js DOES have a `.sort(b.share - a.share)`, yet the DISPLAYED order/ranks don't match. So the bug is between the sorted array and what's shown — most likely `updateStandings()` in ui.js: the DOM-reorder `appendChild` is gated on `sig !== _standSig` (id-order caching) so rows may never actually re-order, while rank labels get set per-row → labels and visual rows desync. OR rival-share init makes the array unsorted.
-Fix: make the DISPLAYED rank AND row order ALWAYS match the descending market-share, in EVERY state (mid/late/finale). VERIFY by actually RENDERING `__view.html?tab=world&stage=mid` and `&stage=finale` and reading the result — do NOT trust that a `.sort` exists in code. The repro state has rival defaults Helion 11 / Cerebra 13 / OmniNet 9 with You 12, so the correct display is: #1 Cerebra 13%, #2 You 12%, #3 Helion 11%, #4 OmniNet 9%.
-
-DEFINITIVE DIAGNOSIS (I inspected the runtime — stop guessing, this is the real cause):
-For `__view.html?tab=world&stage=mid`, `GAME.standings()` returns CORRECTLY SORTED data: `[helion:17, cerebra:13, you:12, omninet:9]`. So the ENGINE and the SORT are RIGHT — Helion legitimately is #1 with 17% share. That's why your sort "fixes" verified green.
-THE ACTUAL BUG IS THE DISPLAYED %: the rendered standings show "#1 Helion **11%**" — i.e. the share NUMBER shown for the #1 row is STALE/WRONG (real value 17, shown 11). Cerebra 13 / You 12 / OmniNet 9 display correctly; only the top (reordered) row shows a wrong %. So after the DOM reorder, the #1 row's share TEXT isn't updated to the current value — almost certainly the `setText` no-op cache (`__t`) skipping the update, or the share/bar element reference getting mismatched to the row during `appendChild` reordering.
-FIX: in `updateStandings()`, ensure each row's displayed share % (and bar width) ALWAYS reflects that row's CURRENT share after reordering — bust the cache / re-bind refs so the moved #1 row shows its real share. VERIFY by rendering `__view.html?tab=world&stage=mid` and reading the #1 row's % — it must show 17%, not 11%. (The rank order itself is already correct.)
-
-== BUG 5 (MINOR, RU) — "You" not localized in standings ==
-In the market-share standings the player row shows "You" in English even in RU. Localize it (e.g. "Вы"). (RU otherwise reads clean — no overflow.)
-
-== BUG 4 (MINOR) — ALIGNMENT ARROW DIRECTION ==
-On the Alignment risk vectors, each rising rate shows a "▼" down-arrow (e.g. "▼ +0.14/s") — confusing. Use a rising/up indicator (or drop the arrow) so it reads as "risk going up".
-
-VERIFY (render via __view.html at fresh/mid/late/finale on Lab/World/Team/Stats):
-- node --check all JS; zero console errors.
-- Valuation is sane (in-scale with cash) and IDENTICAL on Lab HUD and Stats; funding payouts are a sensible boost (not trillions) and the funding flow is explained.
-- No toast flood — finale/ending screen is readable; earned achievements don't re-toast on load.
-- Standings rank matches shown % in every state.
-- RU↔EN parity; no layout overflow at 360/390/414; safe save migration.
-- Commit each fix; update BALANCE.md. Final message: each bug, the fix, and how you verified.
+So the bugfix round is COMPLETE. Now continue making the game better per `GAME-DESIGN.md` (re-read it). Suggested focus next, in order:
+1) EARLY-GAME CLARITY (the first 5 minutes — where players form their impression): make the fresh→first-model→first-funding flow crystal clear. When the player advances a model generation, clearly show what it gave (permanent boost + market-share jump). When a funding round unlocks, the "where did the money come from" line must be obvious. Play the first ~10 minutes as a new player and smooth any confusion.
+2) FEEL/PACING of the new real-time processes: training/datacenter/research timers should feel good — clear progress bars + ETA, satisfying completion moments, and active play/boosts visibly speeding them up. No dead waiting with nothing to do.
+3) Keep self-verifying by RENDERING (and, for anything number/state-related, by inspecting the runtime directly — screenshots of time-evolving state can mislead, as the standings did).
+Full autonomy, RU+EN parity, working build each step, zero external runtime requests, safe save migration, no layout overflow at 360/390/414, commit each step. Keep going — don't stop.
