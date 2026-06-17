@@ -1,22 +1,23 @@
-# Временный промт (обновляется)
+# Временный промт (ночная задача)
 
-> (Я доставляю это строителю сам — схема B.)
+> Ночной автономный билд Singularity Inc. Кидается в /loop. Читается заново каждый заход.
 
 ---
 
-P0 MOBILE BUG — COMPUTE GENERATORS UNREACHABLE ON PHONE (Lab tab). Real-device report + my runtime diagnosis below. Fix this FIRST, before anything else. Full autonomy, don't ask, commit when done, verify on real phone viewports.
+НОЧНАЯ ЗАДАЧА — Singularity Inc.: реализовать переработанный дизайн В КОДЕ и итерировать до ИГРАБЕЛЬНОГО, проходимого, выверенного билда к утру. Режим тимлида, БЕЗ согласований (владелец спит). **Заморозка кода СНЯТА — теперь меняешь код игры.** Цель: утром владелец ИГРАЕТ в обновлённую игру (не читает абстракцию).
 
-SYMPTOM (portrait phone, gets WORSE after training model v1): the compute generator cards (Laptop, GPU Rig, …) are squeezed into a tiny strip at the very bottom and you CANNOT scroll to them — after v1 they vanish below the nav bar entirely. This is the kind of layout bug that most enrages the player. Fix it solidly.
+ЦИКЛ (повторять до сходимости или ~8ч): (1) возьми следующий по приоритету кусок из целевого дизайна (`/root/singularity-inc/DESIGN-GDD-full.md` + `DESIGN-audit-resolutions.md` + `DESIGN-time-accountant.md` + локи `DESIGN-*.md`); (2) реализуй его builder-субагентом в /root/singularity-inc (ПОСЛЕДОВАТЕЛЬНО — общие файлы), рабочий билд на каждом шаге, 0 console-ошибок, RU+EN, безопасная миграция сейвов; (3) ВЕРИФИЦИРУЙ САМ (node --check + рендер-харнесс + числовой пруф-сим где трогаешь экономику) — сломалось → чини/откати; (4) периодически гоняй адверсариальный аудит (экономика-сим: проходимо на 4 + «строить выгодно С V1» + нет спиралей; дизайн worst-case) — новые дыры чини на своё усмотрение; (5) коммить каждый кусок + пиши в STATUS-REPORT и NIGHT-LOG.md (что реализовал/нашёл/починил).
 
-ROOT CAUSE (confirmed via runtime inspection at 390x740): `#genList` (`.scroll`, index.html:77) is a nested `overflow-y:auto` flex child inside `#labMain` (flex column, min-height:0). On the portrait single-column Lab, `#tapZone` (the big TRAIN orb, fixed height) + `#modelPanel` consume the column's vertical budget, so `#genList` collapses to **clientHeight≈24px while its scrollHeight is 562px** — a 24px peephole holding ALL generators, positioned at top=845 (below the 740 viewport, below navTop=687). After v1 the model panel grows (funding button + model head appear), squeezing it further. Desktop is fine because the company tab switches to a 2-column row layout (styles.css:903) where `#labMain` gets full height.
+ПРИОРИТЕТ (несущее → играбельное ядро, потом полировка):
+**P1 (обязательно — делает игру играбельной и верной):**
+- Время: `DAY_SEC` 60→300 (1 день=5 мин); календарь → отображение Год/эра.
+- Экономика-ребаланс: выручка ~ЛИНЕЙНА в Мощности, маржинальная покупка нетто-плюс **С V1** (убить долину И парк-эксплойт); подключить мёртвый round-mult + revMult-лестницу в выручку; перетюнить Невозможно проходимым (rev/burn>1.0 хорошей игрой). ДОКАЗАТЬ пруф-симом (разумный игрок выигрывает Easy/Normal/Hard, Невозможно тесно; жадный/idle падают).
+- Правда о деньгах: доход NET со знаком; runway в ДНЯХ; финстрока всегда видна.
+- БУХГАЛТЕР: авто-найм через ~2 реал.мин; платит счета/налоги офлайн с КОМИССИЕЙ (кусает рано/копейки поздно, НЕ «бесплатно»); отчёт «пока тебя не было»; онлайн — платишь сам без комиссии.
+- Дискретные счета (электро) + налоги, БАТЧИНГ (накопление видно, списание реже/крупнее, не спам каждые 7 дней).
+- Game-over → рестарт→выбор сложности (проверить, Блок 1).
+**P2 (глубина/честность):** активность поздней игры (спринт/саботаж/альянс-решения во время долгих обучений; HUD «отрыв к AGI» + рычаг); каденция решений по реальному времени/сессии, не по игр.дням; полы спиралей (частичное −30%, не 0); 4 метрики (Одобрение населения=Trust / Лояльность гос-ва / Отношения с компаниями / Мораль) с кросс-давлением + открывают двери; Safety с плюсовой тягой.
+**P3 (идентичность/удержание, если успеешь):** хук-juice на TRAIN + зрелище v1; сатира-тикер ривалов; шеримые карточки концовок; плашки изменения долей; альт-цели; дейли-петля; вырезать переусложнённый престиж-стек до ОДНОЙ меты; простой язык (Compute→Мощность и т.д.); полировка (слайдеры громкости, экспорт сейва, colorblind-цвета).
 
-FIX (portrait/mobile only — DO NOT touch the desktop >=breakpoint 2-column row layout): make the whole Lab tab ONE natural vertical page-scroll so every generator is reachable:
-- The `.tab[data-tab="company"]` (or a wrapper inside it) scrolls vertically on mobile; `#content` keeps its clip (`overflow:hidden`).
-- `#tapZone` and `#labMain` flow at natural height (e.g. `flex:0 0 auto`), not fighting over a fixed viewport.
-- `#genList` flows at its FULL natural height on mobile — remove the nested collapsed scroll (no `overflow-y:auto` / `flex:1` that collapses it); let it expand and scroll with the page.
-- `#buyModeBar` stays usable: make it sticky to the bottom of the scroll viewport (or let it scroll with content), never overlapping the last card; give the list bottom padding to clear BOTH the buyModeBar and the bottom nav bar.
-- It is fine and expected that the TRAIN orb scrolls off-screen as you scroll down to the generator shop (standard idle-game pattern).
-
-VERIFY (mandatory, with crops): at 360x640 AND 390x740, EN+RU, in THREE states — (a) fresh start, (b) just after model v1 (the reported case), (c) mid-game (~v4, model panel full + build/funding visible): scroll the Lab top-to-bottom and confirm EVERY generator card is fully reachable and tappable, buyModeBar usable, the last card clears the nav bar, no 24px peephole, no overlap anywhere. Confirm the desktop 2-column Lab and ALL other tabs are unchanged. `node --check` clean on touched JS, safe save migration, commit with a clear message.
-
-(After this P0 ships and I verify, the queued Round A game-feel work follows — do P0 first.)
+ПРАВИЛА: билд ВСЕГДА рабочий и играбельный (не оставляй сломанным на ночь — кусок ломает и быстро не чинится → откати его и залогируй); НЕ выпускай экономику, не прошедшую пруф-сим (гейть баланс на симе); билдеры последовательно; якорь на локи `DESIGN-*.md` (не нарушать время/бухгалтер/простой-язык/4-метрики/одна-мета); крупные veto-able scope-решения — НЕ финаль молча, выноси в MORNING-SUMMARY.md. В конце пересобрать `dist/singularity-inc.zip`; держать сервер :8080 на свежем билде, чтоб утром играть.
+УТРО: ИГРАБЕЛЬНЫЙ билд (владелец будет тестить) + MORNING-SUMMARY.md (что реализовано, что проверено, известные проблемы, открытые вопросы) + NIGHT-LOG.md (детально по кругам).
