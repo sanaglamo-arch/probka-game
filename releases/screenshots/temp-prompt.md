@@ -4,17 +4,19 @@
 
 ---
 
-GAME-FEEL MASTERING ROUND. Two QA/design analysts found the mechanics are solid but the game "feels flat" in key moments. Fix the feel — these are mostly LOW-effort, HIGH-impact, NO new systems, NO economy changes. Full autonomy — don't ask, don't stop, commit each. RU+EN parity, working build each step, zero external runtime requests, no layout overflow at 360/390/414. Verify by rendering AND (for moments/animation) by code + runtime inspection.
+P0 MOBILE BUG — COMPUTE GENERATORS UNREACHABLE ON PHONE (Lab tab). Real-device report + my runtime diagnosis below. Fix this FIRST, before anything else. Full autonomy, don't ask, commit when done, verify on real phone viewports.
 
-1) FIX THE #1 DOPAMINE MOMENT — MODEL-GENERATION ADVANCE (the climax, ~11×/run, currently half-baked). The summary modal pops INSTANTLY and hides the celebration FX. DEFER the gen-summary modal ~1.2s so the celebratory shockwave + confetti play VISIBLY over the main screen first (the progress bar hits 100% → burst → THEN the modal slides in). Make shipping a model feel like a triumph. (`js/ui.js` showGenSummary path.)
-2) LONG-TRAINING FEEDBACK + the v4→v5 MOMENTUM CLIFF (training jumps ~1h→4h around min 50 — players feel stuck). (a) Fire a subtle progress toast at 25% / 50% / 75% of a training run ("Model vN training · 50% · ~Xh left"). (b) The FIRST time a training run exceeds ~1h, show a one-time light, skippable teaching beat: "Models take longer to train now — hire researchers and build datacenters to speed them up. Work in parallel; never just wait." Show the researcher/build CTAs. This keeps "always a next goal" alive. (`js/game.js` finishTraining/tick + `js/ui.js`.)
-3) LATE-GAME DRAMA (v7→AGI, 5+ days currently silent). (a) When a rival crosses 50% / 75% / 90% AGI progress, fire a toast: "🚀 Helion hit 75% AGI — they're catching up!". (b) Add a persistent topbar "race status" badge from mid-game: "🏆 #1 market share" when you lead, switching to "⚠️ Helion 78% AGI" when a rival is closing. Make the race feel alive. (`js/game.js` rival update + `js/ui.js` topbar.)
-4) PARALLEL-TIMER WINS SHOULDN'T BE SILENT. Datacenter build / research / hire completions currently resolve silently. Give each a distinct subtle audio cue + a haptic pulse + a clear toast ("Datacenter built · +X% compute capacity"). (`js/game.js` finishBuild/finishResearch + `js/audio.js` add build/research tones + `js/ui.js`.)
-5) CHEAP JUICE (low effort, real feel):
-   - Milestone ×2 toast shows the output DELTA: "×2! +X/sec" (compute the gain). (`js/ui.js` milestone handler.)
-   - Generator buy: a small floating "+X/sec" over the card on purchase. (`js/game.js` buyGen delta + `js/ui.js` floatText.)
-   - Funding round: a distinct rising jingle + a soft GREEN "good news" screen flash (not the cyan/red used elsewhere). (`js/audio.js` + `js/ui.js` on funding.)
-   - Daily streak milestones (day 7 / 14 / 30): a celebratory toast with a 🔥 badge. (`js/game.js` daily + `js/ui.js`.)
-6) DISCOVERABILITY: surface the orb cosmetics (cyan/gold/crimson) as a small swatch row on the Lab tab (they're buried in Settings now); and show the current ACT name on the topbar (e.g. "ACT III · FRONTIER") so the narrative arc is visible. (`js/ui.js`.)
+SYMPTOM (portrait phone, gets WORSE after training model v1): the compute generator cards (Laptop, GPU Rig, …) are squeezed into a tiny strip at the very bottom and you CANNOT scroll to them — after v1 they vanish below the nav bar entirely. This is the kind of layout bug that most enrages the player. Fix it solidly.
 
-CONSTRAINTS: no new gameplay systems, no balance/economy changes (economy passed audit). Keep it tasteful — feedback should feel premium, not spammy (cap toasts, don't flood). VERIFY: node --check clean; render affected screens at 360/390 EN+RU (no overflow, no regressions); confirm the gen-advance celebration is visible before the modal; RU+EN parity; safe save migration; commit each with a clear message.
+ROOT CAUSE (confirmed via runtime inspection at 390x740): `#genList` (`.scroll`, index.html:77) is a nested `overflow-y:auto` flex child inside `#labMain` (flex column, min-height:0). On the portrait single-column Lab, `#tapZone` (the big TRAIN orb, fixed height) + `#modelPanel` consume the column's vertical budget, so `#genList` collapses to **clientHeight≈24px while its scrollHeight is 562px** — a 24px peephole holding ALL generators, positioned at top=845 (below the 740 viewport, below navTop=687). After v1 the model panel grows (funding button + model head appear), squeezing it further. Desktop is fine because the company tab switches to a 2-column row layout (styles.css:903) where `#labMain` gets full height.
+
+FIX (portrait/mobile only — DO NOT touch the desktop >=breakpoint 2-column row layout): make the whole Lab tab ONE natural vertical page-scroll so every generator is reachable:
+- The `.tab[data-tab="company"]` (or a wrapper inside it) scrolls vertically on mobile; `#content` keeps its clip (`overflow:hidden`).
+- `#tapZone` and `#labMain` flow at natural height (e.g. `flex:0 0 auto`), not fighting over a fixed viewport.
+- `#genList` flows at its FULL natural height on mobile — remove the nested collapsed scroll (no `overflow-y:auto` / `flex:1` that collapses it); let it expand and scroll with the page.
+- `#buyModeBar` stays usable: make it sticky to the bottom of the scroll viewport (or let it scroll with content), never overlapping the last card; give the list bottom padding to clear BOTH the buyModeBar and the bottom nav bar.
+- It is fine and expected that the TRAIN orb scrolls off-screen as you scroll down to the generator shop (standard idle-game pattern).
+
+VERIFY (mandatory, with crops): at 360x640 AND 390x740, EN+RU, in THREE states — (a) fresh start, (b) just after model v1 (the reported case), (c) mid-game (~v4, model panel full + build/funding visible): scroll the Lab top-to-bottom and confirm EVERY generator card is fully reachable and tappable, buyModeBar usable, the last card clears the nav bar, no 24px peephole, no overlap anywhere. Confirm the desktop 2-column Lab and ALL other tabs are unchanged. `node --check` clean on touched JS, safe save migration, commit with a clear message.
+
+(After this P0 ships and I verify, the queued Round A game-feel work follows — do P0 first.)
