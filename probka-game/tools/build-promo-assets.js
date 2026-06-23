@@ -274,28 +274,78 @@ function P3() {
 }
 
 // ============================================================
-// COVER 800x470 (the one allowed to be a banner) — no chips
+// Brand key-art (logo + cover): glossy red hero car bursting through a
+// glowing green EXIT, vivid gradient, perspective grid floor, light & gloss.
 // ============================================================
+const NIGHT_BLUE = skinUrl("night_blue"), TAXI = skinUrl("taxi_yellow");
+const BRAND_CSS = `
+.vbg{position:absolute;inset:0;background:radial-gradient(125% 120% at 26% 16%,#2f6ea4 0%,#1a4569 42%,#0b1f33 100%)}
+.vglow{position:absolute;inset:0;background:radial-gradient(40% 44% at var(--ex,72%) var(--ey,28%),rgba(110,245,175,.6),transparent 62%);mix-blend-mode:screen}
+.vrays{position:absolute;inset:-25%;background:repeating-conic-gradient(from 150deg at var(--ex,72%) var(--ey,28%),rgba(255,255,255,.07) 0deg 3deg,transparent 3deg 12deg);mix-blend-mode:screen;opacity:.5}
+.gridwrap{position:absolute;left:-25%;right:-25%;bottom:-8%;height:62%;perspective:480px;perspective-origin:center top}
+.grid3d{position:absolute;inset:0;transform:rotateX(64deg);transform-origin:bottom center;background-image:linear-gradient(rgba(255,211,92,.5) 2px,transparent 2px),linear-gradient(90deg,rgba(255,211,92,.32) 2px,transparent 2px);background-size:62px 62px;-webkit-mask-image:linear-gradient(to top,#000 2%,transparent 78%);mask-image:linear-gradient(to top,#000 2%,transparent 78%);opacity:.55}
+.vbokeh{position:absolute;inset:0;background:radial-gradient(circle at 16% 26%,rgba(255,211,92,.55) 0,transparent 5px),radial-gradient(circle at 82% 64%,rgba(134,240,187,.5) 0,transparent 6px),radial-gradient(circle at 60% 14%,rgba(255,255,255,.4) 0,transparent 4px);opacity:.85}
+.sheen{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.18),transparent 26%);pointer-events:none}
+.vig{position:absolute;inset:0;background:radial-gradient(96% 96% at 50% 44%,transparent 52%,rgba(3,8,14,.6) 100%);pointer-events:none}
+.exit-glow{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(95,245,175,.85),transparent);filter:blur(8px)}
+.exit-sign{position:absolute;display:grid;place-items:center;border-radius:24px;background:linear-gradient(155deg,#49e89a,#13a45f);box-shadow:0 0 44px rgba(80,240,160,.9),inset 0 3px 0 rgba(255,255,255,.45),inset 0 -6px 14px rgba(0,80,40,.4),0 20px 34px rgba(0,0,0,.45)}
+.exit-sign svg{width:62%;height:62%}
+.streak{position:absolute;border-radius:999px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.65));filter:blur(2.5px);transform-origin:left center}
+.hero-wrap{position:absolute}
+.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 20px 24px rgba(0,0,0,.6)) drop-shadow(0 0 34px rgba(255,68,88,.72))}
+.hero-gloss{position:absolute;inset:0;background:linear-gradient(122deg,rgba(255,255,255,0) 32%,rgba(255,255,255,.82) 47%,rgba(255,255,255,0) 58%);-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat;mix-blend-mode:screen;opacity:.95}
+.blocker{position:absolute;object-fit:contain;filter:brightness(.78) drop-shadow(0 14px 18px rgba(0,0,0,.5))}
+.scoin{position:absolute;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3b0,#ffc83d 60%,#e69a18);box-shadow:0 0 16px rgba(255,200,61,.85),inset 0 -2px 4px rgba(150,90,0,.5)}
+.bt{font-weight:900;line-height:.9;color:#fff;text-shadow:0 6px 30px rgba(0,0,0,.65)}
+.bt .g{background:linear-gradient(180deg,#ffe79a,#ffce5a 55%,#f5a623);-webkit-background-clip:text;background-clip:text;color:transparent}
+.beye{font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#ffd35c}
+.btag{color:#d7e6f6;font-weight:600}`;
+
+const heroCar = (w, h, left, top, rot, skin = RED) =>
+  `<div class="hero-wrap" style="left:${left}px;top:${top}px;width:${w}px;height:${h}px;transform:rotate(${rot}deg)">
+     <img class="hero-img" src="${skin}"><div class="hero-gloss" style="--m:url('${skin}')"></div></div>`;
+const exitSign = (left, top, size) =>
+  `<div class="exit-glow" style="left:${left - size * .35}px;top:${top - size * .35}px;width:${size * 1.7}px;height:${size * 1.7}px"></div>
+   <div class="exit-sign" style="left:${left}px;top:${top}px;width:${size}px;height:${size}px">
+     <svg viewBox="0 0 100 100"><path d="M20 50 H64" stroke="#fff" stroke-width="13" stroke-linecap="round"/><path d="M50 27 L78 50 L50 73" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
+const streaks = (x, y, n, len, rot, gap) => Array.from({ length: n }, (_, i) =>
+  `<div class="streak" style="left:${x}px;top:${y + i * gap}px;width:${len - i % 2 * len * .3}px;height:${Math.max(5, len * .03)}px;transform:rotate(${rot}deg)"></div>`).join("");
+const sparkCoins = (pts) => pts.map(([x, y, s]) => `<div class="scoin" style="left:${x}px;top:${y}px;width:${s}px;height:${s}px"></div>`).join("");
+
+// ---------------- COVER 800x470 ----------------
 function cover() {
-  const W = 800, H = 470, accent = "#ffb86b", S = 470, scale = S / BOARD;
-  const left = W - S + 24, top = (H - S) / 2;
-  const body = `${bg(accent)}
-    <div class="card" style="left:${left}px;top:${top}px;width:${S}px;height:${S}px;transform:perspective(1400px) rotateY(-8deg) rotateX(3deg)">${boardInner("night_yard", scale, { pool: "b", redCol: 3, coins: false })}</div>
-    <div class="t"><p class="eyebrow">Головоломка-парковка</p><h1 class="head">ПРОБКА<br><span class="g">во дворе</span></h1><p class="sub">Выведи красную машину к выезду</p></div>`;
-  const css = `.t{position:absolute;left:40px;top:50%;transform:translateY(-50%);width:430px}.t .eyebrow{font-size:15px;margin-bottom:10px}.t .head{font-size:64px;margin-bottom:14px}.t .sub{font-size:22px}`;
+  const W = 800, H = 470;
+  const body = `<div class="vbg"></div><div class="vglow" style="--ex:80%;--ey:24%"></div><div class="vrays" style="--ex:80%;--ey:24%"></div>
+    <div class="gridwrap"><div class="grid3d"></div></div><div class="vbokeh"></div>
+    <img class="blocker" src="${NIGHT_BLUE}" style="left:556px;top:300px;width:120px;height:240px;transform:rotate(-12deg)">
+    <img class="blocker" src="${TAXI}" style="left:690px;top:248px;width:112px;height:224px;transform:rotate(16deg)">
+    ${streaks(372, 250, 4, 150, 31, 26)}
+    ${exitSign(636, 64, 118)}
+    ${heroCar(214, 428, 430, 66, 31)}
+    ${sparkCoins([[620, 196, 26], [690, 150, 18], [600, 250, 14]])}
+    <div class="scrim"></div>
+    <div class="t"><p class="beye">Головоломка-парковка</p><h1 class="bt">ПРОБКА<br><span class="g">во дворе</span></h1><p class="btag">Выведи красную машину к выезду</p></div>
+    <div class="sheen"></div>`;
+  const css = BRAND_CSS + `
+    .scrim{position:absolute;inset:0;background:linear-gradient(90deg,#08182a 26%,rgba(8,24,42,.55) 44%,transparent 60%);pointer-events:none}
+    .t{position:absolute;left:42px;top:50%;transform:translateY(-50%);width:360px;z-index:5}
+    .t .beye{font-size:15px;margin-bottom:11px}.t .bt{font-size:70px;margin-bottom:16px}.t .btag{font-size:22px;line-height:1.25}`;
   return shell(W, H, css, body);
 }
 
-// ============================================================
-// LOGO 512 — app icon
-// ============================================================
+// ---------------- LOGO / ICON 512 ----------------
 function logo() {
-  const W = 512, H = 512, accent = "#ffb86b", scale = 760 / BOARD, S = BOARD * scale;
-  const fx = (GF.left + 5 * CELL) * scale, fy = (GF.top + (EXIT_ROW + 0.5) * CELL) * scale;
-  const body = `${bg(accent)}<div class="lc"><div class="lb" style="left:${W / 2 - fx}px;top:${H / 2 - fy}px;width:${S}px;height:${S}px">${boardInner("night_yard", scale, { pool: "c", redCol: 3, coins: true })}</div></div><div class="lv"></div>`;
-  const css = `.lc{position:absolute;inset:0;overflow:hidden}.lb{position:absolute}.lb .board{border-radius:0;box-shadow:none}.lb .board-rim{display:none}
-    .lv{position:absolute;inset:0;background:radial-gradient(92% 92% at 50% 42%,transparent 44%,rgba(4,7,12,.72) 100%)}`;
-  return shell(W, H, css, body);
+  const W = 512, H = 512;
+  const body = `<div class="vbg"></div><div class="vglow" style="--ex:70%;--ey:26%"></div><div class="vrays" style="--ex:70%;--ey:26%"></div>
+    <div class="gridwrap"><div class="grid3d"></div></div><div class="vbokeh"></div>
+    <img class="blocker" src="${NIGHT_BLUE}" style="left:-34px;top:296px;width:158px;height:316px;transform:rotate(-13deg)">
+    <img class="blocker" src="${TAXI}" style="left:392px;top:330px;width:150px;height:300px;transform:rotate(17deg)">
+    ${streaks(96, 372, 4, 168, 28, 30)}
+    ${exitSign(330, 116, 150)}
+    ${heroCar(226, 452, 150, 110, 28)}
+    ${sparkCoins([[300, 250, 30], [380, 210, 20], [286, 196, 15]])}
+    <div class="sheen"></div><div class="vig"></div>`;
+  return shell(W, H, BRAND_CSS, body);
 }
 
 // ============================================================ render
