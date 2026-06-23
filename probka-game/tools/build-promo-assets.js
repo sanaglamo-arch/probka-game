@@ -377,22 +377,24 @@ const README = `# Промо-материалы «Пробка во дворе»
 function main() {
   fs.mkdirSync(OUT_DIR, { recursive: true });
   fs.readdirSync(OUT_DIR).forEach((f) => { if (/\.(png|html)$/i.test(f)) fs.unlinkSync(path.join(OUT_DIR, f)); });
+  // logo + cover stay PNG (crisp, already small); screenshots -> JPG (light,
+  // accepted by Yandex) so files and the zip download easily from a private repo
   const jobs = [
-    { name: "logo-512", w: 512, h: 512, html: logo() },
-    { name: "cover-800x470", w: 800, h: 470, html: cover() },
-    { name: "web-1", w: 1920, h: 1080, html: W1() },
-    { name: "web-2", w: 1920, h: 1080, html: W2() },
-    { name: "web-3", w: 1920, h: 1080, html: W3() },
-    { name: "phone-1", w: 1080, h: 1920, html: P1() },
-    { name: "phone-2", w: 1080, h: 1920, html: P2() },
-    { name: "phone-3", w: 1080, h: 1920, html: P3() }
+    { file: "logo-512.png", w: 512, h: 512, html: logo() },
+    { file: "cover-800x470.png", w: 800, h: 470, html: cover() },
+    { file: "web-1.jpg", w: 1920, h: 1080, html: W1() },
+    { file: "web-2.jpg", w: 1920, h: 1080, html: W2() },
+    { file: "web-3.jpg", w: 1920, h: 1080, html: W3() },
+    { file: "phone-1.jpg", w: 1080, h: 1920, html: P1() },
+    { file: "phone-2.jpg", w: 1080, h: 1920, html: P2() },
+    { file: "phone-3.jpg", w: 1080, h: 1920, html: P3() }
   ];
   jobs.forEach((j) => {
-    const p = path.join(OUT_DIR, `_${j.name}.html`);
+    const p = path.join(OUT_DIR, `_${j.file}.html`);
     fs.writeFileSync(p, j.html);
-    capture(p, path.join(OUT_DIR, `${j.name}.png`), j.w, j.h);
+    capture(p, path.join(OUT_DIR, j.file), j.w, j.h);
     fs.unlinkSync(p);
-    console.log("rendered", j.name);
+    console.log("rendered", j.file);
   });
   fs.writeFileSync(path.join(OUT_DIR, "README.md"), README);
   console.log("done ->", OUT_DIR);
