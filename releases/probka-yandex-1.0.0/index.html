@@ -1,99 +1,220 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru" id="htmlRoot">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Пробка во дворе</title>
-    <link rel="icon" href="./favicon.svg?v=70460b9e96" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=70460b9e96" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title data-i18n="doc.title">Пробка во дворе</title>
+    <link rel="icon" href="./favicon.svg?v=bba57d16e6" type="image/svg+xml" />
+    <link rel="preload" href="./assets/fonts/inter-700-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./assets/fonts/inter-700-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./assets/fonts/nunito-800-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./assets/fonts/nunito-800-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="./assets/fonts/fonts.css?v=polish1" />
+    <link rel="stylesheet" href="./styles.css?v=bba57d16e6" />
   </head>
-  <body>
+  <body class="loading">
+    <svg class="svg-defs" aria-hidden="true" focusable="false">
+      <defs>
+        <symbol id="i-car" viewBox="0 0 24 24">
+          <path d="M5.3 9.6 6.4 6.9A2.4 2.4 0 0 1 8.6 5.4h6.8a2.4 2.4 0 0 1 2.2 1.5l1.1 2.7a3 3 0 0 1 2.1 2.9v3.4c0 .7-.5 1.2-1.2 1.2h-.7c-.7 0-1.2-.5-1.2-1.2v-.5H6.3v.5c0 .7-.5 1.2-1.2 1.2h-.7c-.7 0-1.2-.5-1.2-1.2v-3.4a3 3 0 0 1 2.1-2.9Zm2.1-2-.9 2.2h11l-.9-2.2a1 1 0 0 0-.9-.6H8.3a1 1 0 0 0-.9.6ZM7 13.6a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4Zm10 0a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4Z" />
+        </symbol>
+        <symbol id="i-coin" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" fill="url(#coinFace)" />
+          <circle cx="12" cy="12" r="10" fill="none" stroke="rgba(90, 52, 6, 0.5)" stroke-width="1" />
+          <circle cx="12" cy="12" r="7.4" fill="none" stroke="rgba(255, 248, 214, 0.4)" stroke-width="0.8" />
+          <circle cx="12" cy="12" r="4.7" fill="none" stroke="#3a2400" stroke-width="2.2" />
+          <circle cx="12" cy="12" r="1.7" fill="#3a2400" />
+          <path d="M12 9.8V7.4M10.4 13.1l-2.4 1.9M13.6 13.1l2.4 1.9" fill="none" stroke="#3a2400" stroke-width="2" stroke-linecap="round" />
+          <ellipse cx="8.7" cy="8" rx="3" ry="1.7" fill="rgba(255, 255, 255, 0.3)" transform="rotate(-28 8.7 8)" />
+        </symbol>
+        <symbol id="i-play" viewBox="0 0 24 24">
+          <path d="M8.2 5.5c0-1.1 1.2-1.8 2.2-1.2l9 5.4c1 .6 1 2 0 2.6l-9 5.4c-1 .6-2.2-.1-2.2-1.2V5.5Z" />
+        </symbol>
+        <symbol id="i-grid" viewBox="0 0 24 24">
+          <rect x="4" y="4" width="7" height="7" rx="2" />
+          <rect x="13" y="4" width="7" height="7" rx="2" />
+          <rect x="4" y="13" width="7" height="7" rx="2" />
+          <rect x="13" y="13" width="7" height="7" rx="2" opacity="0.45" />
+        </symbol>
+        <symbol id="i-star" viewBox="0 0 24 24">
+          <path d="M12 3.4c.3 0 .6.2.8.5l2.2 4.4 4.9.7c.7.1 1 1 .5 1.5l-3.5 3.4.8 4.8c.1.7-.6 1.2-1.2.9L12 17.3l-4.4 2.3c-.6.3-1.4-.2-1.2-.9l.8-4.8-3.5-3.4c-.5-.5-.2-1.4.5-1.5l4.9-.7 2.2-4.4c.1-.3.4-.5.7-.5Z" />
+        </symbol>
+        <symbol id="i-calendar" viewBox="0 0 24 24">
+          <rect x="3.6" y="5" width="16.8" height="15" rx="2.6" fill="none" stroke="currentColor" stroke-width="2" />
+          <path d="M3.6 9.6h16.8M8 3v3.4M16 3v3.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <path d="m9.4 14.6 1.9 1.9 3.6-3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </symbol>
+        <symbol id="i-back" viewBox="0 0 24 24">
+          <path d="M14.8 5.6 8.4 12l6.4 6.4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+        </symbol>
+        <symbol id="i-restart" viewBox="0 0 24 24">
+          <path d="M19 12a7 7 0 1 1-2.05-4.95" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+          <path d="M19.4 3.6v4h-4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+        </symbol>
+        <symbol id="i-sound-on" viewBox="0 0 24 24">
+          <path d="M4.5 9.4v5.2h3.2L13 19V5L7.7 9.4H4.5Z" />
+          <path d="M16 9c.9.8 1.4 1.8 1.4 3s-.5 2.2-1.4 3M18.3 6.6c1.5 1.4 2.3 3.2 2.3 5.4s-.8 4-2.3 5.4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-sound-off" viewBox="0 0 24 24">
+          <path d="M4.5 9.4v5.2h3.2L13 19V5L7.7 9.4H4.5Z" />
+          <path d="m16.4 9.6 4.8 4.8M21.2 9.6l-4.8 4.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-undo" viewBox="0 0 24 24">
+          <path d="M7.6 5.6 4 9.2l3.6 3.6" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M4.6 9.2h9a6 6 0 0 1 0 12h-3" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-bulb" viewBox="0 0 24 24">
+          <path d="M12 3.2a6.3 6.3 0 0 0-3.6 11.5c.7.5 1.1 1.2 1.1 2v.4h5v-.4c0-.8.4-1.5 1.1-2A6.3 6.3 0 0 0 12 3.2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+          <path d="M9.8 20.4h4.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-skip" viewBox="0 0 24 24">
+          <path d="M5.4 6.2c0-.9 1-1.5 1.8-1l7.2 5.2c.7.5.7 1.6 0 2.1l-7.2 5.2c-.8.5-1.8 0-1.8-1V6.2Z" />
+          <rect x="16.4" y="5" width="2.6" height="14" rx="1.2" />
+        </symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="2.2" />
+          <path d="M12 7.4V12l3.2 2.2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+        </symbol>
+        <symbol id="i-infinity" viewBox="0 0 24 24">
+          <path d="M7.2 8.6c-2 0-3.6 1.5-3.6 3.4s1.6 3.4 3.6 3.4c3.4 0 6.2-6.8 9.6-6.8 2 0 3.6 1.5 3.6 3.4s-1.6 3.4-3.6 3.4c-3.4 0-6.2-6.8-9.6-6.8Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-moves" viewBox="0 0 24 24">
+          <path d="M4 9h13.4M4 15h13.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+          <path d="m15 5.6 3.4 3.4L15 12.4M15 11.6l3.4 3.4L15 18.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+        </symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24">
+          <path d="M7.5 10V8.2a4.5 4.5 0 0 1 9 0V10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <rect x="5.5" y="10" width="13" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="2" />
+          <path d="M12 14.4v2.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-trophy" viewBox="0 0 24 24">
+          <path d="M8 4h8v3.6a4 4 0 0 1-8 0V4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+          <path d="M8 5.4H5a3 3 0 0 0 3 4.4M16 5.4h3a3 3 0 0 1-3 4.4M12 11.6v3M8.6 20h6.8M12 14.6c-1.2 0-2 .8-2 2.2V20h4v-3.2c0-1.4-.8-2.2-2-2.2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </symbol>
+        <symbol id="i-gear" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3.4" fill="none" stroke="currentColor" stroke-width="2" />
+          <path d="M19.6 13.6a8 8 0 0 0 0-3.2l1.9-1.5-1.9-3.3-2.3.9a8 8 0 0 0-2.7-1.6L14.2 2.4H9.8L9.4 4.9a8 8 0 0 0-2.7 1.6l-2.3-.9L2.5 8.9l1.9 1.5a8 8 0 0 0 0 3.2l-1.9 1.5 1.9 3.3 2.3-.9a8 8 0 0 0 2.7 1.6l.4 2.5h4.4l.4-2.5a8 8 0 0 0 2.7-1.6l2.3.9 1.9-3.3-1.9-1.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+        </symbol>
+        <symbol id="i-music" viewBox="0 0 24 24">
+          <path d="M9.2 17.4V6.5l8.4-1.7v9.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          <ellipse cx="6.8" cy="17.6" rx="2.5" ry="2.1" fill="currentColor" />
+          <ellipse cx="15.2" cy="14.9" rx="2.5" ry="2.1" fill="currentColor" />
+        </symbol>
+        <symbol id="i-globe" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="2" />
+          <path d="M3.7 12h16.6M12 3.6c2.3 2.3 3.5 5.1 3.5 8.4s-1.2 6.1-3.5 8.4c-2.3-2.3-3.5-5.1-3.5-8.4S9.7 5.9 12 3.6Z" fill="none" stroke="currentColor" stroke-width="1.7" />
+        </symbol>
+        <linearGradient id="flameOuter" x1="32" y1="3" x2="32" y2="77" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#ffe66d" />
+          <stop offset="0.46" stop-color="#ff9f2f" />
+          <stop offset="1" stop-color="#ff5f45" />
+        </linearGradient>
+        <linearGradient id="flameInner" x1="32" y1="32" x2="32" y2="68" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#fff7b0" />
+          <stop offset="1" stop-color="#ffd24f" />
+        </linearGradient>
+        <radialGradient id="coinFace" cx="0.36" cy="0.30" r="0.85">
+          <stop offset="0" stop-color="#fff0bf" />
+          <stop offset="0.45" stop-color="#ffce5a" />
+          <stop offset="0.82" stop-color="#f2a32c" />
+          <stop offset="1" stop-color="#d2811a" />
+        </radialGradient>
+      </defs>
+    </svg>
+
     <div id="app" class="app">
       <header class="topbar">
-        <div>
-          <p class="eyebrow">Головоломка во дворе</p>
-          <h1>Пробка во дворе</h1>
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><use href="#i-car" /></svg>
+          </span>
+          <div class="brand-copy">
+            <p class="eyebrow" data-i18n="brand.eyebrow">Головоломка</p>
+            <h1 data-i18n="brand.title">Пробка во дворе</h1>
+          </div>
         </div>
-        <div class="wallet" aria-label="Монеты">
-          <span id="coins">0</span>
-          <span class="coin">м</span>
+        <div class="topbar-right">
+          <button class="streak-chip" id="streakChip" type="button" hidden aria-label="Серия">
+            <svg class="streak-chip-flame" viewBox="0 0 64 80" aria-hidden="true">
+              <path d="M32 4C34 14 42 20 46 30 50 39 51 46 51 52 51 65 43 75 32 75 21 75 13 65 13 52 13 46 14 39 18 30 22 20 30 14 32 4Z" fill="url(#flameOuter)" />
+              <path d="M32 34C34 41 40 45 40 53 40 60 36 66 32 66 28 66 24 60 24 53 24 46 30 41 32 34Z" fill="url(#flameInner)" />
+            </svg>
+            <span id="streakChipCount">0</span>
+          </button>
+          <button class="lang-chip" id="topLangButton" type="button" aria-label="Сменить язык / Change language">RU</button>
+          <div class="wallet" aria-label="Монеты" data-i18n-aria="wallet.aria">
+            <span class="coin" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-coin" /></svg></span>
+            <span id="coins">0</span>
+            <span class="coin-pop" id="coinPop" aria-hidden="true"></span>
+          </div>
         </div>
       </header>
 
       <main class="game-shell">
         <section class="panel menu-panel" id="menuPanel">
-          <div class="hub-hero">
-            <div class="hub-hero-copy">
-              <div class="hub-level-line">
-                <span>Уровень</span>
-                <strong id="currentLevelLabel">1</strong>
-              </div>
-              <p id="modeStatusLabel">На счет ходов · уровень 1</p>
-              <p>Разбери двор за минимум ходов и выведи свою машину.</p>
-            </div>
-            <div class="streak-panel" id="streakPanel" aria-label="Серия">
-              <svg class="streak-flame" viewBox="0 0 64 80" aria-hidden="true">
-                <defs>
-                  <linearGradient id="flameOuter" x1="18" y1="4" x2="46" y2="76" gradientUnits="userSpaceOnUse">
-                    <stop offset="0" stop-color="#ffe66d" />
-                    <stop offset="0.46" stop-color="#ff9f2f" />
-                    <stop offset="1" stop-color="#ff5f45" />
-                  </linearGradient>
-                  <linearGradient id="flameInner" x1="29" y1="26" x2="39" y2="66" gradientUnits="userSpaceOnUse">
-                    <stop offset="0" stop-color="#fff7b0" />
-                    <stop offset="1" stop-color="#ffd24f" />
-                  </linearGradient>
-                </defs>
-                <path class="flame-outer" d="M34.9 5.8c3.8 10.2 1.2 16.1-2.2 21.5 5.8-2.7 9.3-7.2 10.7-13.5 10.7 10.1 15.2 21.9 12.2 33.2C52.1 60 42.8 72.5 31.5 72.5 18.7 72.5 8.9 62.6 8.9 49.5c0-9.1 4.8-16.1 11.1-22.7 5.8-6.2 10.7-12 14.9-21z" fill="url(#flameOuter)" />
-                <path class="flame-inner" d="M35.1 36.1c6.7 6 9.2 12 7.4 18.2-1.7 6.1-6.3 10.9-11.9 10.9-6.2 0-11.2-4.9-11.2-11.4 0-4.7 2.6-8 5.9-11.7 2.8-3.1 5.3-6.2 6.7-11 1.7 2 2.5 3.6 3.1 5z" fill="url(#flameInner)" />
-              </svg>
-              <div class="streak-copy">
-                <span>Серия</span>
-                <strong id="streakCount">0</strong>
-                <small id="streakBest">Рекорд 0</small>
-              </div>
-            </div>
-            <button class="primary-button play-cta" id="playButton">Играть</button>
-          </div>
+          <!-- Герой: продолжить игру (минимал — номер уровня + Играть) -->
+          <button class="hub-hero" id="playButton" type="button">
+            <span class="hub-hero-aura" aria-hidden="true"></span>
+            <span class="hub-level">
+              <span class="hub-level-word" data-i18n="hub.levelPrefix">Уровень</span>
+              <strong class="hub-level-num" id="currentLevelLabel">1</strong>
+            </span>
+            <span class="hub-play-cue">
+              <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-play" /></svg>
+              <span data-i18n="play.button">Играть</span>
+            </span>
+          </button>
 
-          <div class="hub-section">
-            <button class="daily-challenge-card daily-status-card" id="dailyButton" type="button">
-              <span class="daily-card-copy">
-                <span class="label">Уровень дня</span>
-                <strong id="dailyStatusLabel">Сложный двор</strong>
-                <small>Сложный пазл на сегодня</small>
-              </span>
-              <span class="daily-card-badge" aria-hidden="true">сложно</span>
-            </button>
-          </div>
-
-          <div class="hub-nav">
+          <!-- Уровень дня -->
+          <button class="daily-card" id="dailyButton" type="button">
+            <span class="daily-card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><use href="#i-calendar" /></svg>
+            </span>
+            <span class="daily-card-copy">
+              <span class="label" data-i18n="dailyCard.label">Уровень дня</span>
+              <strong id="dailyStatusLabel">Сложный двор</strong>
+              <small data-i18n="dailyCard.subtitle">Один сложный пазл на сегодня</small>
+            </span>
+            <span class="daily-card-badge" aria-hidden="true" data-i18n="dailyCard.badge">сложно</span>
+          </button>
+          <!-- Навигация -->
+          <nav class="hub-nav" aria-label="Разделы" data-i18n-aria="hub.nav.aria">
             <button class="nav-tile" id="levelSelectButton">
-              <span class="nav-icon">300</span>
-              <span><strong>Уровни</strong><small>3 режима · 300 уровней</small></span>
+              <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-grid" /></svg></span>
+              <span class="nav-copy"><strong data-i18n="nav.levels.title">Уровни</strong><small data-i18n="nav.levels.sub">3 режима · 300 уровней</small></span>
+              <svg class="nav-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
             <button class="nav-tile" id="garageButton">
-              <span class="nav-icon">01</span>
-              <span><strong>Гараж</strong><small>Машины и дворы</small></span>
+              <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-car" /></svg></span>
+              <span class="nav-copy"><strong data-i18n="nav.garage.title">Гараж</strong><small data-i18n="nav.garage.sub">Машины и дворы</small></span>
+              <svg class="nav-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
             <button class="nav-tile" id="missionsButton">
-              <span class="nav-icon">★</span>
-              <span><strong>Миссии</strong><small id="missionStatusLabel">0/3 выполнено</small></span>
+              <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-star" /></svg></span>
+              <span class="nav-copy"><strong data-i18n="nav.missions.title">Миссии</strong><small id="missionStatusLabel">0/3 выполнено</small></span>
+              <svg class="nav-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
-          </div>
-          <details class="settings-strip">
-            <summary>Настройки</summary>
-            <button class="ghost-button settings-action-button" id="tutorialReplayButton">Повторить обучение</button>
-            <button class="ghost-button reset-button" id="resetButton">Сбросить прогресс</button>
-          </details>
+            <button class="nav-tile" id="statsButton">
+              <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-trophy" /></svg></span>
+              <span class="nav-copy"><strong data-i18n="nav.stats.title">Статистика</strong><small data-i18n="nav.stats.sub">Прогресс и рекорды</small></span>
+              <svg class="nav-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="nav-tile" id="settingsButton">
+              <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-gear" /></svg></span>
+              <span class="nav-copy"><strong data-i18n="nav.settings.title">Настройки</strong><small data-i18n="nav.settings.sub">Звук, язык и сброс</small></span>
+              <svg class="nav-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </nav>
         </section>
 
         <section class="panel modes-panel" id="modeSelectPanel" hidden>
           <div class="panel-head">
-            <button class="icon-button" id="modesBackButton" aria-label="Назад">←</button>
+            <button class="icon-button" id="modesBackButton" aria-label="Назад" data-i18n-aria="back.aria">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back" /></svg>
+            </button>
             <div class="screen-title">
-              <p class="eyebrow">Режимы</p>
-              <h2>Выбери двор</h2>
+              <p class="eyebrow" data-i18n="modes.eyebrow">Режимы</p>
+              <h2 data-i18n="modes.title">Выбери режим</h2>
             </div>
           </div>
           <div class="mode-grid" id="modeGrid"></div>
@@ -101,10 +222,12 @@
 
         <section class="panel daily-panel" id="dailyPanel" hidden>
           <div class="panel-head">
-            <button class="icon-button" id="dailyBackButton" aria-label="Назад">←</button>
+            <button class="icon-button" id="dailyBackButton" aria-label="Назад" data-i18n-aria="back.aria">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back" /></svg>
+            </button>
             <div class="screen-title">
-              <p class="eyebrow">365 вызовов</p>
-              <h2>Уровень дня</h2>
+              <p class="eyebrow" data-i18n="daily.eyebrow">365 вызовов</p>
+              <h2 data-i18n="daily.title">Уровень дня</h2>
             </div>
           </div>
           <div class="daily-overview" id="dailyOverview"></div>
@@ -113,33 +236,43 @@
 
         <section class="play-area" id="playArea" hidden>
           <div class="hud">
-            <button class="icon-button" id="backButton" aria-label="Назад">←</button>
+            <button class="icon-button" id="backButton" aria-label="Назад" data-i18n-aria="back.aria">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back" /></svg>
+            </button>
             <div class="level-meta">
               <span id="levelTitle">Первый выезд</span>
-              <strong id="movesLabel">0 ходов</strong>
-              <strong class="limit-label" id="limitLabel">Осталось 5</strong>
+              <div class="level-meta-row">
+                <strong id="movesLabel">0 ходов</strong>
+                <strong class="limit-label" id="limitLabel">Осталось 5</strong>
+              </div>
               <div class="move-meter" id="moveMeter" aria-hidden="true"><span></span></div>
             </div>
             <div class="hud-actions">
-              <button class="icon-button sound-button" id="muteButton" aria-label="Звук" aria-pressed="false">Звук</button>
-              <button class="icon-button" id="restartButton" aria-label="Заново">↻</button>
+              <button class="icon-button sound-button" id="muteButton" aria-label="Звук" aria-pressed="false" data-i18n-aria="mute.off">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sound-on" /></svg>
+              </button>
+              <button class="icon-button" id="restartButton" aria-label="Заново" data-i18n-aria="restart.aria">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-restart" /></svg>
+              </button>
             </div>
           </div>
 
           <div class="board-wrap">
-            <canvas id="gameCanvas" width="720" height="720" aria-label="Игровое поле"></canvas>
+            <canvas id="gameCanvas" width="720" height="720" tabindex="0" aria-label="Игровое поле" data-i18n-aria="hud.canvas.aria"></canvas>
           </div>
 
           <div class="actions">
-            <button class="tool-button" id="undoButton">Отмена</button>
-            <button class="tool-button" id="hintButton">Подсказка</button>
-            <button class="tool-button" id="skipButton">Пропуск</button>
+            <button class="tool-button" id="undoButton" data-i18n="actions.undo">Отмена</button>
+            <button class="tool-button" id="hintButton" data-i18n="actions.hint">Подсказка</button>
+            <button class="tool-button" id="skipButton" data-i18n="actions.skip">Пропуск</button>
           </div>
         </section>
 
         <section class="panel levels-panel" id="levelsPanel" hidden>
           <div class="panel-head">
-            <button class="icon-button" id="levelsBackButton" aria-label="Назад">←</button>
+            <button class="icon-button" id="levelsBackButton" aria-label="Назад" data-i18n-aria="back.aria">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back" /></svg>
+            </button>
             <div class="screen-title">
               <p class="eyebrow" id="levelsEyebrow">Режим</p>
               <h2 id="levelsTitle">Уровни</h2>
@@ -150,10 +283,12 @@
 
         <section class="panel garage-panel" id="garagePanel" hidden>
           <div class="panel-head">
-            <button class="icon-button" id="garageBackButton" aria-label="Назад">←</button>
+            <button class="icon-button" id="garageBackButton" aria-label="Назад" data-i18n-aria="back.aria">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back" /></svg>
+            </button>
             <div class="screen-title">
-              <p class="eyebrow">Косметика</p>
-              <h2>Гараж</h2>
+              <p class="eyebrow" data-i18n="garage.eyebrow">Косметика</p>
+              <h2 data-i18n="garage.title">Гараж</h2>
             </div>
           </div>
           <div class="garage-summary" id="garageSummary"></div>
@@ -162,82 +297,141 @@
 
         <section class="panel missions-panel" id="missionsPanel" hidden>
           <div class="panel-head">
-            <button class="icon-button" id="missionsBackButton" aria-label="Назад">←</button>
+            <button class="icon-button" id="missionsBackButton" aria-label="Назад" data-i18n-aria="back.aria">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back" /></svg>
+            </button>
             <div class="screen-title">
-              <p class="eyebrow">Награды</p>
-              <h2>Миссии</h2>
+              <p class="eyebrow" data-i18n="missions.eyebrow">Награды</p>
+              <h2 data-i18n="missions.title">Миссии</h2>
             </div>
           </div>
           <div class="mission-refresh" id="missionRefreshLabel"></div>
           <div class="missions-list" id="missionsList"></div>
         </section>
+
+        <section class="panel stats-panel" id="statsPanel" hidden>
+          <div class="panel-head">
+            <button class="icon-button" id="statsBackButton" aria-label="Назад" data-i18n-aria="back.aria">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back" /></svg>
+            </button>
+            <div class="screen-title">
+              <p class="eyebrow" data-i18n="stats.eyebrow">Прогресс</p>
+              <h2 data-i18n="stats.title">Статистика</h2>
+            </div>
+          </div>
+          <div class="stats-body" id="statsBody"></div>
+        </section>
+
+        <section class="panel settings-panel" id="settingsPanel" hidden>
+          <div class="panel-head">
+            <button class="icon-button" id="settingsBackButton" aria-label="Назад" data-i18n-aria="back.aria">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back" /></svg>
+            </button>
+            <div class="screen-title">
+              <p class="eyebrow" data-i18n="settings.eyebrow">Игра</p>
+              <h2 data-i18n="settings.title">Настройки</h2>
+            </div>
+          </div>
+          <div class="settings-list">
+            <button class="settings-row" id="soundToggleButton" type="button" aria-pressed="true">
+              <span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-sound-on" /></svg></span>
+              <span class="settings-row-label" data-i18n="settings.row.sound">Звук</span>
+              <span class="settings-state" data-i18n="settings.state.on">Вкл</span>
+            </button>
+            <button class="settings-row" id="hapticsToggleButton" type="button" aria-pressed="true">
+              <span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-moves" /></svg></span>
+              <span class="settings-row-label" data-i18n="settings.row.haptics">Вибрация</span>
+              <span class="settings-state" data-i18n="settings.state.on">Вкл</span>
+            </button>
+            <button class="settings-row" id="musicToggleButton" type="button" aria-pressed="false">
+              <span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-music" /></svg></span>
+              <span class="settings-row-label" data-i18n="settings.row.music">Музыка</span>
+              <span class="settings-state" data-i18n="settings.state.off">Выкл</span>
+            </button>
+            <button class="settings-row" id="langToggleButton" type="button">
+              <span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-globe" /></svg></span>
+              <span class="settings-row-label" data-i18n="settings.row.lang">Язык</span>
+              <span class="settings-state" data-i18n="settings.lang.value">Русский</span>
+            </button>
+          </div>
+          <div class="settings-actions">
+            <button class="ghost-button settings-action-button" id="tutorialReplayButton" data-i18n="settings.tutorial">Повторить обучение</button>
+            <button class="ghost-button reset-button" id="resetButton" data-i18n="settings.reset">Сбросить прогресс</button>
+          </div>
+        </section>
       </main>
 
-      <div class="toast" id="toast" hidden></div>
+      <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
       <div class="tutorial-overlay" id="tutorialOverlay" hidden>
         <div class="tutorial-card">
-          <span class="tutorial-step" id="tutorialStepLabel">Обучение</span>
+          <span class="tutorial-step" id="tutorialStepLabel" data-i18n="tutorial.step.label">Обучение</span>
           <h2 id="tutorialTitle">Разбери двор</h2>
           <p id="tutorialText">Перетащи машину по ее направлению.</p>
-          <button class="primary-button" id="tutorialNextButton" type="button">Дальше</button>
+          <button class="primary-button" id="tutorialNextButton" type="button" data-i18n="tutorial.btn.next">Дальше</button>
         </div>
       </div>
     </div>
 
-    <div class="modal" id="winModal" hidden>
+    <div class="modal" id="winModal" role="dialog" aria-modal="true" aria-labelledby="winTitle" hidden>
       <div class="modal-card win-card">
-        <p class="eyebrow">Двор свободен</p>
-        <h2 id="winTitle">Уровень пройден</h2>
+        <span class="modal-glow win-glow" aria-hidden="true"></span>
+        <span class="modal-badge win-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><use href="#i-trophy" /></svg>
+        </span>
+        <p class="eyebrow" data-i18n="win.eyebrow">Двор свободен</p>
+        <h2 id="winTitle" data-i18n="win.title">Уровень пройден</h2>
         <p id="starsLabel" class="stars">★★★</p>
-        <p id="rewardLabel">+25 монет</p>
+        <p id="rewardLabel"></p>
         <div class="modal-actions">
-          <button class="primary-button" id="doubleRewardButton">Удвоить награду</button>
-          <button class="ghost-button" id="nextLevelButton">Следующий</button>
-          <button class="ghost-button" id="winMenuButton" hidden>В меню</button>
+          <button class="primary-button" id="doubleRewardButton" data-i18n="win.double">Удвоить награду</button>
+          <button class="ghost-button" id="nextLevelButton" data-i18n="win.next">Следующий</button>
+          <button class="ghost-button" id="winMenuButton" hidden data-i18n="win.menu">В меню</button>
         </div>
       </div>
     </div>
 
-    <div class="modal" id="failModal" hidden>
+    <div class="modal" id="failModal" role="dialog" aria-modal="true" aria-labelledby="failTitle" hidden>
       <div class="modal-card fail-card">
+        <span class="modal-glow fail-glow" aria-hidden="true"></span>
         <p class="eyebrow" id="failEyebrow">Ходы закончились</p>
         <h2 id="failTitle">Двор снова встал</h2>
         <p id="failText">Лимит ходов исчерпан. Попробуй заново.</p>
-        <button class="primary-button" id="retryButton">Заново</button>
+        <button class="primary-button" id="retryButton" data-i18n="fail.retry">Заново</button>
       </div>
     </div>
 
-    <div class="modal" id="archiveConfirmModal" hidden>
+    <div class="modal" id="archiveConfirmModal" role="dialog" aria-modal="true" aria-labelledby="archiveConfirmTitle" hidden>
       <div class="modal-card archive-confirm-card">
-        <p class="eyebrow">Архив уровня дня</p>
-        <h2 id="archiveConfirmTitle">Открыть архивный уровень?</h2>
-        <p id="archiveConfirmText">Посмотри рекламу, чтобы сыграть этот день.</p>
+        <p class="eyebrow" data-i18n="archive.eyebrow">Архив уровня дня</p>
+        <h2 id="archiveConfirmTitle" data-i18n="archive.title">Открыть архивный уровень?</h2>
+        <p id="archiveConfirmText" data-i18n="archive.text">Посмотри рекламу, чтобы сыграть этот день.</p>
         <div class="modal-actions">
-          <button class="primary-button" id="archiveWatchButton">Смотреть рекламу</button>
-          <button class="ghost-button" id="archiveCancelButton">Назад</button>
+          <button class="primary-button" id="archiveWatchButton" data-i18n="archive.watch">Смотреть рекламу</button>
+          <button class="ghost-button" id="archiveCancelButton" data-i18n="archive.cancel">Назад</button>
         </div>
       </div>
     </div>
 
-    <script src="./level-bank.generated.js?v=70460b9e96"></script>
-    <script src="./levels.js?v=70460b9e96"></script>
-    <script src="./yards.js?v=70460b9e96"></script>
-    <script src="./skins.js?v=70460b9e96"></script>
-    <script src="./daily.js?v=70460b9e96"></script>
-    <script src="./config.js?v=70460b9e96"></script>
-    <script src="./texts.js?v=70460b9e96"></script>
-    <script src="./yandex-sdk.js?v=70460b9e96"></script>
-    <script src="./progress.js?v=70460b9e96"></script>
-    <script src="./economy.js?v=70460b9e96"></script>
-    <script src="./rules.js?v=70460b9e96"></script>
-    <script src="./session.js?v=70460b9e96"></script>
-    <script src="./renderer.js?v=70460b9e96"></script>
-    <script src="./screens.js?v=70460b9e96"></script>
-    <script src="./tutorial.js?v=70460b9e96"></script>
-    <script src="./actors.js?v=70460b9e96"></script>
-    <script src="./input.js?v=70460b9e96"></script>
-    <script src="./ads.js?v=70460b9e96"></script>
-    <script src="./audio.js?v=70460b9e96"></script>
-    <script src="./game.js?v=70460b9e96"></script>
+    <script src="./level-bank.generated.js?v=bba57d16e6"></script>
+    <script src="./levels.js?v=bba57d16e6"></script>
+    <script src="./yards.js?v=bba57d16e6"></script>
+    <script src="./skins.js?v=bba57d16e6"></script>
+    <script src="./daily.js?v=bba57d16e6"></script>
+    <script src="./config.js?v=bba57d16e6"></script>
+    <script src="./texts.js?v=bba57d16e6"></script>
+    <script src="./i18n.js?v=bba57d16e6"></script>
+    <script src="./yandex-sdk.js?v=bba57d16e6"></script>
+    <script src="./progress.js?v=bba57d16e6"></script>
+    <script src="./economy.js?v=bba57d16e6"></script>
+    <script src="./rules.js?v=bba57d16e6"></script>
+    <script src="./session.js?v=bba57d16e6"></script>
+    <script src="./renderer.js?v=bba57d16e6"></script>
+    <script src="./screens.js?v=bba57d16e6"></script>
+    <script src="./tutorial.js?v=bba57d16e6"></script>
+    <script src="./actors.js?v=bba57d16e6"></script>
+    <script src="./input.js?v=bba57d16e6"></script>
+    <script src="./ads.js?v=bba57d16e6"></script>
+    <script src="./audio.js?v=bba57d16e6"></script>
+    <script src="./game.js?v=bba57d16e6"></script>
   </body>
 </html>

@@ -281,7 +281,7 @@
             locked.click();
             await wait(120);
             requireVisible(doc, "#archiveConfirmModal", "daily archive");
-            if (!/Смотреть рекламу/.test(doc.querySelector("#archiveWatchButton")?.textContent || "")) {
+            if (!/Смотреть/.test(doc.querySelector("#archiveWatchButton")?.textContent || "")) {
               throw new Error("daily archive: confirm should offer rewarded unlock");
             }
             doc.querySelector("#archiveWatchButton").click();

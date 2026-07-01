@@ -5,7 +5,8 @@ const http = require("http");
 const path = require("path");
 
 const workspace = path.resolve(__dirname, "../..");
-const chromePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const chromePath = process.env.PROBKA_SMOKE_CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const chromeExtraFlags = (process.env.PROBKA_SMOKE_CHROME_FLAGS || "").split(/\s+/).filter(Boolean);
 const port = Number(process.env.PROBKA_SMOKE_PORT || process.argv[2] || 5181);
 const url = `http://localhost:${port}/probka-game/tools/browser-smoke.html`;
 
@@ -23,6 +24,7 @@ async function main() {
   try {
     await waitForServer(server);
     const result = spawnSync(chromePath, [
+      ...chromeExtraFlags,
       "--headless=new",
       "--disable-gpu",
       "--disable-background-networking",

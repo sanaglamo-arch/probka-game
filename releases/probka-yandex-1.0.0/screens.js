@@ -6,7 +6,9 @@
     game: "playArea",
     levels: "levelsPanel",
     garage: "garagePanel",
-    missions: "missionsPanel"
+    missions: "missionsPanel",
+    stats: "statsPanel",
+    settings: "settingsPanel"
   };
 
   function setVisibleView(els, view) {
@@ -31,6 +33,20 @@
     const renderer = deps.renderer || (typeof window !== "undefined" ? window.PROBKA_RENDERER : null) || {};
     const initialGarageTab = new URLSearchParams(window.location.search).get("garageTab") === "yards" ? "yards" : "skins";
     let garageTab = initialGarageTab;
+    // i18n helper — deps.t is injected by game.js; fall back to window.PROBKA_TEXTS.t
+    const t = deps.t || (typeof window !== "undefined" && window.PROBKA_TEXTS && window.PROBKA_TEXTS.t) || ((k) => k);
+    const translateLevelTitle = deps.translateLevelTitle || (typeof window !== "undefined" && window.PROBKA_TEXTS && window.PROBKA_TEXTS.translateLevelTitle) || ((s) => s);
+    const tSkinName = deps.tSkinName || (typeof window !== "undefined" && window.PROBKA_TEXTS && window.PROBKA_TEXTS.tSkinName) || ((id) => id);
+    const tYardName = deps.tYardName || (typeof window !== "undefined" && window.PROBKA_TEXTS && window.PROBKA_TEXTS.tYardName) || ((id) => id);
+    const tModeTitle = deps.tModeTitle || (typeof window !== "undefined" && window.PROBKA_TEXTS && window.PROBKA_TEXTS.tModeTitle) || ((id) => id);
+    const tModeSubtitle = deps.tModeSubtitle || (typeof window !== "undefined" && window.PROBKA_TEXTS && window.PROBKA_TEXTS.tModeSubtitle) || (() => "");
+
+    function modeIconMarkup(mode) {
+      const byRule = { free: "i-infinity", moves: "i-moves", timed: "i-clock" };
+      const symbolId = byRule[mode && mode.rule];
+      if (!symbolId) return (mode && mode.icon) || "#";
+      return `<svg viewBox="0 0 24 24" aria-hidden="true" style="width:1em;height:1em;fill:none;stroke:currentColor"><use href="#${symbolId}" /></svg>`;
+    }
 
     function renderLevelSelect() {
       const els = getEls();
@@ -39,8 +55,8 @@
       const modeLevels = deps.getModeLevels(getSelectedModeId());
       if (!els.levelsGrid || !mode) return;
       els.levelsGrid.innerHTML = "";
-      if (els.levelsEyebrow) els.levelsEyebrow.textContent = mode.title;
-      if (els.levelsTitle) els.levelsTitle.textContent = `Уровни 1-${modeLevels.length}`;
+      if (els.levelsEyebrow) els.levelsEyebrow.textContent = tModeTitle(mode.id) || mode.title;
+      if (els.levelsTitle) els.levelsTitle.textContent = t("levels.title", { n: modeLevels.length });
 
       for (let start = 0; start < modeLevels.length; start += 20) {
         const groupLevels = modeLevels.slice(start, start + 20);
@@ -54,10 +70,10 @@
         const from = start + 1;
         const to = Math.min(from + 19, modeLevels.length);
         title.innerHTML = `
-          <span class="pack-badge">${mode.icon}</span>
+          <span class="pack-badge">${modeIconMarkup(mode)}</span>
           <div class="pack-copy">
-            <strong>${mode.title}</strong>
-            <span>Уровни ${from}-${to} · ${mode.subtitle}</span>
+            <strong>${tModeTitle(mode.id) || mode.title}</strong>
+            <span>${t("levels.pack.range", { from, to, subtitle: tModeSubtitle(mode.id) || mode.subtitle || "" })}</span>
           </div>
           <div class="level-pack-progress" style="--pack-progress: ${progress}%">
             <b>${completedCount}/${groupLevels.length}</b>
@@ -72,6 +88,10 @@
         section.appendChild(grid);
         els.levelsGrid.appendChild(section);
       }
+      requestAnimationFrame(() => {
+        const current = els.levelsGrid.querySelector(".level-button.current");
+        if (current) current.scrollIntoView({ block: "nearest" });
+      });
     }
 
     function renderModeSelect() {
@@ -86,10 +106,10 @@
         const card = document.createElement("button");
         card.className = `mode-card${mode.id === getSelectedModeId() ? " current" : ""}`;
         card.innerHTML = `
-          <span class="mode-card-icon" aria-hidden="true">${mode.icon}</span>
+          <span class="mode-card-icon" aria-hidden="true">${modeIconMarkup(mode)}</span>
           <span class="mode-card-copy">
-            <strong>${mode.title}</strong>
-            <small>${mode.subtitle}</small>
+            <strong>${tModeTitle(mode.id) || mode.title}</strong>
+            <small>${tModeSubtitle(mode.id) || mode.subtitle || ""}</small>
           </span>
           <span class="mode-card-stats">
             <b>${currentOrder}/100</b>
@@ -120,16 +140,17 @@
       const marker = completion
         ? `${"★".repeat(completion.stars)}${"☆".repeat(3 - completion.stars)}`
         : item.modeOrder === deps.getCurrentModeOrder(item.modeId) + 1
-          ? "сейчас"
-          : `сл. ${item.difficulty || 1}`;
+          ? t("level.now")
+          : t("level.next", { d: item.difficulty || 1 });
       button.innerHTML = unlocked
         ? `<span class="level-number">${item.modeOrder}</span><small>${marker}</small>`
-        : `<span class="level-number">${item.modeOrder}</span><small>закрыт</small>`;
-      button.title = completion
-        ? `${item.title}: ${completion.stars} зв., лучший результат ${completion.bestMoves} ходов`
+        : `<span class="level-number">${item.modeOrder}</span><span class="level-lock" aria-label="${t("level.locked")}"><svg viewBox="0 0 24 24"><use href="#i-lock" /></svg></span>`;
+      // aria-label вместо title: ничего не всплывает при наведении, но доступность сохранена.
+      button.setAttribute("aria-label", completion
+        ? t("level.tooltip.done", { title: translateLevelTitle(item.title), stars: completion.stars, moves: completion.bestMoves })
         : unlocked
-          ? `${item.title}: ${item.minMoves} ходов, сложность ${item.difficulty} из 10`
-          : "Закрыто";
+          ? t("level.tooltip.open", { title: translateLevelTitle(item.title), minMoves: item.minMoves, diff: item.difficulty })
+          : t("level.tooltip.locked"));
       button.disabled = !unlocked;
       button.addEventListener("click", () => {
         if (deps.blockTutorialEscape()) return;
@@ -137,6 +158,21 @@
         deps.startLevel(index);
       });
       return button;
+    }
+
+    // Единое состояние кнопки покупки/надевания для скинов и дворов.
+    function applyOwnableButtonState(button, { equipped, owned, canBuy }) {
+      if (equipped) {
+        button.textContent = t("garage.equip.btn.equipped");
+        button.disabled = true;
+      } else if (owned) {
+        button.textContent = t("garage.equip.btn.equip");
+      } else if (canBuy) {
+        button.textContent = t("garage.equip.btn.buy");
+      } else {
+        button.textContent = t("garage.equip.btn.locked");
+        button.disabled = true;
+      }
     }
 
     function renderGarage() {
@@ -157,14 +193,15 @@
 
       if (els.garageSummary) {
         const progress = Math.round((ownedCount / Math.max(1, totalCount)) * 100);
+        const currentItemName = isYardsTab ? tYardName(currentItem.id) : tSkinName(currentItem.id);
         els.garageSummary.innerHTML = `
-          <div class="garage-tabs" role="tablist" aria-label="Коллекция гаража">
-            <button class="garage-tab${!isYardsTab ? " active" : ""}" type="button" role="tab" aria-selected="${!isYardsTab}">Машины</button>
-            <button class="garage-tab${isYardsTab ? " active" : ""}" type="button" role="tab" aria-selected="${isYardsTab}">Дворы</button>
+          <div class="garage-tabs" role="tablist" aria-label="${t("garage.tabs.aria")}">
+            <button class="garage-tab${!isYardsTab ? " active" : ""}" type="button" role="tab" aria-selected="${!isYardsTab}">${t("garage.tabs.skins")}</button>
+            <button class="garage-tab${isYardsTab ? " active" : ""}" type="button" role="tab" aria-selected="${isYardsTab}">${t("garage.tabs.yards")}</button>
           </div>
           <div class="garage-summary-top">
-            <span class="label">${isYardsTab ? "Текущий двор" : "Текущая машина"}</span>
-            <div><strong>${currentItem.name}</strong> · ${ownedCount} из ${totalCount} открыто</div>
+            <span class="label">${isYardsTab ? t("garage.current.yard") : t("garage.current.skin")}</span>
+            <div><strong>${currentItemName}</strong> · ${t("garage.owned", { n: ownedCount, total: totalCount })}</div>
           </div>
           <div class="garage-meter" style="--garage-progress: ${progress}%"><span></span></div>
         `;
@@ -197,10 +234,11 @@
         card.className = `skin-card${skinStateClass}`;
 
         const hasSpritePreview = skin.sprite && renderer.renderSkinSpritePreview;
+        const skinDisplayName = tSkinName(skin.id);
         const preview = hasSpritePreview ? document.createElement("canvas") : document.createElement("div");
         if (hasSpritePreview) {
           preview.className = "skin-preview skin-preview-sprite";
-          preview.setAttribute("aria-label", `Предпросмотр: ${skin.name}`);
+          preview.setAttribute("aria-label", t("garage.preview.aria", { name: skinDisplayName }));
         } else {
           preview.className = `skin-preview skin-preview-${skin.pattern || "rally"}`;
           preview.style.setProperty("--skin-color", skin.color);
@@ -213,20 +251,10 @@
         meta.className = "skin-meta";
         const title = document.createElement("div");
         title.className = "skin-title";
-        title.innerHTML = `<strong>${skin.name}</strong><span>${skin.price ? deps.formatCoinAmount(skin.price, { short: true }) : "База"}</span>`;
+        title.innerHTML = `<strong>${skinDisplayName}</strong><span>${skin.price ? `${skin.price}<svg class="amount-coin" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-coin" /></svg>` : t("garage.base")}</span>`;
 
         const button = document.createElement("button");
-        if (equipped) {
-          button.textContent = "Надето";
-          button.disabled = true;
-        } else if (owned) {
-          button.textContent = "Надеть";
-        } else if (canBuy) {
-          button.textContent = "Купить";
-        } else {
-          button.textContent = "Не хватает";
-          button.disabled = true;
-        }
+        applyOwnableButtonState(button, { equipped, owned, canBuy });
         button.addEventListener("click", () => deps.buyOrEquipSkin(skin));
 
         meta.appendChild(title);
@@ -248,32 +276,50 @@
         const yardStateClass = equipped ? " equipped owned" : owned ? " owned" : canBuy ? " can-buy" : " locked";
         card.className = `skin-card yard-card${yardStateClass}`;
 
+        const yardDisplayName = tYardName(yard.id);
         const preview = document.createElement("canvas");
         preview.className = "yard-preview";
-        preview.setAttribute("aria-label", `Предпросмотр: ${yard.name}`);
+        preview.setAttribute("aria-label", t("garage.preview.aria", { name: yardDisplayName }));
 
         const meta = document.createElement("div");
         meta.className = "skin-meta";
         const title = document.createElement("div");
         title.className = "skin-title";
-        title.innerHTML = `<strong>${yard.name}</strong><span>${yard.price ? deps.formatCoinAmount(yard.price, { short: true }) : "База"}</span>`;
+        title.innerHTML = `<strong>${yardDisplayName}</strong><span>${yard.price ? `${yard.price}<svg class="amount-coin" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-coin" /></svg>` : t("garage.base")}</span>`;
 
         const rarity = document.createElement("span");
         rarity.className = "yard-rarity";
-        rarity.textContent = yard.concept || yard.rarity || "Коллекция";
+        // Map RU concept tags and rarity words to i18n keys
+        const RARITY_KEY_MAP = {
+          "Стартовый": "starter",
+          "Редкий": "rare",
+          "Премиум": "premium",
+          "Легенда": "legend"
+        };
+        const CONCEPT_KEY_MAP = {
+          "город": "city",
+          "фонари": "lights",
+          "снег": "snow",
+          "листья": "leaves",
+          "дождь": "rain",
+          "бетон": "concrete",
+          "премиум": "premium",
+          "трещины": "cracks",
+          "неон": "neon",
+          "гирлянды": "garlands"
+        };
+        const conceptShortKey = yard.concept ? (CONCEPT_KEY_MAP[yard.concept] || yard.concept) : null;
+        const rarityShortKey = yard.rarity ? (RARITY_KEY_MAP[yard.rarity] || yard.rarity.toLowerCase()) : null;
+        const conceptTranslated = conceptShortKey ? t("concept." + conceptShortKey) : null;
+        const rarityTranslated = rarityShortKey ? t("rarity." + rarityShortKey) : null;
+        const conceptKey2 = "concept." + conceptShortKey;
+        const rarityKey2 = "rarity." + rarityShortKey;
+        rarity.textContent = (conceptTranslated && conceptTranslated !== conceptKey2) ? conceptTranslated
+          : (rarityTranslated && rarityTranslated !== rarityKey2) ? rarityTranslated
+          : (yard.concept || yard.rarity || "");
 
         const button = document.createElement("button");
-        if (equipped) {
-          button.textContent = "Надето";
-          button.disabled = true;
-        } else if (owned) {
-          button.textContent = "Надеть";
-        } else if (canBuy) {
-          button.textContent = "Купить";
-        } else {
-          button.textContent = "Не хватает";
-          button.disabled = true;
-        }
+        applyOwnableButtonState(button, { equipped, owned, canBuy });
         button.addEventListener("click", () => deps.buyOrEquipYard(yard));
 
         meta.appendChild(title);
@@ -298,10 +344,10 @@
       if (els.missionRefreshLabel) {
         const completedMissions = missions.filter((mission) => state.missions.records[mission.id]?.claimed).length;
         els.missionRefreshLabel.innerHTML = `
-          <span>Цели на сегодня · обновляются каждый день</span>
+          <span>${t("missions.today")}</span>
           <div class="mission-refresh-stats">
-            <strong>${completedMissions}/${missions.length} выполнено</strong>
-            <strong>Награды за задачи</strong>
+            <strong>${t("missions.done", { n: completedMissions, total: missions.length })}</strong>
+            <strong>${t("missions.reward")}</strong>
           </div>
         `;
       }
@@ -312,14 +358,18 @@
         const card = document.createElement("article");
         card.className = `mission-card${record.claimed ? " claimed" : ready ? " ready" : ""}`;
         const percent = Math.round((progress / mission.target) * 100);
-        const icon = mission.id === "daily_complete" ? "Д" : mission.id === "three_stars" ? "★" : "↶";
+        const iconId = mission.id === "daily_complete" ? "i-calendar" : mission.id === "three_stars" ? "i-star" : "i-undo";
+        const icon = `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#${iconId}" /></svg>`;
+        // Mission title and text are also translatable via i18n keys if provided
+        const missionTitle = (deps.tMissionTitle && deps.tMissionTitle(mission.id)) || mission.title;
+        const missionText = (deps.tMissionText && deps.tMissionText(mission.id)) || mission.text;
         card.innerHTML = `
           <div class="mission-icon" aria-hidden="true">${icon}</div>
           <div class="mission-meta">
-            <div class="mission-title"><strong>${mission.title}</strong><span>+${deps.formatCoinAmount(mission.reward, { short: true })}</span></div>
-            <span class="label">${mission.text}</span>
+            <div class="mission-title"><strong>${missionTitle}</strong><span>+${mission.reward}<svg class="amount-coin" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-coin" /></svg></span></div>
+            <span class="label">${missionText}</span>
             <div class="mission-progress"><span style="width: ${percent}%"></span></div>
-            <button disabled>${record.claimed ? "Получено" : progress >= mission.target ? "Готово" : `${progress} / ${mission.target}`}</button>
+            <button disabled>${record.claimed ? t("missions.btn.claimed") : progress >= mission.target ? t("missions.btn.ready") : `${progress} / ${mission.target}`}</button>
           </div>
         `;
         els.missionsList.appendChild(card);
@@ -342,7 +392,7 @@
         item.className = `daily-day${day.completion ? " done" : ""}${day.isToday ? " today" : ""}${day.isFuture ? " future" : ""}`;
         const dateLabel = deps.formatShortDate(day.dateKey);
         const status = day.completion ? "★".repeat(day.completion.stars) : day.isToday ? "•" : "";
-        const caption = day.isToday ? "сегодня" : day.completion ? "готово" : "";
+        const caption = day.isToday ? t("dailyWeek.today") : day.completion ? t("dailyWeek.done") : "";
         item.innerHTML = `
           <span class="daily-date">${dateLabel}</span>
           <strong>${status}</strong>
@@ -352,6 +402,59 @@
       });
     }
 
+    function renderStats() {
+      const els = getEls();
+      if (!els.statsBody) return;
+      const state = getState();
+      const completed = state.completed || {};
+      const ids = Object.keys(completed);
+      let totalSolved = 0;
+      let threeStars = 0;
+      ids.forEach((id) => {
+        totalSolved += 1;
+        if ((completed[id].stars || 0) >= 3) threeStars += 1;
+      });
+      const completions = (state.daily && state.daily.completions) || {};
+      const dailyDone = Object.keys(completions).filter((key) => completions[key]).length;
+      const streak = (state.daily && state.daily.streak) || { current: 0, best: 0 };
+      const coins = state.coins || 0;
+
+      const tiles = [
+        { icon: "i-grid", value: totalSolved, label: t("stats.tile.solved") },
+        { icon: "i-star", value: threeStars, label: t("stats.tile.stars") },
+        { icon: "i-calendar", value: dailyDone, label: t("stats.tile.daily") },
+        { icon: "i-trophy", value: streak.best || 0, label: t("stats.tile.bestStreak") },
+        { icon: "i-clock", value: streak.current || 0, label: t("stats.tile.streak") },
+        { icon: "i-coin", value: String(coins), label: t("stats.tile.coins") }
+      ];
+
+      const modeRows = getModes().map((mode) => {
+        const modeLevels = deps.getModeLevels(mode.id);
+        const total = modeLevels.length;
+        const done = modeLevels.filter((lvl) => completed[lvl.id]).length;
+        return { title: tModeTitle(mode.id) || mode.title || mode.id, done, total, pct: total ? Math.round((done / total) * 100) : 0 };
+      });
+
+      els.statsBody.innerHTML = `
+        <div class="stats-grid">
+          ${tiles.map((tile) => `
+            <div class="stat-tile">
+              <span class="stat-tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#${tile.icon}" /></svg></span>
+              <strong>${tile.value}</strong>
+              <span class="stat-tile-label">${tile.label}</span>
+            </div>`).join("")}
+        </div>
+        <p class="stats-section-title">${t("stats.section.modes")}</p>
+        <div class="stats-modes">
+          ${modeRows.map((mode) => `
+            <div class="stats-mode-row">
+              <div class="stats-mode-head"><span>${mode.title}</span><strong>${mode.done}/${mode.total}</strong></div>
+              <div class="stats-mode-bar"><span style="width: ${mode.pct}%"></span></div>
+            </div>`).join("")}
+        </div>
+      `;
+    }
+
     function renderDailyPanel(options = {}) {
       const els = getEls();
       const dailyApi = deps.dailyApi;
@@ -359,17 +462,48 @@
       const state = getState();
       const today = deps.getDailyDateKey();
       const todayCompletion = deps.getValidDailyCompletion(today);
-      const todayLevel = dailyApi.getDailyLevel(today);
+      let todayLevel = null;
+      try {
+        todayLevel = dailyApi.getDailyLevel(today);
+      } catch (err) {
+        todayLevel = null;
+      }
       const year = Number(today.slice(0, 4));
       const currentMonth = Number(today.slice(5, 7));
       const rewardPreview = deps.getDailyRewardPreview();
+      const streak = state.daily.streak || { current: 0, best: 0 };
+      const streakNow = Math.max(0, streak.current || 0);
+      const streakBest = Math.max(streakNow, streak.best || 0);
       els.dailyOverview.innerHTML = `
-        <div class="daily-overview-copy">
-          <span class="label">Сегодня · ${deps.formatShortDate(today)}</span>
-          <strong>${todayCompletion ? `Пройдено на ${todayCompletion.stars}★` : "Сложный двор дня"}</strong>
-          <small>${todayLevel.minMoves} оптимальных ходов · награда до ${rewardPreview} монет</small>
+        <div class="daily-streak${streakNow > 0 ? " active" : ""}">
+          <svg class="streak-flame" viewBox="0 0 64 80" aria-hidden="true">
+            <defs>
+              <linearGradient id="flameOuterD" x1="32" y1="3" x2="32" y2="77" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#ffe66d" /><stop offset="0.46" stop-color="#ff9f2f" /><stop offset="1" stop-color="#ff5f45" />
+              </linearGradient>
+              <linearGradient id="flameInnerD" x1="32" y1="32" x2="32" y2="68" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#fff7b0" /><stop offset="1" stop-color="#ffd24f" />
+              </linearGradient>
+            </defs>
+            <path class="flame-outer" d="M32 4C34 14 42 20 46 30 50 39 51 46 51 52 51 65 43 75 32 75 21 75 13 65 13 52 13 46 14 39 18 30 22 20 30 14 32 4Z" fill="url(#flameOuterD)" />
+            <path class="flame-inner" d="M32 34C34 41 40 45 40 53 40 60 36 66 32 66 28 66 24 60 24 53 24 46 30 41 32 34Z" fill="url(#flameInnerD)" />
+          </svg>
+          <span class="daily-streak-copy">
+            <strong>${streakNow}</strong>
+            <span class="daily-streak-eyebrow">${t("streak.label")}</span>
+            <small>${t("streak.record", { n: streakBest })}</small>
+          </span>
         </div>
-        <button class="primary-button" id="dailyTodayStartButton">${todayCompletion ? "Играть еще" : "Начать"}</button>
+        <button class="daily-today" id="dailyTodayStartButton" type="button">
+          <span class="daily-today-copy">
+            <span class="label">${t("daily.overview.today", { date: deps.formatShortDate(today) })}</span>
+            <strong>${todayCompletion ? t("daily.overview.done", { stars: todayCompletion.stars }) : t("daily.overview.open")}</strong>
+          </span>
+          <span class="daily-today-cta">
+            <span>${todayCompletion ? t("daily.overview.playAgain") : t("daily.overview.start")}</span>
+            <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-play" /></svg>
+          </span>
+        </button>
       `;
       const todayButton = document.getElementById("dailyTodayStartButton");
       if (todayButton) {
@@ -381,18 +515,40 @@
         });
       }
 
-      const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+      const monthNames = [1,2,3,4,5,6,7,8,9,10,11,12].map((m) => t("month." + m));
       const calendar = dailyApi.getDailyCalendar ? dailyApi.getDailyCalendar(year) : [];
       els.dailyCalendarGrid.innerHTML = "";
+      const weekdays = t("daily.weekdays").split(" ");
       monthNames.forEach((name, monthIndex) => {
-        const monthDays = calendar.filter((slot) => slot.month === monthIndex + 1);
-        const section = document.createElement("section");
         const monthNumber = monthIndex + 1;
+        const monthDays = calendar.filter((slot) => slot.month === monthNumber);
+        if (!monthDays.length) return;
+        const doneCount = monthDays.filter((slot) => deps.getValidDailyCompletion(slot.dateKey)).length;
+        const section = document.createElement("section");
         section.className = `daily-month${monthNumber === currentMonth ? " current" : ""}`;
         section.dataset.dailyMonth = String(monthNumber);
-        section.innerHTML = `<div class="daily-month-title"><strong>${name}</strong><span>${monthDays.length} уровней</span></div>`;
+        section.innerHTML = `
+          <div class="daily-month-title">
+            <strong>${name}</strong>
+            <span class="daily-month-progress${doneCount ? " has" : ""}">${t("daily.month.progress", { done: doneCount, total: monthDays.length })}</span>
+          </div>
+          <div class="daily-weekrow" aria-hidden="true">${weekdays.map((w) => `<span>${w}</span>`).join("")}</div>
+        `;
         const grid = document.createElement("div");
         grid.className = "daily-month-grid";
+        // выравнивание по дням недели (понедельник — первый)
+        let lead = 0;
+        try {
+          lead = (new Date(`${monthDays[0].dateKey}T00:00:00`).getDay() + 6) % 7;
+        } catch (err) {
+          lead = 0;
+        }
+        for (let i = 0; i < lead; i += 1) {
+          const empty = document.createElement("span");
+          empty.className = "daily-cal-empty";
+          empty.setAttribute("aria-hidden", "true");
+          grid.appendChild(empty);
+        }
         monthDays.forEach((slot) => grid.appendChild(createDailyDayButton(slot, today, state)));
         section.appendChild(grid);
         els.dailyCalendarGrid.appendChild(section);
@@ -446,16 +602,11 @@
       button.setAttribute(
         "aria-label",
         isFuture
-          ? `${deps.formatShortDate(slot.dateKey)}: скоро`
+          ? t("daily.day.aria.future", { date: deps.formatShortDate(slot.dateKey) })
           : unlocked
-            ? `${deps.formatShortDate(slot.dateKey)}: открыт`
-            : `${deps.formatShortDate(slot.dateKey)}: архив закрыт, откроется за рекламу`
+            ? t("daily.day.aria.unlocked", { date: deps.formatShortDate(slot.dateKey) })
+            : t("daily.day.aria.locked", { date: deps.formatShortDate(slot.dateKey) })
       );
-      button.title = isFuture
-        ? "Будущий уровень дня пока закрыт"
-        : unlocked
-          ? `Уровень дня ${deps.formatShortDate(slot.dateKey)} · ${slot.minMoves} ходов`
-          : "Архивный уровень дня открывается за рекламу";
       button.addEventListener("click", () => {
         if (deps.blockTutorialEscape()) return;
         deps.playSound("button");
@@ -466,11 +617,10 @@
       return button;
     }
 
-    function getDailyCalendarStatus({ completion, isToday, isFuture, unlocked }) {
-      if (completion) return completion.stars >= 3 ? "★★★" : `${completion.stars}★`;
-      if (isToday) return "";
-      if (isFuture) return "скоро";
-      if (unlocked) return "открыт";
+    function getDailyCalendarStatus({ completion }) {
+      // Текстовые метки убраны ради чистоты: состояние читается по стилю/иконке.
+      // У пройденных дней — звёзды результата.
+      if (completion) return "★".repeat(Math.max(1, completion.stars || 0));
       return "";
     }
 
@@ -487,18 +637,24 @@
       const remaining = Number.isFinite(limit) ? Math.max(0, limit - moves) : Infinity;
       const timerRemaining = deps.getTimerRemainingSec();
       if (els.coins) els.coins.textContent = state.coins;
+      if (els.streakChip && els.streakChipCount) {
+        const streakNow = Math.max(0, (state.daily && state.daily.streak && state.daily.streak.current) || 0);
+        els.streakChipCount.textContent = String(streakNow);
+        els.streakChip.hidden = streakNow <= 0;
+      }
       if (els.currentLevelLabel) els.currentLevelLabel.textContent = String(deps.getCurrentModeOrder(getSelectedModeId()) + 1);
 
       if (els.movesLabel && els.limitLabel) {
+        const moveForm = deps.pluralMoves ? deps.pluralMoves(moves) : deps.plural(moves, [t("move.form.1"), t("move.form.2"), t("move.form.3")]);
         if (rule === "timed") {
-          els.movesLabel.textContent = `${moves} ${deps.plural(moves, ["ход", "хода", "ходов"])}`;
+          els.movesLabel.textContent = `${moves} ${moveForm}`;
           els.limitLabel.textContent = deps.formatTime(timerRemaining);
         } else if (Number.isFinite(limit)) {
-          els.movesLabel.textContent = level ? `${moves} / ${limit} ходов` : `${moves} ${deps.plural(moves, ["ход", "хода", "ходов"])}`;
-          els.limitLabel.textContent = level ? `Осталось ${remaining}` : "";
+          els.movesLabel.textContent = level ? t("hud.moves.limited", { moves, limit }) : `${moves} ${moveForm}`;
+          els.limitLabel.textContent = level ? t("hud.remaining", { n: remaining }) : "";
         } else {
-          els.movesLabel.textContent = `${moves} ${deps.plural(moves, ["ход", "хода", "ходов"])}`;
-          els.limitLabel.textContent = level ? "Без лимита" : "";
+          els.movesLabel.textContent = `${moves} ${moveForm}`;
+          els.limitLabel.textContent = level ? t("hud.noLimit") : "";
         }
       }
 
@@ -517,16 +673,42 @@
       if (els.playArea) els.playArea.classList.toggle("move-danger", Boolean(dangerState));
       renderActionButtons();
 
-      if (els.dailyButton) els.dailyButton.setAttribute("aria-label", `Уровень дня, награда до ${deps.getDailyRewardPreview()} монет`);
+      if (els.dailyButton) els.dailyButton.setAttribute("aria-label", t("hud.dailyBtn.aria", { coins: deps.getDailyRewardPreview() }));
       if (els.skipButton) els.skipButton.disabled = activeMode === "daily";
       if (els.muteButton) {
-        els.muteButton.textContent = state.settings.muted ? "Тихо" : "Звук";
-        els.muteButton.setAttribute("aria-pressed", String(state.settings.muted));
+        const muted = Boolean(state.settings.muted);
+        if (els.muteButton.dataset.muted !== String(muted)) {
+          els.muteButton.dataset.muted = String(muted);
+          els.muteButton.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sound-${muted ? "off" : "on"}" /></svg>`;
+        }
+        els.muteButton.setAttribute("aria-label", muted ? t("mute.on") : t("mute.off"));
+        els.muteButton.setAttribute("aria-pressed", String(muted));
+      }
+      const setToggleRow = (btn, on) => {
+        if (!btn) return;
+        const stateSpan = btn.querySelector(".settings-state");
+        if (stateSpan) stateSpan.textContent = on ? t("settings.state.on") : t("settings.state.off");
+        else btn.textContent = on ? t("settings.state.on") : t("settings.state.off");
+        btn.setAttribute("aria-pressed", String(on));
+        btn.classList.toggle("is-on", on);
+      };
+      setToggleRow(els.soundToggleButton, !state.settings.muted);
+      setToggleRow(els.hapticsToggleButton, state.settings.haptics !== false);
+      setToggleRow(els.musicToggleButton, Boolean(state.settings.music));
+      if (els.topLangButton) {
+        els.topLangButton.textContent = (window.PROBKA_LANG || "ru") === "ru" ? "RU" : "EN";
+      }
+      if (els.langToggleButton) {
+        const stateSpan = els.langToggleButton.querySelector(".settings-state");
+        if (stateSpan) stateSpan.textContent = t("settings.lang.value");
       }
       if (level && els.levelTitle) {
         const mode = deps.getLevelMode();
-        els.levelTitle.textContent =
-          activeMode === "daily" ? `${level.title} · ${deps.formatShortDate(session.activeDailyDateKey)}` : `${mode.icon} ${level.modeOrder}. ${level.title}`;
+        if (activeMode === "daily") {
+          els.levelTitle.textContent = t("hud.levelTitle.daily", { title: translateLevelTitle(level.title), date: deps.formatShortDate(session.activeDailyDateKey) });
+        } else {
+          els.levelTitle.textContent = t("hud.levelTitle.campaign", { n: level.modeOrder, title: translateLevelTitle(level.title) });
+        }
       }
       updateMenuStatus();
     }
@@ -535,9 +717,13 @@
       const els = getEls();
       const state = getState();
       const session = deps.getSessionSnapshot();
-      setToolButton(els.undoButton, "↶", "Отмена", "ход назад");
-      setToolButton(els.hintButton, "?", "Подсказка", state.hints > 0 ? `${state.hints} в запасе` : "за рекламу");
-      setToolButton(els.skipButton, "»", "Пропуск", session.activeMode === "daily" ? "не для дня" : "за рекламу");
+      setToolButton(els.undoButton, toolIcon("i-undo"), t("tool.undo.title"), t("tool.undo.sub"));
+      setToolButton(els.hintButton, toolIcon("i-bulb"), t("tool.hint.title"), state.hints > 0 ? t("tool.hint.stock", { n: state.hints }) : t("tool.hint.ad"));
+      setToolButton(els.skipButton, toolIcon("i-skip"), t("tool.skip.title"), session.activeMode === "daily" ? t("tool.skip.daily") : t("tool.skip.ad"));
+    }
+
+    function toolIcon(symbolId) {
+      return `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#${symbolId}" /></svg>`;
     }
 
     function setToolButton(button, icon, title, subtitle) {
@@ -559,14 +745,19 @@
       const mode = deps.getMode(getSelectedModeId());
       const modeOrder = deps.getCurrentModeOrder(getSelectedModeId()) + 1;
       if (els.currentLevelLabel) els.currentLevelLabel.textContent = String(modeOrder);
-      if (els.modeStatusLabel) els.modeStatusLabel.textContent = `${mode.title} · уровень ${modeOrder}`;
+      if (els.modeStatusLabel) els.modeStatusLabel.textContent = t("hud.modeStatus", { modeTitle: tModeTitle(mode.id) || mode.title, n: modeOrder });
+      if (els.hubProgressFill) {
+        const total = deps.getModeLevels(getSelectedModeId()).length || 1;
+        const done = Math.max(0, Math.min(total, modeOrder - 1));
+        els.hubProgressFill.style.width = `${Math.round((done / total) * 100)}%`;
+      }
 
       const dateKey = deps.getDailyDateKey();
       const completion = deps.getValidDailyCompletion(dateKey);
       if (els.dailyStatusLabel) {
         els.dailyStatusLabel.textContent = completion
-          ? `Пройден · ${"★".repeat(completion.stars)}${"☆".repeat(3 - completion.stars)}`
-          : `До ${deps.getDailyRewardPreview()} монет`;
+          ? t("dailyCard.statusDone", { stars: "★".repeat(completion.stars) + "☆".repeat(3 - completion.stars) })
+          : t("dailyCard.statusOpen", { coins: deps.getDailyRewardPreview() });
       }
 
       if (els.streakCount && els.streakBest) {
@@ -574,10 +765,10 @@
         const current = Math.max(0, streak.current || 0);
         const best = Math.max(current, streak.best || 0);
         els.streakCount.textContent = String(current);
-        els.streakBest.textContent = `Рекорд ${best}`;
+        els.streakBest.textContent = t("streak.record", { n: best });
         if (els.streakPanel) {
           els.streakPanel.classList.toggle("active", current > 0);
-          els.streakPanel.setAttribute("aria-label", `Серия ${current}, рекорд ${best}`);
+          els.streakPanel.setAttribute("aria-label", t("streak.panel.aria", { current, best }));
         }
       }
 
@@ -588,23 +779,35 @@
           const record = state.missions.records[mission.id];
           return record && !record.claimed && record.progress >= mission.target;
         }).length;
-        els.missionStatusLabel.textContent = available ? `${available} готово · ${claimed}/${missions.length}` : `${claimed}/${missions.length} выполнено`;
+        els.missionStatusLabel.textContent = available ? t("missions.statusN", { n: available, claimed, total: missions.length }) : t("missions.statusAll", { claimed, total: missions.length });
       }
       renderDailyWeek();
     }
 
     function showWinModal(options = {}) {
       const els = getEls();
-      if (els.winTitle) els.winTitle.textContent = options.title || "";
+      if (els.winTitle) els.winTitle.textContent = options.packComplete ? t("win.packComplete") : (options.title || "");
       if (els.starsLabel) els.starsLabel.textContent = options.starsLabel || "☆☆☆";
       if (els.rewardLabel) {
-        els.rewardLabel.textContent = options.rewardText || "";
+        const rewardText = options.rewardText || "";
+        els.rewardLabel.textContent = rewardText;
         els.rewardLabel.classList.remove("reward-pop");
+        els.rewardLabel.classList.toggle("reward-empty", !rewardText.includes("+"));
       }
       if (els.doubleRewardButton) els.doubleRewardButton.hidden = !options.canDouble;
-      if (els.nextLevelButton) els.nextLevelButton.textContent = options.nextText || "Следующий";
+      if (els.nextLevelButton) els.nextLevelButton.textContent = options.nextText || t("win.next");
       if (els.winMenuButton) els.winMenuButton.hidden = !options.showMenuButton;
-      if (els.winModal) els.winModal.hidden = false;
+      if (els.winModal) {
+        els.winModal.classList.toggle("pack-complete", Boolean(options.packComplete));
+        els.winModal.hidden = false;
+        requestAnimationFrame(() => {
+          try {
+            if (els.nextLevelButton) els.nextLevelButton.focus();
+          } catch {
+            // фокус не критичен — безопасно игнорируем
+          }
+        });
+      }
     }
 
     function setWinStars(label) {
@@ -622,7 +825,16 @@
       if (els.failEyebrow) els.failEyebrow.textContent = options.eyebrow || "";
       if (els.failTitle) els.failTitle.textContent = options.title || "";
       if (els.failText) els.failText.textContent = options.text || "";
-      if (els.failModal) els.failModal.hidden = false;
+      if (els.failModal) {
+        els.failModal.hidden = false;
+        requestAnimationFrame(() => {
+          try {
+            if (els.retryButton) els.retryButton.focus();
+          } catch {
+            // фокус не критичен — безопасно игнорируем
+          }
+        });
+      }
     }
 
     return {
@@ -630,6 +842,7 @@
       renderModeSelect,
       renderGarage,
       renderMissions,
+      renderStats,
       renderDailyWeek,
       renderDailyPanel,
       updateHud,

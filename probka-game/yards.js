@@ -19,7 +19,7 @@
       environment: "quiet_city",
       description: "Чистый асфальт, аккуратный бордюр и спокойная разметка.",
       palette: { accent: "#78adff", line: "#d9b766", exit: "#77d7a6", base: "#151b24" },
-      assetVersion: "quiet-v6-wall-exit",
+      assetVersion: "quiet-v6-art1",
       gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
@@ -31,7 +31,7 @@
       environment: "night_city",
       description: "Темный асфальт, теплые фонари и мягкие блики на машинах.",
       palette: { accent: "#ffb86b", line: "#c88b45", exit: "#57c995", base: "#090c14" },
-      assetVersion: "night-v6-wall-exit",
+      assetVersion: "night-v6-art1",
       gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
@@ -43,7 +43,7 @@
       environment: "winter_premium",
       description: "Снег по краям, следы шин, ледяной бордюр и зимние машины.",
       palette: { accent: "#8fd4ff", line: "#e7edf5", exit: "#65cba1", base: "#d5e8f4" },
-      assetVersion: "winter-v9-wall-exit",
+      assetVersion: "winter-v9-art1",
       gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
@@ -55,7 +55,7 @@
       environment: "forest_parking",
       description: "Каменная плитка, мох, листья, лесной бордюр и природный выезд.",
       palette: { accent: "#8aa265", line: "#d0b34c", exit: "#d0b34c", base: "#11190f" },
-      assetVersion: "forest-v9-wall-exit",
+      assetVersion: "forest-v9-art1",
       gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
@@ -67,7 +67,7 @@
       environment: "rainy_yard",
       description: "Мокрый асфальт, лужи, отражения разметки и блеск на кузове.",
       palette: { accent: "#7dbbff", line: "#9dc9d3", exit: "#6ee5b2", base: "#0a1218" },
-      assetVersion: "rainy-v6-wall-exit",
+      assetVersion: "rainy-v6-art1",
       gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
@@ -79,7 +79,7 @@
       environment: "underground_parking",
       description: "Бетон, колонны, строгая разметка и холодный свет ламп.",
       palette: { accent: "#b9c6d8", line: "#e1be55", exit: "#58c98f", base: "#191c22" },
-      assetVersion: "underground-v6-wall-exit",
+      assetVersion: "underground-v6-art1",
       gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
@@ -91,7 +91,7 @@
       environment: "business_center",
       description: "Чистая парковка, ровные линии, стеклянный холодный свет.",
       palette: { accent: "#78adff", line: "#b8c6d8", exit: "#5fd0a0", base: "#101824" },
-      assetVersion: "business-v7-wall-exit",
+      assetVersion: "business-v7-art1",
       gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
@@ -103,7 +103,7 @@
       environment: "old_block",
       description: "Потертый асфальт, трещины, ржавые детали и выцветшая разметка.",
       palette: { accent: "#7fac72", line: "#b7a05a", exit: "#64bd86", base: "#1e211a" },
-      assetVersion: "oldblock-v6-wall-exit",
+      assetVersion: "oldblock-v6-art1",
       gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
@@ -115,7 +115,7 @@
       environment: "neon_yard",
       description: "Темная база, cyan/purple линии и сдержанные неоновые отражения.",
       palette: { accent: "#b889ff", line: "#5ff2ff", exit: "#66f2b6", base: "#090a18" },
-      assetVersion: "neon-v6-wall-exit",
+      assetVersion: "neon-v6-art1",
       gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     },
     {
@@ -127,7 +127,7 @@
       environment: "holiday_yard",
       description: "Теплый свет, гирлянды по краям и праздничные детали без шума.",
       palette: { accent: "#ff7a86", line: "#ffd166", exit: "#70d59c", base: "#251615" },
-      assetVersion: "holiday-v5-wall-exit",
+      assetVersion: "holiday-v5-art1",
       gridFrame: { left: 125, top: 125, right: 845, bottom: 845 }
     }
   ];
@@ -140,6 +140,7 @@
     const base = `./assets/yards/${id}`;
     return {
       board: withVersion(`${base}/board.png`, version),
+      preview: withVersion(`${base}/preview.jpg`, version),
       traffic: {
         car2Horizontal: withVersion(`${base}/traffic/car-2-h.png`, version),
         car2Vertical: withVersion(`${base}/traffic/car-2-v.png`, version),

@@ -22,12 +22,12 @@
       smartHintDuration: 4600
     },
     rewards: {
-      dailyBase: 60,
-      dailyPerfect: 25,
-      dailyStreakStep: 5,
-      dailyMaxStreak: 25,
-      freeStars: [0, 3, 5, 7],
-      limitedStars: [0, 4, 6, 9]
+      dailyBase: 70,
+      dailyPerfect: 35,
+      dailyStreakStep: 7,
+      dailyMaxStreak: 70,
+      freeStars: [0, 5, 8, 12],
+      limitedStars: [0, 7, 11, 16]
     }
   };
 })();

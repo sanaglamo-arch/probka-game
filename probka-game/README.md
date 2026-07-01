@@ -47,6 +47,8 @@ node probka-game/tools/browser-smoke.js
 Для холодной локальной проверки синтаксиса, ассетов и runtime-файлов без долгого банка уровней используйте `node probka-game/tools/release-yandex.js --check --quick`.
 После уже пройденного полного `--check` релиз можно собрать без повторного прогона проверок: `node probka-game/tools/release-yandex.js --skip-checks`.
 `browser-smoke.js` запускает headless Chrome, поэтому его лучше оставлять для финальной UI-проверки.
+По умолчанию используется путь Chrome для macOS; на Linux/CI задайте бинарь и флаги через переменные окружения:
+`PROBKA_SMOKE_CHROME="$(which google-chrome)" PROBKA_SMOKE_CHROME_FLAGS="--no-sandbox --disable-dev-shm-usage" node probka-game/tools/browser-smoke.js`.
 `release-yandex.js --check` проверяет релизные файлы и данные, но не открывает браузерный smoke.
 
 ## Генерация черновиков уровней
@@ -71,7 +73,7 @@ node probka-game/tools/release-yandex.js --check --quick --yard <yard_id>
 
 Галерея для ручного визуального просмотра создается в `probka-game/assets/yards/_guides/themed-sprites-gallery.html`.
 Генератор обновляет runtime-спрайты `car-2-*`, `van-3-*` и стандартные препятствия; старые extra-файлы вроде `truck-4-*` в отдельных папках не используются runtime-манифестом.
-Генератор `generate-yard-boards.py` собирает финальные `board.png` размером `1024x1024` из `source/board-ai.png` и общего скелета: игровое поле `720x720` в `gridFrame 125..845`, одинаковый широкий визуальный выезд справа `x=845 y=305 w=179 h=403`.
+Генератор `generate-yard-boards.py` рисует финальные `board.png` размером `1024x1024` полностью процедурно в мультяшном стиле игры (AI-исходники `source/board-ai.png` больше не используются) по общему скелету: игровое поле `720x720` в `gridFrame 125..845`, одинаковый широкий визуальный выезд справа `x=845 y=305 w=179 h=403`.
 
 ## Что уже есть
 

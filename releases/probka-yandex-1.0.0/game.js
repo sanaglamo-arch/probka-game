@@ -8,6 +8,16 @@
   const yandex = window.PROBKA_YANDEX;
   const config = window.PROBKA_CONFIG || {};
   const texts = window.PROBKA_TEXTS || {};
+  // i18n shorthand — available after i18n.js loads (which is before game.js)
+  const t = (texts.t && typeof texts.t === "function") ? texts.t.bind(texts) : ((k) => k);
+  const pluralMoves = (texts.pluralMoves && typeof texts.pluralMoves === "function") ? texts.pluralMoves.bind(texts) : null;
+  const translateLevelTitle = (texts.translateLevelTitle && typeof texts.translateLevelTitle === "function") ? texts.translateLevelTitle.bind(texts) : ((s) => s);
+  const tSkinName = (texts.tSkinName && typeof texts.tSkinName === "function") ? texts.tSkinName.bind(texts) : ((id) => id);
+  const tYardName = (texts.tYardName && typeof texts.tYardName === "function") ? texts.tYardName.bind(texts) : ((id) => id);
+  const tModeTitle = (texts.tModeTitle && typeof texts.tModeTitle === "function") ? texts.tModeTitle.bind(texts) : ((id) => id);
+  const tModeSubtitle = (texts.tModeSubtitle && typeof texts.tModeSubtitle === "function") ? texts.tModeSubtitle.bind(texts) : (() => "");
+  const tMissionTitle = (texts.tMissionTitle && typeof texts.tMissionTitle === "function") ? texts.tMissionTitle.bind(texts) : ((id) => id);
+  const tMissionText = (texts.tMissionText && typeof texts.tMissionText === "function") ? texts.tMissionText.bind(texts) : ((id) => id);
   const economy = window.PROBKA_ECONOMY || {};
   const rules = window.PROBKA_RULES || {};
   const screens = window.PROBKA_SCREENS || {};
@@ -28,6 +38,7 @@
   const urlParams = config.urlParams || new URLSearchParams(window.location.search);
   const isAssetShowcase = Boolean(config.flags?.isAssetShowcase);
   const isQaMode = Boolean(config.flags?.isQaMode);
+  const standardGridFrame = window.PROBKA_YARD_ASSET_STANDARD?.gridFrame || { left: 125, top: 125, right: 845, bottom: 845 };
   const missionDefinitions = texts.missions || [
     { id: "daily_complete", title: "Уровень дня", text: "Заверши ежедневный вызов", reward: 8, target: 1 },
     { id: "three_stars", title: "Три звезды", text: "Пройди уровень идеально", reward: 10, target: 1 },
@@ -37,7 +48,11 @@
   const els = {
     app: document.getElementById("app"),
     coins: document.getElementById("coins"),
+    coinPop: document.getElementById("coinPop"),
+    streakChip: document.getElementById("streakChip"),
+    streakChipCount: document.getElementById("streakChipCount"),
     currentLevelLabel: document.getElementById("currentLevelLabel"),
+    hubProgressFill: document.getElementById("hubProgressFill"),
     modeStatusLabel: document.getElementById("modeStatusLabel"),
     dailyStatusLabel: document.getElementById("dailyStatusLabel"),
     streakPanel: document.getElementById("streakPanel"),
@@ -67,9 +82,21 @@
     dailyButton: document.getElementById("dailyButton"),
     garageButton: document.getElementById("garageButton"),
     missionsButton: document.getElementById("missionsButton"),
+    statsButton: document.getElementById("statsButton"),
+    statsPanel: document.getElementById("statsPanel"),
+    statsBody: document.getElementById("statsBody"),
+    statsBackButton: document.getElementById("statsBackButton"),
+    settingsButton: document.getElementById("settingsButton"),
+    settingsPanel: document.getElementById("settingsPanel"),
+    settingsBackButton: document.getElementById("settingsBackButton"),
     levelSelectButton: document.getElementById("levelSelectButton"),
     resetButton: document.getElementById("resetButton"),
     tutorialReplayButton: document.getElementById("tutorialReplayButton"),
+    soundToggleButton: document.getElementById("soundToggleButton"),
+    hapticsToggleButton: document.getElementById("hapticsToggleButton"),
+    musicToggleButton: document.getElementById("musicToggleButton"),
+    topLangButton: document.getElementById("topLangButton"),
+    langToggleButton: document.getElementById("langToggleButton"),
     backButton: document.getElementById("backButton"),
     modesBackButton: document.getElementById("modesBackButton"),
     dailyBackButton: document.getElementById("dailyBackButton"),
@@ -156,6 +183,8 @@
         storageKey: config.storageKey || "probka_vo_dvore_progress_v1",
         progressVersion: config.progressVersion || 2,
         isAssetShowcase,
+        unlockAllYards: Boolean(config.flags?.unlockAllYards),
+        yards,
         yandex
       })
     : null;
@@ -207,8 +236,18 @@
         syncDailyMissions,
         createMissionRecord,
         formatCoinAmount,
+        formatLevelCount,
         formatTime,
-        plural
+        plural,
+        pluralMoves,
+        t,
+        translateLevelTitle,
+        tSkinName,
+        tYardName,
+        tModeTitle,
+        tModeSubtitle,
+        tMissionTitle,
+        tMissionText
       })
     : null;
   const tutorialController = tutorialApi.createController
@@ -255,7 +294,8 @@
         applyMove,
         startBump,
         draw,
-        clamp
+        clamp,
+        playSound
       })
     : null;
   const adsController = adsApi.createController
@@ -293,7 +333,7 @@
       daily: { completions: {}, archiveUnlocks: {}, attempts: {}, streak: { current: 0, best: 0, lastDateKey: "" } },
       missions: { dateKey: "", records: {} },
       tutorial: { completedVersion: 0 },
-      settings: { muted: false }
+      settings: { muted: false, lang: null }
     };
   }
 
@@ -316,7 +356,7 @@
   }
 
   function getMode(modeId = selectedModeId) {
-    return modes.find((mode) => mode.id === modeId) || modes[0] || { id: "moves", title: "На счет ходов", rule: "moves", icon: "#" };
+    return modes.find((mode) => mode.id === modeId) || modes[0] || { id: "moves", title: t("mode.fallback.title"), rule: "moves", icon: "#" };
   }
 
   function getModeLevels(modeId = selectedModeId) {
@@ -338,7 +378,7 @@
   }
 
   function getLevelMode(current = level) {
-    if (activeMode === "daily") return { id: "daily", title: "Уровень дня", rule: "free", icon: "◆" };
+    if (activeMode === "daily") return { id: "daily", title: t("mode.daily.title"), rule: "free", icon: "◆" };
     return getMode(current ? current.modeId : selectedModeId);
   }
 
@@ -390,9 +430,9 @@
     syncTutorialLock();
   }
 
-  function blockTutorialEscape(message = "Сначала закончи обучение") {
+  function blockTutorialEscape(message) {
     if (!isTutorialActive()) return false;
-    showToast(message);
+    showToast(message || t("toast.tutorialBlock"));
     const allowedView = getTutorialAllowedView();
     if (allowedView && currentView !== allowedView) show(allowedView, { fromTutorial: true });
     else updateTutorialStep();
@@ -400,10 +440,11 @@
   }
 
   function show(view, options = {}) {
+    document.body.classList.remove("loading");
     if (isTutorialActive() && !options.fromTutorial) {
       const allowedView = getTutorialAllowedView();
       if (view !== allowedView) {
-        showToast("Сначала закончи обучение");
+        showToast(t("toast.tutorialBlock"));
         view = allowedView;
       }
     }
@@ -432,9 +473,11 @@
     if (view === "levels") renderLevelSelect();
     if (view === "garage") renderGarage();
     if (view === "missions") renderMissions();
+    if (view === "stats") renderStats();
     applyCaptureMode();
     if (view === "game") resizeCanvas();
     updateGameplayMarker();
+    updateMusicPlayback();
     renderDailyWeek();
     syncTutorialLock();
   }
@@ -448,6 +491,37 @@
 
   function updateHud() {
     if (screenController) screenController.updateHud();
+  }
+
+  // Анимация прироста монет в кошельке + всплывающее «+N» после награды.
+  let coinAnimFrame = null;
+  function animateCoins(from, to, duration = 560) {
+    if (!els.coins) return;
+    const reduce = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (coinAnimFrame) cancelAnimationFrame(coinAnimFrame);
+    if (reduce || from === to) {
+      els.coins.textContent = String(to);
+      return;
+    }
+    const start = performance.now();
+    const step = (now) => {
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      els.coins.textContent = String(Math.round(from + (to - from) * eased));
+      coinAnimFrame = progress < 1 ? requestAnimationFrame(step) : null;
+    };
+    coinAnimFrame = requestAnimationFrame(step);
+  }
+
+  function rewardCoinFeedback(coinsBefore) {
+    const gain = state.coins - coinsBefore;
+    animateCoins(coinsBefore, state.coins);
+    if (gain > 0 && els.coinPop) {
+      els.coinPop.textContent = `+${gain}`;
+      els.coinPop.classList.remove("active");
+      void els.coinPop.offsetWidth;
+      els.coinPop.classList.add("active");
+    }
   }
 
   function renderActionButtons() {
@@ -481,7 +555,12 @@
   }
 
   function formatCoinAmount(value, options = {}) {
-    return texts.formatCoinAmount ? texts.formatCoinAmount(value, options) : `${Math.max(0, Math.round(value || 0))} монет`;
+    return texts.formatCoinAmount ? texts.formatCoinAmount(value, options) : String(Math.max(0, Math.round(value || 0)));
+  }
+
+  function formatLevelCount(value) {
+    const count = Math.max(0, Math.round(value || 0));
+    return texts.formatLevelCount ? texts.formatLevelCount(count) : String(count);
   }
 
   function formatTime(seconds) {
@@ -506,6 +585,7 @@
     if (timerFrame) cancelAnimationFrame(timerFrame);
     timerFrame = null;
     timerState = null;
+    updateGameplayMarker();
   }
 
   function pauseTimer() {
@@ -642,12 +722,12 @@
   function startDailyLevel(date = new Date()) {
     if (blockTutorialEscape()) return;
     if (!dailyApi) {
-      showToast("Уровень дня пока недоступен");
+      showToast(t("toast.dailyUnavailable"));
       return;
     }
     const dateKey = dailyApi.getDateKey(date);
     if (!isDailyDatePlayable(dateKey)) {
-      showToast(dateKey > getDailyDateKey() ? "Будущий уровень еще закрыт" : "Сначала открой архивный день");
+      showToast(dateKey > getDailyDateKey() ? t("toast.dailyFuture") : t("toast.dailyNeedUnlock"));
       show("daily");
       return;
     }
@@ -723,16 +803,8 @@
     resetRunState();
   }
 
-  function getTutorialCards() {
-    return tutorialController ? tutorialController.getCards() : tutorialApi.getMenuCards ? tutorialApi.getMenuCards() : [];
-  }
-
   function updateTutorialStep() {
     if (tutorialController) tutorialController.updateStep();
-  }
-
-  function setTutorialCard(step) {
-    if (tutorialController) tutorialController.setCard(step);
   }
 
   function setTutorialDomFocus(ids) {
@@ -745,10 +817,6 @@
 
   function getTutorialExpectedMove() {
     return tutorialController ? tutorialController.getExpectedMove() : null;
-  }
-
-  function getTutorialGuidedMove() {
-    return tutorialController ? tutorialController.getGuidedMove() : null;
   }
 
   function showTutorialExpectedHint(move) {
@@ -764,8 +832,8 @@
       targetX: vehicle.x + (vehicle.axis === "horizontal" ? move.delta : 0),
       targetY: vehicle.y + (vehicle.axis === "vertical" ? move.delta : 0),
       direction: { axis: vehicle.axis, sign: Math.sign(move.delta) },
-      sourceLabel: vehicle.id === level.targetVehicleId ? "Твоя машина" : "Тащи эту",
-      targetLabel: "Сюда",
+      sourceLabel: vehicle.id === level.targetVehicleId ? t("hint.source.target") : t("hint.source.other"),
+      targetLabel: t("hint.target"),
       until: Number.POSITIVE_INFINITY
     };
     draw();
@@ -776,15 +844,15 @@
     if (!isTutorialActive()) return true;
     const expected = getTutorialExpectedMove();
     if (!expected) {
-      showToast("Следуй шагу обучения");
+      showToast(t("toast.tutorialStep"));
       return false;
     }
     if (!vehicle || vehicle.id !== expected.id) {
-      showToast("Сейчас нужна подсвеченная машина");
+      showToast(t("toast.tutorialHighlighted"));
       return false;
     }
     if (delta !== null && delta !== expected.delta) {
-      showToast("Двигай до подсвеченной позиции");
+      showToast(t("toast.tutorialPosition"));
       return false;
     }
     return true;
@@ -852,14 +920,14 @@
     if (els.tutorialOverlay) els.tutorialOverlay.hidden = true;
     state.tutorial.completedVersion = tutorialVersion;
     saveProgress({ flush: true });
-    showToast("Обучение пройдено");
+    showToast(t("toast.tutorialDone"));
     show("menu");
   }
 
   function restartLevel() {
     if (isAnimating) return;
     if (tutorialState && tutorialState.active) {
-      showToast("Сначала закончи обучение");
+      showToast(t("toast.tutorialBlock"));
       return;
     }
     playSound("button");
@@ -889,14 +957,14 @@
       state.garage.equippedSkinId = skin.id;
       saveProgress({ flush: true });
       playSound("button");
-      showToast(`${skin.name}: надето`);
+      showToast(t("toast.skinEquipped", { name: tSkinName(skin.id) }));
       renderGarage();
       draw();
       return;
     }
     if (state.coins < skin.price) {
       playSound("bump");
-      showToast("Не хватает монет");
+      showToast(t("toast.notEnoughCoins"));
       return;
     }
     state.coins -= skin.price;
@@ -904,7 +972,7 @@
     state.garage.equippedSkinId = skin.id;
     saveProgress({ flush: true });
     playSound("coin");
-    showToast(`${skin.name}: куплено`);
+    showToast(t("toast.skinBought", { name: tSkinName(skin.id) }));
     updateHud();
     renderGarage();
     draw();
@@ -917,14 +985,14 @@
       state.garage.equippedYardId = yard.id;
       saveProgress({ flush: true });
       playSound("button");
-      showToast(`${yard.name}: надето`);
+      showToast(t("toast.skinEquipped", { name: tYardName(yard.id) }));
       renderGarage();
       resizeCanvas();
       return;
     }
     if (state.coins < yard.price) {
       playSound("bump");
-      showToast("Не хватает монет");
+      showToast(t("toast.notEnoughCoins"));
       return;
     }
     state.coins -= yard.price;
@@ -932,7 +1000,7 @@
     state.garage.equippedYardId = yard.id;
     saveProgress({ flush: true });
     playSound("coin");
-    showToast(`${yard.name}: куплено`);
+    showToast(t("toast.skinBought", { name: tYardName(yard.id) }));
     updateHud();
     renderGarage();
     resizeCanvas();
@@ -940,6 +1008,10 @@
 
   function renderMissions() {
     if (screenController) screenController.renderMissions();
+  }
+
+  function renderStats() {
+    if (screenController) screenController.renderStats();
   }
 
   function renderDailyWeek() {
@@ -957,8 +1029,8 @@
       return;
     }
     pendingDailyArchiveDateKey = dateKey;
-    if (els.archiveConfirmTitle) els.archiveConfirmTitle.textContent = `Открыть ${formatShortDate(dateKey)}?`;
-    if (els.archiveConfirmText) els.archiveConfirmText.textContent = "Посмотри рекламу, чтобы сыграть этот архивный уровень дня.";
+    if (els.archiveConfirmTitle) els.archiveConfirmTitle.textContent = t("archive.title.date", { date: formatShortDate(dateKey) });
+    if (els.archiveConfirmText) els.archiveConfirmText.textContent = t("archive.text");
     if (els.archiveWatchButton) els.archiveWatchButton.disabled = false;
     if (els.archiveConfirmModal) els.archiveConfirmModal.hidden = false;
   }
@@ -989,10 +1061,10 @@
     const unlock = () => {
       state.daily.archiveUnlocks[dateKey] = true;
       saveProgress({ flush: true });
-      showToast(`Архив ${formatShortDate(dateKey)} открыт`);
+      showToast(t("toast.archiveUnlocked", { date: formatShortDate(dateKey) }));
       renderDailyPanel();
     };
-    return showRewarded("Архив уровня дня", "После ролика откроется выбранный архивный уровень.", unlock);
+    return showRewarded(t("rewarded.archive.title"), t("rewarded.archive.text"), unlock);
   }
 
   function isDailyDatePlayable(dateKey) {
@@ -1020,8 +1092,7 @@
     els.canvas.width = size;
     els.canvas.height = size;
     ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
-    const yardTheme = getEquippedYard();
-    const frame = yardTheme && yardTheme.fullArtBoard && yardTheme.gridFrame && gridSize === 6 ? yardTheme.gridFrame : null;
+    const frame = gridSize === 6 ? standardGridFrame : null;
     if (frame) {
       boardPadX = Math.round(rect.width * frame.left / 1024);
       boardPadY = Math.round(rect.width * frame.top / 1024);
@@ -1125,6 +1196,7 @@
     const fromY = vehicle.y;
     const toX = vehicle.x + (vehicle.axis === "horizontal" ? delta : 0);
     const toY = vehicle.y + (vehicle.axis === "vertical" ? delta : 0);
+    vibrate(8);
 
     moveHistory.push({
       vehicles: vehicles.map(cloneVehicle),
@@ -1159,6 +1231,7 @@
     if (!vehicle || !sign || isAnimating) return;
     if (!isTutorialActive()) clearHint();
     playSound("bump");
+    vibrate([14, 8, 10]);
     startVehicleAnimation({
       type: "bump",
       vehicleId: vehicle.id,
@@ -1193,7 +1266,8 @@
     const fromX = target.x;
     const fromY = target.y;
     playSound("win");
-    winFx = { start: performance.now(), duration: 900 };
+    vibrate([12, 40, 30, 40, 60]);
+    winFx = { start: performance.now(), duration: 1400 };
     startVehicleAnimation({
       type: "win",
       vehicleId: target.id,
@@ -1230,6 +1304,8 @@
   }
 
   function completeCampaignLevel(stars) {
+    const coinsBefore = state.coins;
+    const isPackEnd = level.modeOrder > 0 && level.modeOrder % 20 === 0;
     const previous = state.completed[level.id];
     const previousStars = previous ? previous.stars || 0 : 0;
     const reward = Math.max(0, getCampaignStarReward(level, stars) - getCampaignStarReward(level, previousStars));
@@ -1257,16 +1333,19 @@
     saveProgress({ flush: true });
 
     showWinModal({
-      title: `${level.title}`,
+      title: translateLevelTitle(level.title),
       rewardText: formatCampaignRewardLabel(reward, missionReward, elapsedMs),
       canDouble: reward > 0,
-      nextText: "Следующий",
-      showMenuButton: false
+      nextText: t("win.next"),
+      showMenuButton: false,
+      packComplete: isPackEnd
     });
     updateHud();
+    rewardCoinFeedback(coinsBefore);
     revealStars(stars);
+    if (isPackEnd) setTimeout(() => playSound("coin"), 720);
     updateGameplayMarker();
-    if (missionReward) showToast(`Миссии: +${missionReward} монет`);
+    if (missionReward) showToast(t("toast.missionsReward", { coins: missionReward }));
   }
 
   function getCampaignStarReward(item, stars) {
@@ -1278,15 +1357,16 @@
   function formatCampaignRewardLabel(reward, missionReward, elapsedMs) {
     const parts = [];
     if (reward > 0) {
-      parts.push(getRuleType() === "timed" && elapsedMs ? `+${reward} монет · ${formatTime(elapsedMs / 1000)}` : `+${reward} монет`);
+      parts.push(getRuleType() === "timed" && elapsedMs ? t("reward.coinsTimed", { n: reward, time: formatTime(elapsedMs / 1000) }) : t("reward.coins", { n: reward }));
     } else {
-      parts.push("Монеты уже получены");
+      parts.push(t("reward.alreadyClaimed"));
     }
-    if (missionReward) parts.push(`миссии +${missionReward}`);
+    if (missionReward) parts.push(t("reward.missionSuffix", { n: missionReward }));
     return parts.join(" · ");
   }
 
   function completeDailyLevel(stars) {
+    const coinsBefore = state.coins;
     const dateKey = activeDailyDateKey || getDailyDateKey();
     const isToday = dateKey === getDailyDateKey();
     let completion = state.daily.completions[dateKey];
@@ -1319,22 +1399,23 @@
 
     lastReward = 0;
     showWinModal({
-      title: `${level.title}`,
+      title: translateLevelTitle(level.title),
       rewardText: isToday
         ? totalReward
-          ? `+${totalReward} монет за сегодня${streakReward ? ` · серия +${streakReward}` : ""}`
-          : "Награда дня уже получена"
+          ? t("reward.daily.earned", { total: totalReward }) + (streakReward ? ` · ${t("reward.daily.streak", { n: streakReward })}` : "")
+          : t("reward.daily.claimed")
         : archiveReward
-          ? `Архив ${formatShortDate(dateKey)} · +${archiveReward} монет`
-          : "Архив уже закрыт на лучший результат",
+          ? t("reward.archive.earned", { date: formatShortDate(dateKey), coins: archiveReward })
+          : t("reward.archive.done"),
       canDouble: false,
-      nextText: "Календарь",
+      nextText: t("win.nextDaily"),
       showMenuButton: true
     });
     updateHud();
+    rewardCoinFeedback(coinsBefore);
     revealStars(stars);
     updateGameplayMarker();
-    if (totalReward || archiveReward) showToast(`${isToday ? "Уровень дня" : "Архив"}: +${totalReward + archiveReward} монет`);
+    if (totalReward || archiveReward) showToast(isToday ? t("toast.dailyReward.today", { coins: totalReward + archiveReward }) : t("toast.dailyReward.archive", { coins: totalReward + archiveReward }));
   }
 
   function showWinModal(options) {
@@ -1367,24 +1448,25 @@
     clearHint();
     if (timerState) timerState.finished = true;
     playSound("bump");
+    vibrate([22, 10, 22]);
     let failOptions;
     if (reason === "time") {
       failOptions = {
-        eyebrow: "Таймер",
-        title: "Время вышло",
-        text: "Время вышло. Двор начнется заново."
+        eyebrow: t("fail.eyebrow.time"),
+        title: t("fail.title.time"),
+        text: t("fail.text.time")
       };
     } else if (activeMode === "daily" || !Number.isFinite(getMoveLimit())) {
       failOptions = {
-        eyebrow: "Без лимита",
-        title: "Еще попытка",
-        text: "Попробуй еще раз, этот режим не ограничивает ходы."
+        eyebrow: t("fail.eyebrow.free"),
+        title: t("fail.title.free"),
+        text: t("fail.text.free")
       };
     } else {
       failOptions = {
-        eyebrow: "Лимит ходов",
-        title: "Ходы закончились",
-        text: `Лимит ${getMoveLimit()} ходов исчерпан. Двор начнется заново.`
+        eyebrow: t("fail.eyebrow.moves"),
+        title: t("fail.title.moves"),
+        text: t("fail.text.moves", { n: getMoveLimit() })
       };
     }
     showFailModal(failOptions);
@@ -1427,7 +1509,7 @@
       const hint = findHint();
       if (!hint) {
         playSound("bump");
-        showToast("Сейчас нет полезной подсказки");
+        showToast(t("toast.noHint"));
         return;
       }
       state.hints -= 1;
@@ -1436,14 +1518,14 @@
       flashHint(hint);
       return;
     }
-    showRewarded("Подсказка", "После короткого ролика появится следующий правильный ход.", () => {
-      showToast("Ищу лучший ход");
+    showRewarded(t("rewarded.hint.title"), t("rewarded.hint.text"), () => {
+      showToast(t("toast.searching"));
       requestAnimationFrame(() => {
         const hint = findHint();
         if (hint) flashHint(hint);
         else {
           playSound("bump");
-          showToast("Сейчас нет полезной подсказки");
+          showToast(t("toast.noHint"));
         }
       });
     });
@@ -1463,7 +1545,7 @@
 
   function requestToolAction(action) {
     if (tutorialState && tutorialState.active) {
-      showToast("В обучении следуй подсветке");
+      showToast(t("toast.tutorialInGame"));
       return;
     }
     if (queueToolAction(action)) return;
@@ -1483,7 +1565,7 @@
 
   function flashHint(hint = findHint()) {
     if (!hint) {
-      showToast("Сейчас нет полезной подсказки");
+      showToast(t("toast.noHint"));
       return;
     }
     activeHint = {
@@ -1519,14 +1601,14 @@
 
   function skipLevel() {
     if (isAnimating) return;
-    if (blockTutorialEscape("В обучении следуй подсветке")) return;
+    if (blockTutorialEscape(t("toast.tutorialInGame"))) return;
     if (activeMode === "daily") {
       playSound("bump");
-      showToast("Уровень дня нельзя пропустить");
+      showToast(t("toast.dailyNoSkip"));
       return;
     }
     playSound("button");
-    showRewarded("Пропуск уровня", "После короткого ролика следующий двор откроется сразу.", () => {
+    showRewarded(t("rewarded.skip.title"), t("rewarded.skip.text"), () => {
       const nextIndex = getNextLevelIndexInMode();
       const next = levels[nextIndex];
       if (next) {
@@ -1561,9 +1643,16 @@
     return adsController ? adsController.runAdPause(showAdCallback) : showAdCallback();
   }
 
+  // Минимальный интервал между межстраничными роликами (рекомендация Яндекса —
+  // не показывать рекламу слишком часто; счётчик уровней дополняем таймером).
+  const MIN_INTERSTITIAL_INTERVAL_MS = 60000;
+
   function maybeShowInterstitial(callback) {
-    if (state.ad.completedLevels >= 3 && state.ad.levelsSinceInterstitial >= 1) {
+    const now = Date.now();
+    const sinceLast = now - (state.ad.lastInterstitialAt || 0);
+    if (state.ad.completedLevels >= 3 && state.ad.levelsSinceInterstitial >= 1 && sinceLast >= MIN_INTERSTITIAL_INTERVAL_MS) {
       state.ad.levelsSinceInterstitial = 0;
+      state.ad.lastInterstitialAt = now;
       saveProgress();
       showInterstitial(callback);
       return;
@@ -1601,12 +1690,12 @@
     if (blockTutorialEscape()) return;
     if (activeMode === "daily" || lastReward <= 0) {
       playSound("bump");
-      showToast(activeMode === "daily" ? "Уровень дня не удваивается" : "Нечего удваивать");
+      showToast(activeMode === "daily" ? t("toast.dailyNoDouble") : t("toast.nothingToDouble"));
       return;
     }
     playSound("button");
     els.winModal.hidden = true;
-    showRewarded("Удвоить награду", "После рекламного ролика монеты за уровень удвоятся.", () => {
+    showRewarded(t("rewarded.double.title"), t("rewarded.double.text"), () => {
       state.coins += lastReward;
       saveProgress({ flush: true });
       updateHud();
@@ -1692,6 +1781,7 @@
     ctx.clearRect(0, 0, width, height);
 
     drawYard(width, height);
+    drawExitGlow();
     drawActorRoutes();
     drawMoveGuide();
     if (!isTutorialHintActive()) drawHint();
@@ -1707,6 +1797,21 @@
 
   function drawYard(width, height) {
     if (renderer.drawYard) renderer.drawYard(ctx, { level, cellSize, boardPad, width, height, yardTheme: getEquippedYard() });
+  }
+
+  // Мягкое свечение в точке выезда — цель «манит» (зелёный = go).
+  // Рисуется за машинами; для запечённого в board.png выезда подсвечивает зону.
+  function drawExitGlow() {
+    if (!level || !level.exit) return;
+    const p = boardToScreen(level.width, level.exit.row + 0.5);
+    ctx.save();
+    const r = cellSize * 0.85;
+    const grad = ctx.createRadialGradient(p.x - cellSize * 0.1, p.y, 0, p.x - cellSize * 0.1, p.y, r);
+    grad.addColorStop(0, "rgba(120, 226, 170, 0.3)");
+    grad.addColorStop(1, "rgba(120, 226, 170, 0)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(p.x - r, p.y - r, r * 2, r * 2);
+    ctx.restore();
   }
 
   function drawActorRoutes() {
@@ -1822,36 +1927,40 @@
     const targetSkin = isTarget ? getEquippedSkin() : null;
     const yardTheme = getEquippedYard();
     const usesTrafficSprite = !isTarget && renderer.hasYardTrafficSprite && renderer.hasYardTrafficSprite(yardTheme, vehicle);
-    const pad = usesTrafficSprite ? cellSize * 0.075 : cellSize * 0.12;
+    const usesSkinSprite = isTarget && renderer.hasSkinSprite && renderer.hasSkinSprite(targetSkin);
+    const pad = usesSkinSprite || usesTrafficSprite ? cellSize * 0.02 : cellSize * 0.12;
     const x = pos.x + pad;
     const y = pos.y + pad;
     const bodyWidth = width - pad * 2;
     const bodyHeight = height - pad * 2;
-    const usesSkinSprite = isTarget && renderer.hasSkinSprite && renderer.hasSkinSprite(targetSkin);
+    const spriteBox = {
+      x,
+      y,
+      width: bodyWidth,
+      height: bodyHeight
+    };
     const skinSpriteRect = usesSkinSprite && renderer.getSkinSpriteDrawRect
       ? renderer.getSkinSpriteDrawRect(targetSkin, x, y, bodyWidth, bodyHeight, vehicle.axis)
       : null;
     const trafficKind = getTrafficVehicleKind(vehicle);
+    const bodyRadius = isTarget ? 14 : getVehicleBodyRadius(trafficKind, vehicle);
+
+    // Контактная тень под машиной — объём на поле. Рисуется первой, корпус
+    // её перекрывает, наружу выходит мягкий ореол.
+    ctx.save();
+    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+    ctx.shadowBlur = cellSize * 0.16;
+    ctx.shadowOffsetY = cellSize * 0.06;
+    ctx.fillStyle = "rgba(4, 7, 12, 0.4)";
+    roundedRect(ctx, x + 2, y + 2, bodyWidth - 4, bodyHeight - 4, bodyRadius);
+    ctx.fill();
+    ctx.restore();
 
     ctx.save();
-    ctx.fillStyle = "rgba(17, 21, 28, 0.16)";
-    const shadowRect = skinSpriteRect || { x, y, width: bodyWidth, height: bodyHeight };
-    roundedRect(
-      ctx,
-      shadowRect.x + shadowRect.width * 0.08,
-      shadowRect.y + shadowRect.height * 0.8,
-      shadowRect.width * 0.84,
-      Math.max(3, shadowRect.height * 0.12),
-      999
-    );
-    ctx.fill();
-
     if (isTarget) {
       const outlineRect = skinSpriteRect || { x, y, width: bodyWidth, height: bodyHeight };
       const outlinePad = usesSkinSprite ? (visual.isSelected ? cellSize * 0.045 : cellSize * 0.025) : 3;
       const outlineRadius = usesSkinSprite ? Math.min(14, outlineRect.height * 0.24) : 15;
-      ctx.shadowColor = visual.isSelected ? "rgba(130, 182, 255, 0.34)" : usesSkinSprite ? "rgba(255, 207, 112, 0.08)" : "rgba(238, 123, 135, 0.14)";
-      ctx.shadowBlur = visual.isSelected ? 12 : usesSkinSprite ? 3 : 5;
       ctx.fillStyle = visual.isSelected ? "rgba(130, 182, 255, 0.045)" : usesSkinSprite ? "rgba(255, 207, 112, 0.032)" : "rgba(238, 123, 135, 0.02)";
       roundedRect(
         ctx,
@@ -1873,11 +1982,18 @@
         outlineRadius
       );
       ctx.stroke();
+    } else if (visual.isSelected) {
+      // Кольцо выделения для захваченной блокирующей машины — тактильная обратная связь.
+      const ring = 3;
+      const radius = getVehicleBodyRadius(trafficKind, vehicle) + ring;
+      ctx.fillStyle = "rgba(130, 182, 255, 0.06)";
+      roundedRect(ctx, x - ring, y - ring, bodyWidth + ring * 2, bodyHeight + ring * 2, radius);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(178, 212, 255, 0.72)";
+      ctx.lineWidth = 2;
+      roundedRect(ctx, x - ring, y - ring, bodyWidth + ring * 2, bodyHeight + ring * 2, radius);
+      ctx.stroke();
     }
-
-    ctx.shadowColor = visual.isSelected ? "rgba(130, 182, 255, 0.34)" : "rgba(0,0,0,0.28)";
-    ctx.shadowBlur = visual.isSelected ? 14 : 10;
-    ctx.shadowOffsetY = visual.isSelected ? 2 : 5;
 
     const paintColor = getVehicleColor(vehicle);
     if (!usesSkinSprite && !usesTrafficSprite) {
@@ -1896,10 +2012,10 @@
     else if (usesTrafficSprite) {
       renderer.drawYardTrafficSprite(ctx, {
         vehicle,
-        x,
-        y,
-        width: bodyWidth,
-        height: bodyHeight,
+        x: spriteBox.x,
+        y: spriteBox.y,
+        width: spriteBox.width,
+        height: spriteBox.height,
         axis: vehicle.axis,
         cellSize,
         yardTheme,
@@ -2007,6 +2123,18 @@
     if (audio) audio.play(name);
   }
 
+  // Тактильная отдача на мобильных. navigator.vibrate тихо игнорируется
+  // на iOS/десктопе; гейтится отдельной настройкой haptics.
+  function vibrate(pattern) {
+    if (typeof navigator !== "undefined" && navigator.vibrate && state.settings && state.settings.haptics !== false) {
+      try {
+        navigator.vibrate(pattern);
+      } catch {
+        // Некоторые встроенные браузеры бросают на vibrate — безопасно игнорируем.
+      }
+    }
+  }
+
   function getVehicleColor(vehicle) {
     if (level && vehicle.id === level.targetVehicleId) return getEquippedSkin().color;
     return vehicle.color;
@@ -2073,6 +2201,19 @@
     if (changed) saveProgress();
   }
 
+  // Приветственная серия: при входе серия всегда минимум 1 (с датой «сегодня»),
+  // чтобы огонёк сразу был виден и игроку было что беречь.
+  function ensureWelcomeStreak() {
+    if (!state.daily) return false;
+    if (!state.daily.streak) state.daily.streak = { current: 0, best: 0, lastDateKey: "" };
+    const s = state.daily.streak;
+    if (Number(s.current) >= 1) return false;
+    s.current = 1;
+    s.best = Math.max(1, Number(s.best) || 0);
+    s.lastDateKey = getDailyDateKey();
+    return true;
+  }
+
   function createMissionRecord() {
     return economy.createMissionRecord ? economy.createMissionRecord() : { progress: 0, claimed: false };
   }
@@ -2112,12 +2253,60 @@
     }, 1900);
   }
 
+  // Музыка звучит только во время самого геймплея (view === "game").
+  function updateMusicPlayback() {
+    if (!audio) return;
+    if (currentView === "game" && state.settings.music && !state.settings.muted) {
+      if (audio.startMusic) audio.startMusic();
+    } else if (audio.stopMusic) {
+      audio.stopMusic();
+    }
+  }
+
   function toggleMute() {
     if (blockTutorialEscape()) return;
     state.settings.muted = !state.settings.muted;
     saveProgress();
     updateHud();
     if (!state.settings.muted) playSound("button");
+    updateMusicPlayback();
+  }
+
+  function toggleHaptics() {
+    if (blockTutorialEscape()) return;
+    state.settings.haptics = state.settings.haptics === false;
+    saveProgress();
+    updateHud();
+    if (state.settings.haptics) vibrate(18);
+  }
+
+  function toggleMusic() {
+    if (blockTutorialEscape()) return;
+    state.settings.music = !state.settings.music;
+    saveProgress();
+    updateHud();
+    playSound("button");
+    updateMusicPlayback();
+  }
+
+  function toggleLang() {
+    if (blockTutorialEscape()) return;
+    const current = window.PROBKA_LANG || "ru";
+    const next = current === "ru" ? "en" : "ru";
+    window.PROBKA_LANG = next;
+    if (!state.settings) state.settings = {};
+    state.settings.lang = next;
+    saveProgress();
+    if (texts.applyI18n) texts.applyI18n(document);
+    updateHud();
+    updateMenuStatus();
+    // Re-render the current view so all dynamic strings update
+    if (currentView === "modes") renderModeSelect();
+    else if (currentView === "levels") renderLevelSelect();
+    else if (currentView === "garage") renderGarage();
+    else if (currentView === "missions") renderMissions();
+    else if (currentView === "stats") renderStats();
+    else if (currentView === "daily") renderDailyPanel();
   }
 
   async function initializePlatform() {
@@ -2126,12 +2315,19 @@
       onPause: handlePlatformPause,
       onResume: handlePlatformResume
     });
-    applyPlatformLanguage(yandex.getLanguage ? yandex.getLanguage() : "ru");
+    applyPlatformLanguage();
     await restoreCloudProgress();
   }
 
-  function applyPlatformLanguage(language) {
-    document.documentElement.lang = String(language || "ru").startsWith("ru") ? "ru" : "ru";
+  function applyPlatformLanguage() {
+    // Resolve language: saved preference → platform lang (ru/en only) → "ru"
+    const savedLang = state.settings && state.settings.lang;
+    const platformLang = yandex && yandex.getLanguage ? yandex.getLanguage() : null;
+    const resolvedLang = savedLang || (platformLang === "en" ? "en" : null) || "ru";
+    window.PROBKA_LANG = resolvedLang;
+    if (texts.applyI18n) texts.applyI18n(document);
+    else document.documentElement.lang = resolvedLang;
+    updateHud();
   }
 
   async function restoreCloudProgress() {
@@ -2152,7 +2348,7 @@
   }
 
   function loadGeneratedSkinPack() {
-    const assetVersion = "rc6-night-gridframe";
+    const assetVersion = "rc16-wall-yard-exit";
     const refresh = () => {
       renderGarage();
       draw();
@@ -2164,8 +2360,13 @@
   async function initializeGame() {
     loadGeneratedSkinPack();
     bindEvents();
-    await initializePlatform();
+    try {
+      await initializePlatform();
+    } catch (error) {
+      // Платформа не критична — продолжаем на локальном прогрессе.
+    }
     syncDailyMissions();
+    ensureWelcomeStreak();
     saveProgress({ touch: false });
     applyAssetShowcaseState();
     const launchScreen = getLaunchScreenFromUrl();
@@ -2186,7 +2387,7 @@
     if (!screen) return "";
     const modeId = urlParams.get("mode");
     if (modeId && getModeLevels(modeId).length) selectedModeId = modeId;
-    if (["menu", "modes", "daily", "levels", "garage", "missions"].includes(screen)) return screen;
+    if (["menu", "modes", "daily", "levels", "garage", "missions", "stats", "settings"].includes(screen)) return screen;
     return "";
   }
 
@@ -2260,6 +2461,11 @@
     return {
       activeMode,
       levelId: level ? level.id : "",
+      yardId: getEquippedYard().id,
+      boardPadX,
+      boardPadY,
+      cellSize,
+      gridFrame: standardGridFrame,
       moves,
       isAnimating,
       winOpen: Boolean(els.winModal && !els.winModal.hidden),
@@ -2351,6 +2557,13 @@
       playSound("button");
       show("daily");
     });
+    if (els.streakChip) {
+      els.streakChip.addEventListener("click", () => {
+        if (blockTutorialEscape()) return;
+        playSound("button");
+        show("daily");
+      });
+    }
     els.garageButton.addEventListener("click", () => {
       if (blockTutorialEscape()) return;
       playSound("button");
@@ -2361,6 +2574,13 @@
       playSound("button");
       show("missions");
     });
+    if (els.statsButton) {
+      els.statsButton.addEventListener("click", () => {
+        if (blockTutorialEscape()) return;
+        playSound("button");
+        show("stats");
+      });
+    }
     els.levelSelectButton.addEventListener("click", () => {
       if (blockTutorialEscape()) return;
       playSound("button");
@@ -2369,7 +2589,7 @@
     els.resetButton.addEventListener("click", () => {
       if (blockTutorialEscape()) return;
       playSound("button");
-      localStorage.removeItem(storageKey);
+      localStorage.removeItem(config.storageKey || "probka_vo_dvore_progress_v1");
       state = defaultProgress();
       selectedModeId = state.lastModeId;
       syncDailyMissions();
@@ -2382,6 +2602,17 @@
         startTutorialFlow(true);
       });
     }
+    if (els.soundToggleButton) els.soundToggleButton.addEventListener("click", toggleMute);
+    if (els.hapticsToggleButton) els.hapticsToggleButton.addEventListener("click", toggleHaptics);
+    if (els.musicToggleButton) els.musicToggleButton.addEventListener("click", toggleMusic);
+    if (els.langToggleButton) els.langToggleButton.addEventListener("click", toggleLang);
+    if (els.topLangButton) els.topLangButton.addEventListener("click", toggleLang);
+    // Музыка только в геймплее; первый жест разблокирует автоплей,
+    // а играть она начнёт лишь если текущий экран — игровой.
+    document.addEventListener("pointerdown", function startMusicOnGesture() {
+      document.removeEventListener("pointerdown", startMusicOnGesture);
+      updateMusicPlayback();
+    }, { once: true });
     els.backButton.addEventListener("click", () => {
       if (isAnimating) return;
       if (blockTutorialEscape()) return;
@@ -2416,6 +2647,27 @@
       playSound("button");
       show("menu");
     });
+    if (els.statsBackButton) {
+      els.statsBackButton.addEventListener("click", () => {
+        if (blockTutorialEscape()) return;
+        playSound("button");
+        show("menu");
+      });
+    }
+    if (els.settingsButton) {
+      els.settingsButton.addEventListener("click", () => {
+        if (blockTutorialEscape()) return;
+        playSound("button");
+        show("settings");
+      });
+    }
+    if (els.settingsBackButton) {
+      els.settingsBackButton.addEventListener("click", () => {
+        if (blockTutorialEscape()) return;
+        playSound("button");
+        show("menu");
+      });
+    }
     els.restartButton.addEventListener("click", restartLevel);
     els.muteButton.addEventListener("click", toggleMute);
     els.undoButton.addEventListener("click", () => requestToolAction("undo"));
@@ -2439,8 +2691,16 @@
     els.canvas.addEventListener("pointermove", onPointerMove);
     els.canvas.addEventListener("pointerup", onPointerUp);
     els.canvas.addEventListener("pointercancel", onPointerUp);
-    window.addEventListener("resize", resizeCanvas);
-    if (window.visualViewport) window.visualViewport.addEventListener("resize", resizeCanvas);
+    let resizeRaf = null;
+    const scheduledResize = () => {
+      if (resizeRaf) return;
+      resizeRaf = requestAnimationFrame(() => {
+        resizeRaf = null;
+        resizeCanvas();
+      });
+    };
+    window.addEventListener("resize", scheduledResize);
+    if (window.visualViewport) window.visualViewport.addEventListener("resize", scheduledResize);
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         pauseTimer();
@@ -2451,15 +2711,25 @@
       }
       updateGameplayMarker();
     });
+
+    // Некоторые мобильные браузеры и WebView Яндекса не всегда шлют
+    // visibilitychange при сворачивании — дублируем паузу по blur/focus окна.
+    window.addEventListener("blur", () => {
+      pauseTimer();
+      pauseAudio();
+      updateGameplayMarker();
+    });
+    window.addEventListener("focus", () => {
+      if (!document.hidden && !isPlatformPaused && !isPlatformAdOpen && els.winModal.hidden && els.failModal.hidden) {
+        resumeTimer();
+        resumeAudio();
+      }
+      updateGameplayMarker();
+    });
   }
 
-  function isInsidePlayArea(target) {
-    return Boolean(els.playArea && target && els.playArea.contains(target));
-  }
-
-  function preventGameAreaDefault(event) {
-    if (currentView !== "game" || !isInsidePlayArea(event.target) || !event.cancelable) return;
-    event.preventDefault();
+  function preventNativeMenuDefault(event) {
+    if (event.cancelable) event.preventDefault();
   }
 
   function preventGameViewportGesture(event) {
@@ -2468,8 +2738,10 @@
   }
 
   function bindGameplayNativeGestureBlockers() {
+    // Контекстное меню, выделение и перетаскивание игре не нужны нигде —
+    // блокируем по всему документу (требования платформы 1.6.1.8 / 1.6.2.7).
     ["contextmenu", "selectstart", "dragstart"].forEach((type) => {
-      document.addEventListener(type, preventGameAreaDefault, { capture: true });
+      document.addEventListener(type, preventNativeMenuDefault, { capture: true });
     });
     document.addEventListener("touchmove", preventGameViewportGesture, { passive: false });
     document.addEventListener("gesturestart", preventGameViewportGesture, { passive: false });

@@ -15,6 +15,21 @@ const archivePath = path.join(workspace, "releases", `${releaseName}.zip`);
 const baseRuntimeFiles = [
   "index.html",
   "favicon.svg",
+  "assets/fonts/fonts.css",
+  "assets/fonts/inter-400-latin.woff2",
+  "assets/fonts/inter-400-cyrillic.woff2",
+  "assets/fonts/inter-500-latin.woff2",
+  "assets/fonts/inter-500-cyrillic.woff2",
+  "assets/fonts/inter-600-latin.woff2",
+  "assets/fonts/inter-600-cyrillic.woff2",
+  "assets/fonts/inter-700-latin.woff2",
+  "assets/fonts/inter-700-cyrillic.woff2",
+  "assets/fonts/inter-800-latin.woff2",
+  "assets/fonts/inter-800-cyrillic.woff2",
+  "assets/fonts/nunito-800-latin.woff2",
+  "assets/fonts/nunito-800-cyrillic.woff2",
+  "assets/fonts/nunito-900-latin.woff2",
+  "assets/fonts/nunito-900-cyrillic.woff2",
   "assets/skins/v3/classic_red.png",
   "assets/skins/v3/taxi_yellow.png",
   "assets/skins/v3/mint_courier.png",
@@ -41,6 +56,7 @@ const baseRuntimeFiles = [
   "daily.js",
   "config.js",
   "texts.js",
+  "i18n.js",
   "yandex-sdk.js",
   "progress.js",
   "economy.js",
@@ -64,6 +80,7 @@ const syntaxFiles = [
   "daily.js",
   "config.js",
   "texts.js",
+  "i18n.js",
   "yandex-sdk.js",
   "progress.js",
   "economy.js",
@@ -390,7 +407,7 @@ function getRuntimeHash() {
 }
 
 function applyCacheVersion(index, versionHash) {
-  return index.replace(/(\.\/(?:(?:favicon|styles|yandex-sdk|level-bank\.generated|levels|yards|skins|daily|config|texts|progress|economy|rules|session|renderer|screens|tutorial|actors|input|ads|audio|game)\.(?:svg|css|js)|assets\/skins\/v3\/[a-z0-9_-]+\.png))\?v=[^"']+/g, `$1?v=${versionHash}`);
+  return index.replace(/(\.\/(?:(?:favicon|styles|yandex-sdk|level-bank\.generated|levels|yards|skins|daily|config|texts|i18n|progress|economy|rules|session|renderer|screens|tutorial|actors|input|ads|audio|game)\.(?:svg|css|js)|assets\/skins\/v3\/[a-z0-9_-]+\.png))\?v=[^"']+/g, `$1?v=${versionHash}`);
 }
 
 function formatBytes(bytes) {

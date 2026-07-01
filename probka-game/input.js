@@ -32,6 +32,7 @@
         intentSign: 0,
         range: deps.getAllowedRange(vehicle)
       });
+      if (deps.playSound) deps.playSound("select");
       try {
         deps.getCanvas().setPointerCapture(event.pointerId);
       } catch {
